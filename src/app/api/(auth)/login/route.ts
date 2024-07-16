@@ -24,9 +24,13 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ msg: "invalid password" }, { status: 400 });
     }
 
-    const token = jwt.sign({ username: user.email }, process.env.JWT_SECRET!, {
-      expiresIn: "72h",
-    });
+    const token = jwt.sign(
+      { user_email: user.email, user_id: user._id },
+      process.env.JWT_SECRET!,
+      {
+        expiresIn: "72h",
+      }
+    );
 
     const response = NextResponse.json(
       { msg: "login successful", token },
@@ -36,7 +40,7 @@ export const POST = async (req: NextRequest) => {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 3,
     });
-    return response
+    return response;
   } catch (error) {
     console.error(error);
     return NextResponse.json(JSON.stringify(error), { status: 500 });
