@@ -16,7 +16,7 @@ export const POST = async (req: NextRequest) => {
     }
 
     const user = await User.findOne({
-      _id: new mongoose.Types.ObjectId(user_id),
+      _id: new mongoose.Types.ObjectId(user_id as string),
     });
 
     if (!user) {
