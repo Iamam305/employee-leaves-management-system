@@ -26,7 +26,10 @@ const membership_schema = new mongoose.Schema(
     timestamps: true,
   }
 );
-const membership_model = mongoose.model("Membership", membership_schema);
 
 export const Membership =
-  (mongoose.models.Membership as typeof membership_model) || membership_model;
+  mongoose.models.Membership || mongoose.model("Membership", membership_schema);
+// const membership_model = mongoose.model();
+
+// export const Membership =
+// (mongoose.models.Membership as typeof membership_model) || membership_model;

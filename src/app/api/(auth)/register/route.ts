@@ -6,6 +6,7 @@ import { Org } from "@/models/org.model";
 import { Membership } from "@/models/membership.model";
 import { Resend } from "resend";
 import { connect_db } from "@/configs/db";
+import { EmailVerification } from "@/components/email-temp/EmailVerification";
 connect_db();
 const resend = new Resend(process.env.RESEND_API_KEY);
 export const POST = async (req: NextRequest) => {
@@ -29,7 +30,13 @@ export const POST = async (req: NextRequest) => {
     // Hash the peppered password
     const hashed_password = await bcrypt.hash(pepper_password, salt);
 
-    const verification_code = crypto.randomBytes(64).toString("hex");
+    // const verification_code = crypto.randomBytes(64).toString("hex");
+    // const hashed_verification_code = await bcrypt.hash(verification_code, salt);
+
+    const verification_code = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
     const hashed_verification_code = await bcrypt.hash(verification_code, salt);
 
     const new_user = new User({
@@ -50,10 +57,14 @@ export const POST = async (req: NextRequest) => {
     });
 
     const { data, error } = await resend.emails.send({
-      from: "Acme <onboarding@resend.dev>",
+      from: "Acme <team@qtee.ai>",
       to: email,
       subject: "Verification Code",
-      text: verification_code + "+" + new_user._id,
+      react: EmailVerification({
+        code: verification_code,
+        userId: new_user._id,
+      }),
+      html: "5",
     });
 
     if (error) {
