@@ -6,7 +6,7 @@ import { Org } from "@/models/org.model";
 import { Membership } from "@/models/membership.model";
 import { Resend } from "resend";
 import { connect_db } from "@/configs/db";
-import { EmailVerification } from "@/components/email-temp/EmailVerification";
+import { EmailVerification } from "@/components/email-temp/EmailVerificationTemplate";
 connect_db();
 const resend = new Resend(process.env.RESEND_API_KEY);
 export const POST = async (req: NextRequest) => {
