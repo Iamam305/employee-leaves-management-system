@@ -18,11 +18,11 @@ export const CurrentUserProvider = ({
   const dispatch = useDispatch();
   const getCurrentUser = async () => {
     try {
-      const res = await axios.get("/api/auth/me");
+      const res = await axios.get("/api/me");
       //   console.log("in contect====>", res);
       if (res.data) {
         dispatch(login(res.data.user));
-        // console.log("res.data===>", res.data);
+        console.log("res.data===>", res.data);
         setIsAuth(true);
         if (res.data.membership === null) router.push("/membership");
         dispatch(selectMembership(res.data.membership));
