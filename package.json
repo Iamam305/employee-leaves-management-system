@@ -9,7 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@nextui-org/react": "^2.4.6",
     "@radix-ui/react-slot": "^1.1.0",
+    "@reduxjs/toolkit": "^2.2.6",
     "axios": "^1.7.2",
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
@@ -18,8 +20,13 @@
     "lucide-react": "^0.408.0",
     "mongoose": "^8.5.1",
     "next": "14.2.5",
+    "next13-progressbar": "^1.2.1",
     "react": "^18",
     "react-dom": "^18",
+    "react-query": "^3.39.3",
+    "react-redux": "^9.1.2",
+    "redux": "^5.0.1",
+    "redux-persist": "^6.0.0",
     "resend": "^3.4.0",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.4.0",
