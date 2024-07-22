@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useUserLogin } from "@/lib/react-query/queryAndMutation";
 
 const Login = () => {
   const [email, setEmail] = useState<string>("");
@@ -13,16 +14,28 @@ const Login = () => {
 
   const router = useRouter();
 
+  const { mutateAsync: LoginUser, isLoading, isError } = useUserLogin();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post("/api/login", {
-        email,
-        password,
-      });
+
+      // const response = await axios.post("/api/login", {
+      //   email,
+      //   password,
+      // });
+      const response = await LoginUser({
+          email,
+          password,
+        });
+
+      if (response.data) {
+        toast.success(response.data.message);
+        window.location.href = "/dashboard";
+      }
       console.log("Success response:", response.data);
-      toast.success(response.data.message || "Login successful");
+      // toast.success(response.data.message || "Login successful");
     } catch (error: any) {
       toast.error(error.response.data.msg || "An error occurred during login");
     } finally {
@@ -66,7 +79,7 @@ const Login = () => {
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-            Login
+          {isLoading ? "Loading..." : "Login"}
           </Button>
           <h1 className="w-full text-end mt-2">
             Click here to

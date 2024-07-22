@@ -33,7 +33,7 @@ const Register = () => {
       toast.success("Email Sent Successfully");
       console.log("Registration successful", response.data);
       setSuccess(true);
-      router.push("/verify-mail");
+      router.push(`/notification?value=${"Verification Code"}&email=${email}`);
     } catch (error: any) {
       toast.error(error.response.data.msg || "An error occurred during login");
       console.error("Registration error", error);
@@ -139,14 +139,12 @@ const Register = () => {
         </Button>
 
         <h1 className="w-full text-end mt-2">
-        Click here to
-        <Link href="/login">
-          <span className="text-blue-500"> Login</span>
-        </Link>
-      </h1>
-
+          Click here to
+          <Link href="/login">
+            <span className="text-blue-500"> Login</span>
+          </Link>
+        </h1>
       </form>
-      
     </div>
   );
 };
