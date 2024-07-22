@@ -25,20 +25,25 @@ import {
   UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import Image from "next/image";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const pathname = usePathname();
+
+  const router = useRouter();
+
   const handleLogout = async () => {
     try {
-      const res = await axios.get("/api/auth/logout");
+      const res = await axios.get("/api/logout");
       if (res.data) {
-        window.location.href = "/login";
+        toast.success(res.data.msg);
+        router.push("/login");
       }
     } catch (error) {
       console.log(error);

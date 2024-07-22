@@ -20,19 +20,18 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-
       // const response = await axios.post("/api/login", {
       //   email,
       //   password,
       // });
       const response = await LoginUser({
-          email,
-          password,
-        });
+        email,
+        password,
+      });
 
       if (response.data) {
-        toast.success(response.data.message);
-        window.location.href = "/dashboard";
+        toast.success(response.data.msg);
+        router.push("/dashboard");
       }
       console.log("Success response:", response.data);
       // toast.success(response.data.message || "Login successful");
@@ -79,7 +78,7 @@ const Login = () => {
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-          {isLoading ? "Loading..." : "Login"}
+            {isLoading ? "Loading..." : "Login"}
           </Button>
           <h1 className="w-full text-end mt-2">
             Click here to
