@@ -1,10 +1,12 @@
 import { ForgotPasswordEmailTemplate } from "@/components/email-temp/ForgotPasswordTemplate";
+import { connect_db } from "@/configs/db";
 import { User } from "@/models/user.model";
 import bcrypt from "bcrypt";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+connect_db();
 
 export async function POST(req: NextRequest) {
   try {

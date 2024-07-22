@@ -1,7 +1,10 @@
+import { connect_db } from "@/configs/db";
 import { User } from "@/models/user.model";
-import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import { NextRequest, NextResponse } from "next/server";
+connect_db();
+
 export const POST = async (req: NextRequest) => {
   try {
     console.log("Received request to verify email");

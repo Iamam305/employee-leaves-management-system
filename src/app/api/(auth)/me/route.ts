@@ -1,5 +1,7 @@
+import { connect_db } from "@/configs/db";
 import { auth_middleware } from "@/lib/auth-middleware";
 import { NextRequest, NextResponse } from "next/server";
+connect_db();
 
 export async function GET(req: NextRequest) {
   try {
