@@ -1,4 +1,4 @@
-import ChangePassword from "@/components/Auth/ChangePassword";
+import ChangePasswordPage from "@/components/Auth/ChangePassword";
 import React from "react";
 
 const page = () => {
@@ -17,7 +17,7 @@ const page = () => {
           </div>
         </div>
         <div className="md:w-[55%] w-[100%] h-full  flex items-center justify-center">
-          <ChangePassword />
+          <ChangePasswordPage />
         </div>
       </div>
     </>

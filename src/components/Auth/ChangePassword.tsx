@@ -4,31 +4,33 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import axios from "axios";
 import { toast } from "sonner";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const ChangePassword = () => {
-  const [email, setEmail] = useState<string>("");
-  const [emailError, setEmailError] = useState<string>("");
-
-  const validateEmail = (email: string) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
+  const [password, setPassword] = useState<string>("");
+  const [passwordError, setPasswordError] = useState<string>("");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const user_id = searchParams.get("userId");
+  const validatePassword: any = (password: string) => {
+    return password.length >= 8;
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateEmail(email)) {
-      setEmailError("Please enter a valid email address");
+    if (!validatePassword(password)) {
+      setPasswordError("Please enter a valid email address");
       return;
     }
-    setEmailError("");
+    setPasswordError("");
     try {
-      const response = await axios.post("/api/forgot-password", {
-        email,
+      const response = await axios.patch("/api/forgot-password", {
+        user_id,
+        password,
       });
       if (response.data) {
         toast.success(response.data.msg);
+        router.push("/login");
       }
-      console.log(response.data);
     } catch (error: any) {
       toast.error(
         error.response?.data?.msg || "An error occurred while sending email"
@@ -48,18 +50,18 @@ const ChangePassword = () => {
         <form className="space-y-8 mt-4" onSubmit={handleSubmit}>
           <div className="flex flex-col">
             <label htmlFor="email" className="mb-2 font-medium">
-              Email
+              Password
             </label>
             <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your Password"
               className="border rounded p-2"
             />
-            {emailError && (
-              <p className="text-red-500 text-sm mt-1">{emailError}</p>
+            {passwordError && (
+              <p className="text-red-500 text-sm mt-1">{passwordError}</p>
             )}
           </div>
           <Button type="submit" className="w-full">
@@ -77,4 +79,12 @@ const ChangePassword = () => {
   );
 };
 
-export default ChangePassword;
+const ChangePasswordPage: React.FC = ({ children }: any) => {
+  return (
+    <React.Suspense fallback={<div>Loading...</div>}>
+      <ChangePassword />
+    </React.Suspense>
+  );
+};
+
+export default ChangePasswordPage;
