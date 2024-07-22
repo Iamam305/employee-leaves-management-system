@@ -1,8 +1,8 @@
 import { ForgotPasswordEmailTemplate } from "@/components/email-temp/ForgotPasswordTemplate";
 import { User } from "@/models/user.model";
+import bcrypt from "bcrypt";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import bcrypt from "bcrypt";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function PUT(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   try {
     const { password, user_id } = await req.json();
     // const user = await User.findById(user_id);

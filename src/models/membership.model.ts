@@ -1,4 +1,4 @@
-import mongoose, { InferSchemaType } from "mongoose";
+import mongoose from "mongoose";
 const schema = {};
 const membership_schema = new mongoose.Schema(
   {
@@ -10,7 +10,7 @@ const membership_schema = new mongoose.Schema(
     org_id: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "User",
+      ref: "Org",
     },
     role: {
       type: String,
