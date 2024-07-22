@@ -1,13 +1,9 @@
 import { auth_middleware } from "@/lib/auth-middleware";
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
-    const token = req.cookies.get("token")?.value;
-    if (!token) {
-      return NextResponse.json({ msg: "No token provided" }, { status: 401 });
-    }
-    const user = await auth_middleware({ token });
+    const user = await auth_middleware(req);
     if (!user) {
       return NextResponse.json(
         { error: "User does not exist" },
