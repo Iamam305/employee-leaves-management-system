@@ -21,7 +21,7 @@ export const CurrentUserProvider = ({
       const res = await axios.get("/api/me");
       //   console.log("in contect====>", res);
       if (res.data) {
-        dispatch(login(res.data.user));
+        dispatch(login(res.data[0].user));
         console.log("res.data===>", res.data);
         setIsAuth(true);
         if (res.data.membership === null) router.push("/membership");

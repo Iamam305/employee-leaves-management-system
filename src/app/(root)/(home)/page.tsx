@@ -13,11 +13,11 @@ const Page = () => {
   //not changed for demo working
   useEffect(() => {
     if (isAuth) {
-    //   window.location.href = "/dashboard";
+      window.location.href = "/dashboard";
     console.log("authenticated user")
 
     } else {
-    //   window.location.href = "/login";
+      window.location.href = "/login";
     console.log("not authenticated user")
     }
   }, []);
