@@ -25,7 +25,7 @@ const Page = () => {
 
   useEffect(() => {
     inputRefs.current = inputRefs.current.slice(0, emails.length);
-    console.log(inputRefs.current)
+    console.log(inputRefs.current);
   }, [emails]);
 
   const handleChange =
@@ -70,7 +70,7 @@ const Page = () => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("submitted",emails,orgId,userRole);
+    console.log("submitted", emails, orgId, userRole);
     console.log(emails);
   };
 
@@ -134,9 +134,9 @@ const Page = () => {
           </div>
           <div className="">
             <span className=" text-xs">
-              "Please enter email addresses, pressing Enter after each email.
-              Remember not to use commas; simply type the email address and then
-              press Enter to continue."
+              &quot;Please enter email addresses, pressing Enter after each
+              email. Remember not to use commas; simply type the email address
+              and then press Enter to continue.&quot;
             </span>
           </div>
 
