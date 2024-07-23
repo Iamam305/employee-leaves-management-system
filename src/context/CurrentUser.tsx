@@ -24,8 +24,8 @@ export const CurrentUserProvider = ({
         dispatch(login(res.data[0].user));
         console.log("res.data===>", res.data);
         setIsAuth(true);
-        if (res.data.membership === null) router.push("/membership");
-        dispatch(selectMembership(res.data.membership));
+        if (res.data[0].membership === null) router.push("/membership");
+        dispatch(selectMembership(res.data[0].membership));
       }
     } catch (error) {
       console.log(error);
