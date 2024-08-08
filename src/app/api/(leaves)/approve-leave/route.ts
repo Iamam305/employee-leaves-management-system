@@ -51,19 +51,19 @@ export const POST = async (req : NextRequest) => {
 
 
         // send message to employee for status changed
-        // const { data, error } = await resend.emails.send({
-        //     from: "Acme <team@qtee.ai>",
-        //     to: "sgrlekhwani@gmail.com",
-        //     subject: "Leave Status changed",
-        //     react: LeaveStatusEmail({
-        //         employeeName : `${updateleave.user_id}`,
-        //         leaveStartDate : `${updateleave.start_date}`,
-        //         leaveEndDate : `${updateleave.end_date}`,
-        //         leaveReason :  `${updateleave.leave_type_id.name}`,
-        //         StatusOfLeave:`${updateleave.status}`,
-        //     }),
-        //     html: "5",
-        //   });
+        const { data, error } = await resend.emails.send({
+            from: "Acme <team@qtee.ai>",
+            to: "sgrlekhwani@gmail.com",
+            subject: "Leave Status changed",
+            react: LeaveStatusEmail({
+                employeeName : `${updateleave.user_id}`,
+                leaveStartDate : `${updateleave.start_date}`,
+                leaveEndDate : `${updateleave.end_date}`,
+                leaveReason :  `${updateleave.leave_type_id.name}`,
+                StatusOfLeave:`${updateleave.status}`,
+            }),
+            html: "5",
+          });
 
         //if not manager than send to hr or admin
 
