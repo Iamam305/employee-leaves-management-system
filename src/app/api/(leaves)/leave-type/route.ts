@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 connect_db();
 
-
+//create Leave Type
 export const POST = async (req: NextRequest) => {
     try {
         const { role, org_id, Leave_Type_Name, Leave_Type_Description, carryforward, count } = await req.json();
@@ -37,7 +37,7 @@ export const POST = async (req: NextRequest) => {
 };
 
 
-
+// get all Leave Types
 export const GET = async (req: NextRequest) => {
     try {
         const leavtypes = await LeaveType.find();
