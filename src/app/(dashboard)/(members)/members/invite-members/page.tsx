@@ -1,6 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import React, {
   useState,
   FormEvent,
@@ -15,6 +17,9 @@ const Page = () => {
   const [emails, setEmails] = useState<string[]>([""]);
   const [orgId, setOrgId] = useState<string>("");
   const [userRole, setUserRole] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const router = useRouter();
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -68,20 +73,33 @@ const Page = () => {
     }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("submitted", emails, orgId, userRole);
-    console.log(emails);
-  };
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/org/invite-member", {
+        emails,
+        org_id: orgId,
+        role: userRole,
+      });
 
-  console.log("emails: ", emails);
-  console.log("org_id => ", orgId);
-  console.log("Role: ", userRole);
+      toast.success(response.data.msg);
+      router.push("/members");
+      setLoading(false);
+    } catch (error: any) {
+      console.log(error.message);
+      toast.error(
+        error.response.data.msg ||
+          "An error occurred during sending invitations"
+      );
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="p-4">
       <div className=" flex justify-between w-full">
-        <h1 className="text-2xl font-bold mb-4  mx-auto">Invite Members</h1>
+        <h1 className="text-3xl font-bold mb-4  mx-auto">Invite Members</h1>
         <div className="flex gap-2">
           {/* <Button type="button" onClick={addEmailField} variant="secondary">
             Add Another Email
@@ -89,11 +107,11 @@ const Page = () => {
         </div>
       </div>
 
-      <div className="bg-gray-100 p-6 rounded-lg md:w-[66%] w-full mx-auto">
+      <div className="bg-gray-100 p-8 pb-10 rounded-lg w-full mx-auto">
         <div className="mb-3">
           <label htmlFor="userEmail">User Email</label>
         </div>
-        <form className=" flex flex-col gap-4">
+        <form className=" flex flex-col gap-4" onSubmit={handleSubmit}>
           <div className=" flex w-full p-3 gap-1 border-2 flex-wrap">
             {emails.map((email, index) => (
               <div
@@ -108,6 +126,7 @@ const Page = () => {
                   value={email}
                   onChange={handleChange(index)}
                   onKeyDown={handleKey(index)}
+                  required
                   placeholder="Enter email"
                   className={`
             flex-grow-0 bg-transparent
@@ -126,7 +145,7 @@ const Page = () => {
                     onClick={() => removeEmailField(index)}
                     className="absolute right-0.5 top-1/2 transform -translate-y-1/2 text-black cursor-pointer text-sm font-medium  rounded-full bg-white h-4 w-4 flex items-center justify-center"
                   >
-                    {/* < className=" h-3 w-3"/> */}X
+                    X
                   </span>
                 )}
               </div>
@@ -147,11 +166,14 @@ const Page = () => {
               id=""
               className="  p-3 hover:cursor-pointer rounded-md"
               onChange={(e) => setOrgId(e.target.value)}
+              required
             >
               <option value="">Select The Group</option>
               <option value="val1">Mushroom World</option>
               <option value="val2">Mushroom Health</option>
-              <option value="val3">Mushroom FutureTech</option>
+              <option value="669f97ab186ea1a384360673">
+                Mushroom FutureTech
+              </option>
               <option value="val4">Mushroom Film</option>
               <option value="val5">Mushroom Fitness</option>
             </select>
@@ -164,16 +186,16 @@ const Page = () => {
               id=""
               className="  p-3 hover:cursor-pointer rounded-md"
               onChange={(e) => setUserRole(e.target.value)}
+              required
             >
               <option value="">Select The Role</option>
-              <option value="val1">Admin</option>
-              <option value="val2">Hr</option>
-              <option value="val3">Employee</option>
-              <option value="val4">Manager</option>
+              <option value="hr">Hr</option>
+              <option value="employee">Employee</option>
+              <option value="manager">Manager</option>
             </select>
           </div>
-          <Button type="submit" onClick={handleSubmit as any}>
-            Submit
+          <Button type="submit" disabled={loading}>
+            {loading ? "Submitting ...." : "Submit"}
           </Button>
         </form>
       </div>
