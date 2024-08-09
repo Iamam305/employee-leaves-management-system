@@ -1,8 +1,12 @@
+import StatsCards from '@/components/dashboard/StateCards'
 import React from 'react'
 
 const page = () => {
   return (
-    <div>Dashboard page</div>
+    <>
+    <h1>Dashboard</h1>
+    <StatsCards />
+    </>
   )
 }
 

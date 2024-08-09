@@ -12,6 +12,7 @@ const leave_type = new mongoose.Schema(
     org_id: {
       type: mongoose.Types.ObjectId,
       required: true,
+      ref:"Org"
     },
 
     does_carry_forward: {
