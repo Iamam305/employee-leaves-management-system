@@ -1,7 +1,7 @@
 import StatsCards from '@/components/dashboard/StateCards'
 import React from 'react'
 
-const page = () => {
+const Page = () => {
   return (
     <>
     <h1>Dashboard</h1>
@@ -10,7 +10,7 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
 
 
 

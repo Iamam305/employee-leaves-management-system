@@ -4,7 +4,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 
-const page = () => {
+const Page = () => {
   
   const [leavedata, setLeavedata] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -148,4 +148,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
