@@ -71,7 +71,7 @@ export const POST = async (req : NextRequest) => {
 
 export const GET = async (req: NextRequest) => {
     try {
-        const leaves = await Leave.find();
+        const leaves = await Leave.find().populate('user_id' ,  "-password -createdAt -updatedAt -verification_code -is_verified").populate("leave_type_id");
         return NextResponse.json({ msg: "All Leaves fetched Successfully" , data: leaves}, { status: 200 });
         
     } catch (error) {

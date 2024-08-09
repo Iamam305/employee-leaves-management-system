@@ -4,20 +4,22 @@ export function middleware(request: NextRequest) {
   console.log(new Date(), request.method, "=>", request.nextUrl.href);
   const path = request.nextUrl.pathname;
   const auth_path =
-    path === "/login" || path === "/register" || path == "/verify-mail";
+    path === "/login" || path === "/register" || path === "/verify-mail";
   const is_private_path =
-    request.nextUrl.pathname.startsWith("/api") ||
-    request.nextUrl.pathname.startsWith("/dashboard");
+    path.startsWith("/api") || 
+    path.startsWith("/dashboard") || 
+    path.startsWith("/members") || 
+    path.startsWith("/leaves");
   const token = request.cookies.get("token")?.value || "";
   const is_bg_server = process.env.IS_BG_SERVER;
 
   if (is_bg_server == "true") {
-    if (request.nextUrl.pathname.startsWith("/api")) {
+    if (path.startsWith("/api")) {
       return NextResponse.next();
     } else {
       return NextResponse.redirect(
         new URL(
-          `https://qtee.ai/${request.nextUrl.pathname}`,
+          `https://qtee.ai${path}`,
           request.nextUrl
         ).toString()
       );
@@ -31,13 +33,20 @@ export function middleware(request: NextRequest) {
     if (
       is_private_path &&
       !token &&
-      !request.nextUrl.pathname.startsWith("/api/")
+      !path.startsWith("/api/")
     ) {
       return NextResponse.redirect(
         new URL("/login", request.nextUrl).toString()
       );
     }
+    if (path === "/" && token) {
+      return NextResponse.redirect(
+        new URL("/dashboard", request.nextUrl).toString()
+      );
+    }
   }
+
+  return NextResponse.next();
 }
 
 export const config = {

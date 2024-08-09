@@ -3,6 +3,7 @@ import { LineChart, UsersIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { TbListCheck } from "react-icons/tb";
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -45,6 +46,17 @@ const Sidebar = () => {
               >
                 <UsersIcon className="h-4 w-4" />
                 Members
+              </Link>
+              <Link
+                href="/leave"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 ${
+                  pathname.includes("members")
+                    ? "bg-muted text-primary"
+                    : "text-muted-foreground"
+                }  transition-all hover:text-primary`}
+              >
+                <TbListCheck className="h-4 w-4" />
+                Leaves
               </Link>
             </nav>
           </div>

@@ -5,10 +5,12 @@ const leave_schema = new mongoose.Schema(
     user_id: {
       type: mongoose.Types.ObjectId,
       required: true,
+      ref:"User"
     },
     leave_type_id: {
       type: mongoose.Types.ObjectId,
       required: true,
+      ref: "LeaveType"
     },
     org_id: {
       type: mongoose.Types.ObjectId,

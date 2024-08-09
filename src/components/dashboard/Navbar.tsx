@@ -32,6 +32,7 @@ import { Input } from "../ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import Image from "next/image";
 import { toast } from "sonner";
+import { TbListCheck } from "react-icons/tb";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -99,6 +100,19 @@ const Navbar = () => {
             >
               <UsersIcon className="h-5 w-5" />
               Members
+            </Link>
+            <Link
+              href="/leave"
+              className={`mx-[-0.65rem] flex items-center gap-4
+              ${
+                pathname.includes("members")
+                  ? "bg-muted text-primary"
+                  : "text-muted-foreground"
+              } 
+              rounded-xl px-3 py-2  hover:text-foreground`}
+            >
+              <TbListCheck className="h-5 w-5" />
+              Leaves
             </Link>
           </nav>
         </SheetContent>
