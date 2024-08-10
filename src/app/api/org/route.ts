@@ -1,26 +1,22 @@
 import { connect_db } from "@/configs/db";
-import { Membership } from "@/models/membership.model";
+import { Org } from "@/models/org.model";
 import { NextRequest, NextResponse } from "next/server";
 
 connect_db();
 
 export async function GET(req: NextRequest) {
   try {
-    const membership = await Membership.find().populate(
-      "user_id",
-      "-password -createdAt -updatedAt -verification_code -is_verified"
-    );
+    const all_orgs = await Org.find();
     return NextResponse.json(
       {
-        membership,
+        all_orgs,
       },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Error fetching orgs:", error);
     return NextResponse.json(
-      {
-        msg: "Something went wrong",
-      },
+      { error: error.message || "Internal Server Error" },
       { status: 500 }
     );
   }

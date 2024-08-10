@@ -16,6 +16,7 @@ import { toast } from "sonner";
 const Page = () => {
   const [emails, setEmails] = useState<string[]>([""]);
   const [orgId, setOrgId] = useState<string>("");
+  const [orgs, setOrgs] = useState<any>([]);
   const [userRole, setUserRole] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -96,18 +97,29 @@ const Page = () => {
     }
   };
 
+  const fetch_all_orgs = async () => {
+    try {
+      const { data } = await axios.get("/api/org");
+      setOrgs(data.all_orgs);
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  };
+
+  useEffect(() => {
+    fetch_all_orgs();
+  }, []);
+
+  console.log("Org---> ", orgs);
+
   return (
     <div className="p-4">
       <div className=" flex justify-between w-full">
         <h1 className="text-3xl font-bold mb-4  mx-auto">Invite Members</h1>
-        <div className="flex gap-2">
-          {/* <Button type="button" onClick={addEmailField} variant="secondary">
-            Add Another Email
-          </Button> */}
-        </div>
       </div>
 
-      <div className="bg-gray-100 p-8 pb-10 rounded-lg w-full mx-auto">
+      <div className="bg-gray-100 p-8 pb-10 md:w-[70%] rounded-lg w-full mx-auto">
         <div className="mb-3">
           <label htmlFor="userEmail">User Email</label>
         </div>
@@ -169,13 +181,11 @@ const Page = () => {
               required
             >
               <option value="">Select The Group</option>
-              <option value="val1">Mushroom World</option>
-              <option value="val2">Mushroom Health</option>
-              <option value="669f97ab186ea1a384360673">
-                Mushroom FutureTech
-              </option>
-              <option value="val4">Mushroom Film</option>
-              <option value="val5">Mushroom Fitness</option>
+              {orgs.map((org: any, index: any) => (
+                <option key={index} value={org._id}>
+                  {org.name}
+                </option>
+              ))}
             </select>
           </div>
 

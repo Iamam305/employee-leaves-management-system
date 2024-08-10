@@ -1,74 +1,87 @@
 "use client";
-import TableComponent from "@/components/dashboard/TableComponent";
-import React from "react";
-import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
-import RoleButton from "@/components/dashboard/RoleButton";
-import Link from "next/link";
-
-const data: any = [
-  { username: "JohnDoe", email: "john.doe@example.com", role: "Admin" },
-  { username: "JaneSmith", email: "jane.smith@example.com", role: "User" },
-  {
-    username: "MikeJohnson",
-    email: "mike.johnson@example.com",
-    role: "Editor",
-  },
-  { username: "EmilyBrown", email: "emily.brown@example.com", role: "User" },
-  {
-    username: "ChrisWilson",
-    email: "chris.wilson@example.com",
-    role: "Manager",
-  },
-  { username: "SarahDavis", email: "sarah.davis@example.com", role: "User" },
-  { username: "AlexTaylor", email: "alex.taylor@example.com", role: "Admin" },
-  {
-    username: "OliviaWhite",
-    email: "olivia.white@example.com",
-    role: "Editor",
-  },
-  { username: "DanielLee", email: "daniel.lee@example.com", role: "User" },
-  {
-    username: "SophiaClark",
-    email: "sophia.clark@example.com",
-    role: "Manager",
-  },
-];
-
-const columns: ColumnDef<any>[] = [
-  {
-    header: "username",
-    accessorKey: "username",
-  },
-  {
-    header: "Email",
-    accessorKey: "email",
-  },
-  {
-    header: "Role",
-    accessorKey: "role",
-    cell: ({ row }) => <RoleButton role={row.original.role} />,
-  },
-];
+import React, { useCallback, useEffect, useState } from "react";
+import { MemberTableClient } from "@/components/table/memberTable/client";
+import axios from "axios";
+import { usePathname, useRouter } from "next/navigation";
+import { debounce } from "@/lib/utils";
 
 const Page = () => {
+  const [members, setMembers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [name, setName] = useState<string>("");
+  const [orgs, setOrgs] = useState<any>([]);
+  const [orgId, setOrgId] = useState<any>("");
+
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const fetchMembers = useCallback(
+    debounce(async () => {
+      try {
+        const { data } = await axios.get(
+          `/api/org/get-members?name=${name}&org_id=${orgId}`
+        );
+        const flattenedMembers = data.all_members.flat().map((member: any) => ({
+          username: member.user_id?.name ?? "N/A",
+          email: member.user_id?.email ?? "N/A",
+          role: member.role,
+          orgName: member.org_id?.name ?? "N/A",
+        }));
+        setMembers(flattenedMembers);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching members:", error);
+        setIsLoading(false);
+      }
+    }, 1000),
+    [name, orgId]
+  );
+
+  useEffect(() => {
+    fetchMembers();
+  }, [name, fetchMembers]);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams();
+    if (name) {
+      queryParams.set("name", name);
+    }
+    if (orgId) {
+      queryParams.set("org_id", orgId);
+    }
+    const queryString = queryParams.toString();
+    const newPath = queryString ? `${pathname}?${queryString}` : pathname;
+
+    router.push(newPath);
+  }, [name, orgId, pathname, router]);
+
+  const fetch_all_orgs = async () => {
+    try {
+      const { data } = await axios.get("/api/org");
+      setOrgs(data.all_orgs);
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  };
+
+  useEffect(() => {
+    fetch_all_orgs();
+  }, []);
+
+  console.log("Org---> ", orgs);
+
   return (
-    <div className="p-4 ">
-      <div className=" flex justify-between">
-        <h1 className="text-2xl font-bold mb-4">Members</h1>
-        <div>
-          <Button className="w-full py-2 px-4 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
-            <Link href={"/members/invite-members"}>
-              <div className="flex items-center justify-center space-x-2">
-                <PlusCircle className="h-5 w-5" />
-                <span>Invite Members</span>
-              </div>
-            </Link>
-          </Button>
-        </div>
-      </div>
-      <TableComponent data={data} columns={columns} />
+    <div className="p-4">
+      <MemberTableClient
+        data={members}
+        isLoading={isLoading}
+        name={name}
+        setName={setName}
+        orgs={orgs}
+        setOrgs={setOrgs}
+        setOrgId={setOrgId}
+      />
     </div>
   );
 };
