@@ -50,7 +50,7 @@ const Sidebar = () => {
               <Link
                 href="/leave"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 ${
-                  pathname.includes("members")
+                  pathname.includes("leave")
                     ? "bg-muted text-primary"
                     : "text-muted-foreground"
                 }  transition-all hover:text-primary`}
