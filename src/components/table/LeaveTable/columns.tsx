@@ -27,8 +27,14 @@ const truncateText = (text: any, length: number) => {
 
 export const columns: ColumnDef<LeavetypeInterface>[] = [
   {
+    accessorKey: "index",
+    header: "S.No",
+    cell: ({ row }) =>
+      truncateText(row.index + 1 || "N/A", 10),
+  },
+  {
     accessorKey: "user_id",
-    header: "User Name",
+    header: "Employee Name",
     cell: ({ row }) =>
       
       truncateText(row.original.user_id.name || "N/A", 10),
@@ -43,21 +49,29 @@ export const columns: ColumnDef<LeavetypeInterface>[] = [
   },
   {
     accessorKey: "org_id",
-    header: "Org id",
+    header: "Orgnisation Name",
     cell: ({ row }) => <LeaveToolTip data={row.original.org_id} />,
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      <Badge>{row.original.status}</Badge>
+      row.original.status === "pending" ? (
+        <Badge variant="warning">{row.original.status}</Badge>
+      ) : (
+        row.original.status === "approved" ? (
+          <Badge variant="success">{row.original.status}</Badge>
+        ) : (
+          <Badge variant="destructive">{row.original.status}</Badge>
+        )
+      )
     ),
   },
   {
     accessorKey: "",
     header: "View",
     cell: ({ row }) => (
-      <LeaveModal title="View"/>
+      <LeaveModal title="View" accessorKey={row.original}/>
     ),
   },
 ];
