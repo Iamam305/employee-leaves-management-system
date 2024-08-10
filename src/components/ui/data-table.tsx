@@ -84,7 +84,7 @@ export function DataTable<TData, TValue>({
             <select
               name="group_name"
               id=""
-              className="p-3 hover:cursor-pointer rounded-md bg-transparent border"
+              className="pl-2 hover:cursor-pointer rounded-md bg-transparent border"
               onChange={(e) => setOrgId(e.target.value)}
               required
             >

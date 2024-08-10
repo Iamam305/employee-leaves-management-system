@@ -6,12 +6,14 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 
-export function debounce(func: (...args: any[]) => void, delay: number) {
-  let timeoutId: NodeJS.Timeout;
-  return function (...args: any[]) {
-    if (timeoutId) clearTimeout(timeoutId);
+export const debounce = (func:any, delay:any) => {
+  let timeoutId:any;
+  return (...args:any) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
     timeoutId = setTimeout(() => {
       func(...args);
     }, delay);
   };
-}
+};
