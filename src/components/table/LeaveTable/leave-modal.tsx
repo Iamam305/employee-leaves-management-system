@@ -1,9 +1,16 @@
 "use client";
-import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
+import { Separator } from "@/components/ui/separator";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LeavetypeInterface } from "@/lib/type";
 import { Description } from "@radix-ui/react-dialog";
-import React, { useState } from "react";
+import axios from "axios";
+import dayjs from "dayjs";
+import { set } from "mongoose";
+import React, { useEffect, useState } from "react";
 
 const truncateText = (text: any, length: number) => {
   const str = text ? String(text) : "";
@@ -12,33 +19,25 @@ const truncateText = (text: any, length: number) => {
 
 const LeaveModal: React.FC<{
   title: string;
-  // accessorKey: keyof LeavetypeInterface;
+  accessorKey: any;
   // row: LeavetypeInterface;
-}> = ({ title}) => {
+}> = ({ title , accessorKey}) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [dataleave, setdataleave] = useState([])
+  const [isloading , setIsLoading] = useState(false)
+console.log(accessorKey)
+  
+// useEffect(() => {
+// (async() => {
+//   try {
+//     setIsLoading(true);
+//     const {data} = axios.get(`/api/leave/${accessorKey}`)
+//   } catch (error) {
+    
+//   }
+// })
+// }, [])
 
-  // const getData = () => {
-  //   const data = row[accessorKey];
-  //   return Array.isArray(data) ? data : [data];
-  // };
-
-  // const truncatedText = (() => {
-  //   if (accessorKey === "user_id") {
-  //     return truncateText(
-  //       row[accessorKey]?.name ||
-  //         "N/A",
-  //       10
-  //     );
-  //   }
-  //   if (accessorKey === "leave_type_id") {
-  //     return truncateText(
-  //       row[accessorKey]?.name ||
-  //         "N/A",
-  //       10
-  //     );
-  //   }
-  //   return truncateText(row[accessorKey] || "N/A", 10);
-  // })();
 
   return (
     <>
@@ -51,80 +50,89 @@ const LeaveModal: React.FC<{
       {/* {truncatedText !== "N/A" && ( */}
         <>
           <Modal
-            title={title}
-            description={`Detailed view of ${title}`}
+            title="Leave Application"
+            description={accessorKey.status}
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
           >
             {/* <div className="p-4"> */}
             <div className="p-4 max-h-[60vh]  overflow-y-auto">
-              {/* {accessorKey === "agent_actions" ? (
-                <ul className="list-none pl-5">
-                  {row[accessorKey]?.map((action) => (
-                    <Card className=" mt-3 p-3">
-                      <li key={action._id}>
-                        <strong>Action:</strong> {action.action} <br />
-                        <strong>Timestamp:</strong> {action.timestamp}
-                      </li>
-                    </Card>
-                  ))}
-                </ul>
-              ) : accessorKey === "product_analysis" ? (
-                <ul className="list-none pl-5">
-                  {row[accessorKey]?.map((item, index) => (
-                    <Card className=" mt-3 p-3">
-                      <li key={index}>
-                        <strong>Correct Answer:</strong> {item.correct_answer}{" "}
-                        <br />
-                        <strong>Is Correct:</strong>{" "}
-                        {item.is_correct ? "Yes" : "No"} <br />
-                        <strong>Similarity:</strong> {item.similarity} <br />
-                        <strong>Info is in Context:</strong>{" "}
-                        {item.info_is_in_context ? "Yes" : "No"}
-                      </li>
-                    </Card>
-                  ))}
-                </ul>
-              ) : accessorKey === "parameter_analysis" ? (
-                <>
-                  <ul className="list-none pl-5">
-                    {row[accessorKey]?.map((item, index) => (
-                      <Card className=" mt-3 p-3">
-                        <li key={index}>
-                          <strong>Parameter Name:</strong> {item.parameter_name}{" "}
-                          <br />
-                          <strong>Area Of Improvement</strong>{" "}
-                          {item.area_of_improvement} <br />
-                          <strong>Criteria Description</strong>
-                          {item.criteria_description} <br />
-                          <strong>Followed:</strong>
-                          {item.followed ? "True" : "False"} <br />
-                        </li>
-                      </Card>
-                    ))}
-                  </ul>
-                </>
-              ) : (
-                <ul className="list-disc pl-5">
-                  {getData().map((item, index) => (
-                    <li key={index}>
-                      {typeof item === "object" && item !== null ? (
-                        <div>
-                          {Object.entries(item).map(([subKey, subValue]) => (
-                            <div key={subKey}>
-                              <strong>{subKey}:</strong> {subValue}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        item
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )} */}
-              Leave Modal
+            <Card className="overflow-hidden max-h-[774px]">
+      <CardHeader className="flex flex-row items-start bg-muted/50">
+        <div className="grid gap-0.5">
+          <CardTitle className="group flex items-center gap-2 text-lg">
+            Leave Application Details
+          </CardTitle>
+        </div>
+      </CardHeader>
+      <CardContent className="p-6 text-sm">
+        <div className="grid gap-3">
+          <div className="font-semibold">Leave Details</div>
+          <ul className="grid gap-3">
+            <li className="flex items-center justify-between">
+              <span className="text-muted-foreground">Employee Name</span>
+              <span>{accessorKey.user_id.name}</span>
+            </li>
+            <li className="flex items-center justify-between">
+              <span className="text-muted-foreground">Organization Name</span>
+              <span>Mushroom Company</span>
+            </li>
+            <li className="flex items-center justify-between">
+              <span className="text-muted-foreground">Start Date</span>
+              {/* <span>{dayjs(accessorKey.start_date).format("DD/MM/YYYY")}</span> */}
+              <span>{accessorKey.start_date}</span>
+            </li>
+            <li className="flex items-center justify-between">
+              <span className="text-muted-foreground">End Date</span>
+              {/* <span>{dayjs(accessorKey.end_date).format("DD/MM/YYYY")}</span> */}
+              <span>{accessorKey.end_date}</span>
+            </li>
+            <li className="flex items-center justify-between">
+              <span className="text-muted-foreground">No of Days</span>
+              <span>3</span>
+            </li>
+            <li className="flex flex-col items-start">
+              <span className="text-muted-foreground">Description</span>
+              <span className="text-justify">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut reprehenderit provident tenetur quibusdam consequatur, minus tempora culpa nihil iure adipisci, quas debitis aliquam cupiditate laborum aliquid commodi dolore exercitationem? Praesentium!
+              </span>
+            </li>
+          </ul>
+          <Separator className="my-2" />
+          <div className="font-semibold">Leave Type Details</div>
+          <ul className="grid gap-3">
+
+            {/* Leave Type Deatails  */}
+            
+            <li className="flex items-center justify-start gap-2">
+              <span className="text-muted-foreground">Name</span>
+              <span>
+                Vacations
+              </span>
+            </li>
+
+            <li className="flex flex-col items-start">
+              <span className="text-muted-foreground">Description</span>
+              <span className="text-justify">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut reprehenderit provident tenetur quibusdam consequatur, minus tempora culpa nihil iure adipisci, quas debitis aliquam cupiditate laborum aliquid commodi dolore exercitationem? Praesentium!
+              </span>
+            </li>
+            
+
+          </ul>
+        </div>
+      </CardContent>
+    </Card>
             </div>
+            {accessorKey.status === "pending" && (
+            <>
+            <Separator className="my-4" />
+           <div className="flex items-center justify-between">
+            <Button variant="success" size="lg" onClick={() => setIsOpen(false)}>Appove</Button>
+            <Button variant="destructive" size="lg" onClick={() => setIsOpen(false)}>Reject</Button>
+           </div>
+           </>
+          )}
           </Modal>
         </>
       {/* )} */}
