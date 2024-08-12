@@ -11,6 +11,7 @@ import { Heading } from "@/components/ui/heading";
 export const LeaveTableClient: React.FC<any> = ({
   data,
   isLoading,
+  fetchdata
   // page,
   // setPage,
   // totalPage,
@@ -26,7 +27,7 @@ export const LeaveTableClient: React.FC<any> = ({
       <Separator />
       <DataTable
         searchKey=""
-        columns={columns}
+        columns={columns(fetchdata)}
         data={data}
         isLoading={isLoading}
         // setPage={setPage}

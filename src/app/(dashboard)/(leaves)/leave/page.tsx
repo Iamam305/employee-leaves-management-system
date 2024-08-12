@@ -1,6 +1,7 @@
 "use client"
 import { LeaveTableClient } from "@/components/table/LeaveTable/client";
 import axios from "axios";
+import { set } from "lodash";
 import { useEffect, useState } from "react";
 
 
@@ -131,19 +132,44 @@ const Page = () => {
       status: 'rejected',
     },
   ];
+
+  const fetchdata = async() => {
+    try{
+    setIsLoading(true)  
+    const {data} = await axios.get('/api/leave')
+    // console.log('leave data' ,data.data)
+    setLeavedata(data.data)
+    setIsLoading(false)
+  }
+    catch(error){
+      setIsLoading(false)
+      console.log("error occured while loading " , error)
+      
+    }
+  }
   
   useEffect(() => {
-
-    (async() => {
-      const {data} = await axios.get('/api/leave')
-      console.log('leave data' ,data.data)
-    })();
+    fetchdata();
+    // (async() => {
+    //   try{
+    //   setIsLoading(true)  
+    //   const {data} = await axios.get('/api/leave')
+    //   console.log('leave data' ,data.data)
+    //   setLeavedata(data.data)
+    //   setIsLoading(false)
+    // }
+    //   catch(error){
+    //     setIsLoading(false)
+    //     console.log("error occured while loading " , error)
+        
+    //   }
+    // })();
   }, [])
   
 
   return (
     <div> 
-      <LeaveTableClient data={Leaves} isLoading={false}/>
+      <LeaveTableClient data={leavedata} isLoading={isLoading} fetchdata={fetchdata}/>
     </div>
   )
 }

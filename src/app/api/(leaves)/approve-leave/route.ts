@@ -56,7 +56,7 @@ export const POST = async (req : NextRequest) => {
             to: "sgrlekhwani@gmail.com",
             subject: "Leave Status changed",
             react: LeaveStatusEmail({
-                employeeName : `${updateleave.user_id}`,
+                employeeName : `${updateleave.user_id.name}`,
                 leaveStartDate : `${updateleave.start_date}`,
                 leaveEndDate : `${updateleave.end_date}`,
                 leaveReason :  `${updateleave.leave_type_id.name}`,
