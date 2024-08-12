@@ -15,9 +15,11 @@ export const MemberTableClient: React.FC<any> = ({
   orgs,
   setOrgs,
   setOrgId,
+  page,
+  setPage,
   // page,
   // setPage,
-  // totalPage,
+  totalPage,
 }) => {
   return (
     <>
@@ -41,9 +43,9 @@ export const MemberTableClient: React.FC<any> = ({
         orgs={orgs}
         setOrgs={setOrgs}
         setOrgId={  setOrgId}
-        // setPage={setPage}
-        // page={page}
-        // totalPage={totalPage}
+        setPage={setPage}
+        page={page}
+        totalPage={totalPage}
       />
     </>
   );
