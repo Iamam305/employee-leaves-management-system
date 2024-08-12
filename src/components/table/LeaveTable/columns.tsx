@@ -25,7 +25,7 @@ const truncateText = (text: any, length: number) => {
 //   createdAt?: Date;
 //   updatedAt?: Date;
 
-export const columns: ColumnDef<LeavetypeInterface>[] = [
+export const columns = (fetchData: () => void): ColumnDef<LeavetypeInterface>[] => [
   {
     accessorKey: "index",
     header: "S.No",
@@ -50,7 +50,7 @@ export const columns: ColumnDef<LeavetypeInterface>[] = [
   {
     accessorKey: "org_id",
     header: "Orgnisation Name",
-    cell: ({ row }) => <LeaveToolTip data={row.original.org_id} />,
+    cell: ({ row }) => <LeaveToolTip data={row.original.org_id.name} />,
   },
   {
     accessorKey: "status",
@@ -71,7 +71,7 @@ export const columns: ColumnDef<LeavetypeInterface>[] = [
     accessorKey: "",
     header: "View",
     cell: ({ row }) => (
-      <LeaveModal title="View" accessorKey={row.original}/>
+      <LeaveModal title="View" accessorKey={row.original} onclose={fetchData}/>
     ),
   },
 ];

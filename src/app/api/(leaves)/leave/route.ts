@@ -3,6 +3,7 @@ import { LeaveRequestEmail } from "@/components/email-temp/LeaveRequestTemplate"
 import { connect_db } from "@/configs/db";
 import { LeaveType } from "@/models/leave-type.model";
 import { Leave } from "@/models/leave.model";
+import { Org } from "@/models/org.model";
 import { User } from "@/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
@@ -71,7 +72,7 @@ export const POST = async (req : NextRequest) => {
 
 export const GET = async (req: NextRequest) => {
     try {
-        const leaves = await Leave.find().populate('user_id' ,  "-password -createdAt -updatedAt -verification_code -is_verified").populate("leave_type_id");
+        const leaves = await Leave.find().populate('user_id' ,  "-password -createdAt -updatedAt -verification_code -is_verified").populate("leave_type_id").populate("org_id");
         return NextResponse.json({ msg: "All Leaves fetched Successfully" , data: leaves}, { status: 200 });
         
     } catch (error) {
