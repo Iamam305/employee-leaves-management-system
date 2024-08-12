@@ -1,8 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
 import { MemberTableClient } from "@/components/table/memberTable/client";
 import axios from "axios";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const Page = () => {
   const [members, setMembers] = useState([]);
@@ -41,9 +41,10 @@ const Page = () => {
       setIsLoading(false);
     }
   };
-  useEffect(() => {
-    fetchMembers(name, orgId);
-  }, [name, orgId]);
+
+  // useEffect(() => {
+  //   fetchMembers(name, orgId);
+  // }, [name, orgId]);
 
   useEffect(() => {
     const queryParams = new URLSearchParams();
@@ -59,6 +60,14 @@ const Page = () => {
     router.push(newPath);
   }, [name, orgId, pathname, router]);
 
+  // Debousce of users
+  useEffect(() => {
+    const debounced = setTimeout(() => {
+      fetchMembers(name, orgId);
+    }, 500);
+    return () => clearTimeout(debounced);
+  }, [name, orgId]);
+
   const fetch_all_orgs = async () => {
     try {
       const { data } = await axios.get("/api/org");
@@ -72,7 +81,6 @@ const Page = () => {
   useEffect(() => {
     fetch_all_orgs();
   }, []);
-
 
   return (
     <div className="p-4">
