@@ -10,20 +10,37 @@ export async function GET(req: NextRequest) {
   try {
     const name = req.nextUrl.searchParams.get("name");
     const org_id = req.nextUrl.searchParams.get("org_id");
-    let query = {};
+    const page = parseInt(req.nextUrl.searchParams.get("page") || "1");
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    let userQuery = {};
     if (name) {
-      query = { ...query, name: { $regex: name, $options: 'i' } };
+      userQuery = { ...userQuery, name: { $regex: name, $options: "i" } };
     }
-    let users = await User.find(query);
     let membershipQuery = {};
     if (org_id) {
       membershipQuery = { org_id };
     }
+    let userIds = [];
+    if (org_id) {
+      const memberships = await Membership.find(membershipQuery).distinct(
+        "user_id"
+      );
+      userIds = memberships;
+      userQuery = { ...userQuery, _id: { $in: userIds } };
+    }
+    const totalUsers = await User.countDocuments(userQuery);
+    const totalPages = Math.ceil(totalUsers / limit);
+    let users = await User.find(userQuery as any)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
     const all_members = await Promise.all(
       users.map(async (user) => {
         const memberships = await Membership.find({
           user_id: user._id,
-          ...membershipQuery
+          ...membershipQuery,
         })
           .populate("org_id", [], Org)
           .populate(
@@ -33,11 +50,19 @@ export async function GET(req: NextRequest) {
         return memberships;
       })
     );
+
     const flattened_members = all_members.flat();
+
     return NextResponse.json(
       {
         name,
         org_id,
+        pagination: {
+          totalUsers,
+          totalPages,
+          currentPage: page,
+          limit,
+        },
         all_members: flattened_members,
       },
       { status: 200 }

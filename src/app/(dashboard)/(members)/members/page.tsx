@@ -10,41 +10,37 @@ const Page = () => {
   const [name, setName] = useState<string>("");
   const [orgs, setOrgs] = useState<any>([]);
   const [orgId, setOrgId] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const router = useRouter();
   const pathname = usePathname();
-  const fetchMembers = async (name: any, orgId: any) => {
-    let data;
+
+  const fetchMembers = async () => {
     try {
       setIsLoading(true);
-      let queryString = "";
-      if (name.toString().trim() !== "") {
-        queryString += `name=${name}`;
+      let queryString = `page=${page}`;
+      if (name.trim() !== "") {
+        queryString += `&name=${encodeURIComponent(name)}`;
       }
-      if (orgId.toString().trim() !== "") {
-        if (queryString) {
-          queryString += "&";
-        }
-        queryString += `org_id=${orgId}`;
+      if (orgId.trim() !== "") {
+        queryString += `&org_id=${orgId}`;
       }
       const response = await axios.get(`/api/org/get-members?${queryString}`);
-      data = response.data;
-      const flattenedMembers = data.all_members.flat().map((member: any) => ({
+      const data = response.data;
+      const flattenedMembers = data.all_members.map((member: any) => ({
         username: member.user_id?.name ?? "N/A",
         email: member.user_id?.email ?? "N/A",
         role: member.role,
         orgName: member.org_id?.name ?? "N/A",
       }));
       setMembers(flattenedMembers);
+      setTotalPages(data.pagination.totalPages);
     } catch (error) {
       console.error("Error fetching members:", error);
     } finally {
       setIsLoading(false);
     }
   };
-
-  // useEffect(() => {
-  //   fetchMembers(name, orgId);
-  // }, [name, orgId]);
 
   useEffect(() => {
     const queryParams = new URLSearchParams();
@@ -54,19 +50,24 @@ const Page = () => {
     if (orgId) {
       queryParams.set("org_id", orgId);
     }
+    if (page > 1) {
+      queryParams.set("page", page.toString());
+    }
     const queryString = queryParams.toString();
     const newPath = queryString ? `${pathname}?${queryString}` : pathname;
-
     router.push(newPath);
-  }, [name, orgId, pathname, router]);
+  }, [name, orgId, page, pathname, router]);
 
-  // Debousce of users
+  useEffect(() => {
+    setPage(1);
+  }, [name, orgId]);
+
   useEffect(() => {
     const debounced = setTimeout(() => {
-      fetchMembers(name, orgId);
+      fetchMembers();
     }, 500);
     return () => clearTimeout(debounced);
-  }, [name, orgId]);
+  }, [name, orgId, page]);
 
   const fetch_all_orgs = async () => {
     try {
@@ -77,7 +78,6 @@ const Page = () => {
       return error;
     }
   };
-
   useEffect(() => {
     fetch_all_orgs();
   }, []);
@@ -92,6 +92,9 @@ const Page = () => {
         orgs={orgs}
         setOrgs={setOrgs}
         setOrgId={setOrgId}
+        page={page}
+        setPage={setPage}
+        totalPage={totalPages}
       />
     </div>
   );

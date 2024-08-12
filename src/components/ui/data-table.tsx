@@ -178,7 +178,7 @@ export function DataTable<TData, TValue>({
                 size="sm"
                 onClick={() => {
                   setPage(page - 1);
-                  router.push(`${pathname}?page=${page - 1}`);
+                  // router.push(`${pathname}?page=${page - 1}`);
                 }}
                 disabled={page === 1}
               >
@@ -189,7 +189,7 @@ export function DataTable<TData, TValue>({
                 size="sm"
                 onClick={() => {
                   setPage(page + 1);
-                  router.push(`${pathname}?page=${page + 1}`);
+                  // router.push(`${pathname}?page=${page + 1}`);
                 }}
                 disabled={page == totalPage}
               >
@@ -198,7 +198,7 @@ export function DataTable<TData, TValue>({
             </div>
             <div>
               <span className="text-sm">
-                {`Page  ${page} of ${totalPage || 2}`}
+                {`Page  ${page} of ${totalPage}`}
               </span>
             </div>
           </div>
