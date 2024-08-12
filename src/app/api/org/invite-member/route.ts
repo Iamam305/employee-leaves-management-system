@@ -58,6 +58,7 @@ export const POST = async (req: NextRequest) => {
             name: email.split("@")[0],
             email,
             password: hashedPassword,
+            is_verified:true
           });
 
           const new_membership = await Membership.create({
