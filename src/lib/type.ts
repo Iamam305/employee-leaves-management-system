@@ -3,11 +3,13 @@ import { Types } from "mongoose";
 interface user_id {
   name: string;
   email: string;
+  _id:string;
 }
 
 interface leave_type_id {
   name: string;
   description: string;
+  _id:string;
 }
 
 interface org_id {
@@ -19,9 +21,9 @@ interface org_id {
 
 export interface LeavetypeInterface {
   _id: Types.ObjectId;
-  user_id: user_id;
-  leave_type_id: leave_type_id;
-  org_id: org_id;
+  user: user_id;
+  leave_type: leave_type_id;
+  org: org_id;
   start_date: Date;
   end_date: Date;
   description?: string;

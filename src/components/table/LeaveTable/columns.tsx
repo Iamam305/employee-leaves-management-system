@@ -33,24 +33,22 @@ export const columns = (fetchData: () => void): ColumnDef<LeavetypeInterface>[] 
       truncateText(row.index + 1 || "N/A", 10),
   },
   {
-    accessorKey: "user_id",
+    accessorKey: "user",
     header: "Employee Name",
-    cell: ({ row }) =>
-      
-      truncateText(row.original.user_id.name || "N/A", 10),
+    cell: ({ row }) =>row.original.user.name ,
   },
   {
-    accessorKey: "leave_type_id",
+    accessorKey: "leave_type",
     header: "Leave Type",
     cell: ({ row }) => (
       // truncateText(row.original.call_info?.unique_identifier || "", 10),
-      <LeaveToolTip data={row.original.leave_type_id.name} />
+      <LeaveToolTip data={row.original.leave_type.name} />
     ),
   },
   {
-    accessorKey: "org_id",
+    accessorKey: "org",
     header: "Orgnisation Name",
-    cell: ({ row }) => <LeaveToolTip data={row.original.org_id.name} />,
+    cell: ({ row }) => <LeaveToolTip data={row.original.org.name} />,
   },
   {
     accessorKey: "status",
