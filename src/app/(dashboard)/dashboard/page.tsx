@@ -1,4 +1,4 @@
-import GraphData from "@/components/dashboard/GraphData";
+import ChartData from "@/components/dashboard/ChartData";
 import StatsCards from "@/components/dashboard/StateCards";
 import React from "react";
 
@@ -6,7 +6,7 @@ const Page = () => {
   return (
     <>
       <StatsCards />
-      <GraphData />
+      <ChartData />
     </>
   );
 };
