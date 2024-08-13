@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { TbListCheck } from "react-icons/tb";
+import Oraganization from "./Oraganization";
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -13,7 +14,10 @@ const Sidebar = () => {
       <div className="hidden border-r bg-muted/40  lg:w-[230px] w-[220px] md:block ">
         <div className="flex h-full  max-h-[100vh] flex-col gap-2 lg:w-[230px] w-[220px] sticky top-0 left-0  ">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6 g:w-[300px]">
-            <Link href="/" className="flex items-center font-semibold ">
+            <div className="w-full">
+              <Oraganization />
+            </div>
+            {/* <Link href="/" className="flex items-center font-semibold ">
               <Image
                 src=""
                 alt="Logo"
@@ -21,7 +25,7 @@ const Sidebar = () => {
                 height={40}
                 className="filter invert"
               />
-            </Link>
+            </Link> */}
           </div>
           <div className="flex-1">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4 ">

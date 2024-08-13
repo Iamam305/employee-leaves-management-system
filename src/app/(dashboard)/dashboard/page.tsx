@@ -1,4 +1,4 @@
-import GraphData from "@/components/dashboard/GraphData";
+import ChartData from "@/components/dashboard/ChartData";
 import StatsCards from "@/components/dashboard/StateCards";
 import LeaveRequestModal from "@/components/leaves/LeaveRequestModal";
 import React from "react";
@@ -10,7 +10,7 @@ const Page = () => {
       <LeaveRequestModal title="Apply For Leave"/>
       </div>
       <StatsCards />
-      <GraphData />
+      <ChartData />
     </>
   );
 };

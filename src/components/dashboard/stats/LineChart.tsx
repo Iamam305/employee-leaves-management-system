@@ -22,7 +22,7 @@ ChartJS.register(
   Legend
 );
 
-const UsersChart = ({ data, title }: any) => {
+const LineChart = ({ data, title }: any) => {
   const dummyData = [
     { date: "2024-01-01", count: 75 },
     { date: "2024-02-01", count: 80 },
@@ -34,6 +34,13 @@ const UsersChart = ({ data, title }: any) => {
     { date: "2024-08-01", count: 86 },
     { date: "2024-09-01", count: 92 },
     { date: "2024-10-01", count: 89 },
+    { date: "2024-11-31", count: 89 },
+    { date: "2024-12-05", count: 89 },
+    { date: "2025-01-22", count: 89 },
+    { date: "2024-10-10", count: 89 },
+    { date: "2024-10-12", count: 89 },
+    { date: "2025-10-02", count: 89 },
+    { date: "2025-10-01", count: 79 },
   ];
 
   const options: any = {
@@ -46,12 +53,31 @@ const UsersChart = ({ data, title }: any) => {
         display: true,
       },
     },
+    // scales: {
+    //   x: {
+    //     ticks: {
+    //       maxTicksLimit: 10,
+    //     },
+    //     barPercentage: 0.5,
+    //     categoryPercentage: 0.5,
+    //     grid: {
+    //       display: false, // Disable grid lines on the x-axis
+    //     },
+    //   },
+    //   y: {
+    //     beginAtZero: true,
+    //     grid: {
+    //       display: false, // Disable grid lines on the y-axis
+    //     },
+    //   },
+    // },
+    // };
     scales: {
       x: {
         ticks: {
-          maxTicksLimit: 10,
+          maxTicksLimit: 6,
         },
-        barPercentage: 0.5,
+        barPercentage: 0.1,
         categoryPercentage: 0.5,
       },
       y: {
@@ -75,16 +101,16 @@ const UsersChart = ({ data, title }: any) => {
         data: (data || dummyData).map((item: any) => item.count),
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
-        tension: 0.5,
+        tension: 1,
       },
     ],
   };
 
   return (
-    <div className="w-8/12 max-h-[400px] mx-auto">
+    <div className="md:w-6/12 w-full md:h-[400px] h-1/2 mx-auto ">
       <Line data={chart_data} options={options} />
     </div>
   );
 };
 
-export default UsersChart;
+export default LineChart;

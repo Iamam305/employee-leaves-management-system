@@ -33,6 +33,7 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import Image from "next/image";
 import { toast } from "sonner";
 import { TbListCheck } from "react-icons/tb";
+import Oraganization from "./Oraganization";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -61,7 +62,10 @@ const Navbar = () => {
         </SheetTrigger>
         <SheetContent side="left" className="flex flex-col  w-[300px]">
           <nav className="grid gap-2 text-lg font-medium">
-            <Link
+            <div className=" w-full">
+              <Oraganization/>
+            </div>
+            {/* <Link
               href="#"
               className="flex items-center gap-2 text-lg font-semibold"
             >
@@ -74,7 +78,8 @@ const Navbar = () => {
                 className="filter invert"
               />
               {/* <span className="text-white">Qtee.Ai</span> */}
-            </Link>
+              qtee
+            {/* </Link> */} 
             <Link
               href={`/dashboard`}
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 

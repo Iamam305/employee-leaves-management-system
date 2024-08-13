@@ -8,7 +8,15 @@ connect_db();
 export async function POST(req: NextRequest) {
   try {
     const { name } = await req.json();
-    const auth:any = await auth_middleware(req);
+    if (!name) {
+      return NextResponse.json(
+        {
+          msg: "Name is Required",
+        },
+        { status: 400 }
+      );
+    }
+    const auth: any = await auth_middleware(req);
     if (auth[0] === null || auth[1] !== null) {
       console.error("Authentication error:", auth[1]);
       return NextResponse.json({ msg: "Unauthorized" }, { status: 401 });
@@ -34,7 +42,6 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
 
 export async function GET(req: NextRequest) {
   try {
