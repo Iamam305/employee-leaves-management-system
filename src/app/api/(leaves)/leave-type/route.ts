@@ -40,8 +40,8 @@ export const POST = async (req: NextRequest) => {
 // get all Leave Types
 export const GET = async (req: NextRequest) => {
     try {
-        const leavtypes = await LeaveType.find();
-        return NextResponse.json({ msg: "All LeaveTypes fetched Successfully" , data: leavtypes}, { status: 200 });
+        const leavetypes = await LeaveType.find();
+        return NextResponse.json({ msg: "All LeaveTypes fetched Successfully" , data: leavetypes}, { status: 200 });
         
     } catch (error) {
         console.log(error);
