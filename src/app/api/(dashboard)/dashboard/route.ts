@@ -47,6 +47,20 @@ export async function GET(req: NextRequest) {
           },
           count: 1,
         },
+      },
+      {
+        $group: {
+          _id: null, 
+          totalUsers: { $sum: "$count" },
+          users: { $push: { date: "$date", count: "$count" } }, 
+        },
+      },
+      {
+        $project: {
+          _id: 0, 
+          totalUsers: 1,
+          users: 1,
+        },
       }
     );
 
@@ -113,11 +127,23 @@ export async function GET(req: NextRequest) {
           count: 1,
         },
       },
+      {
+        $group: {
+          _id: null, 
+          totalLeaves: { $sum: "$count" },
+          leaves: { $push: { date: "$date", count: "$count" } }, 
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalLeaves: 1,
+          leaves: 1,
+        },
+      },
     ]);
 
-    // const pending_leaves = await Leave.find({
-    //   status: { $eq: "approved" }
-    // })
+    console.log(leaves);
 
     const pending_leaves = await Leave.aggregate([
       {
@@ -152,11 +178,23 @@ export async function GET(req: NextRequest) {
           count: 1,
         },
       },
+      {
+        $group: {
+          _id: null,
+          totalPendingLeaves: { $sum: "$count" },
+          pending_leaves: { $push: { date: "$date", count: "$count" } },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalPendingLeaves: 1,
+          pending_leaves: 1,
+        },
+      },
     ]);
 
-    // const leaves_data = await Leave.find({
-    //     status:{$eq:"approved"}
-    // })
+    console.log(pending_leaves);
 
     const leaves_data = await Leave.aggregate([
       {
@@ -166,54 +204,6 @@ export async function GET(req: NextRequest) {
         },
       },
     ]);
-
-
-    // const top_users_leaves = await Leave.find({
-    //   status:{$eq:"approved"}
-    // }).populate("user_id")
-
-    // const top_users_leaves = await Leave.aggregate([
-    //   {
-    //     $match: {
-    //       status: "approved",
-    //     },
-    //   },
-    //   {
-    //     $group: {
-    //       _id: "$user_id",
-    //       count: { $sum: 1 },
-    //     },
-    //   },
-    //   {
-    //     $sort: { count: -1 }, // Sort by count in descending order
-    //   },
-    //   {
-    //     $limit: 10, 
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "users", // The name of the users collection
-    //       localField: "_id", // The user_id field in Leave collection
-    //       foreignField: "_id", // The _id field in Users collection
-    //       as: "user_details",
-    //     },
-    //   },
-    //   {
-    //     $unwind: "$user_details", // Unwind the array to get user details as an object
-    //   },
-    //   {
-    //     $project: {
-    //       _id: 0,
-    //       user: "$user_details", // Include user details
-    //       leaves_taken: "$count", // Include the count of leaves
-    //     },
-    //   },
-    // ]);
-    
-    // console.log(top_users_leaves);
-    
-
-
     return NextResponse.json(
       {
         // top_users_leaves,

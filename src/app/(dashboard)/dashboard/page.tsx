@@ -9,7 +9,6 @@ const Page = () => {
       <div className="flex items-center justify-end">
       <LeaveRequestModal title="Apply For Leave"/>
       </div>
-      <StatsCards />
       <ChartData />
     </>
   );

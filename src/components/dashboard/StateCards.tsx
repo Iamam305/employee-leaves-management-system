@@ -6,27 +6,27 @@ import { MdOutlineBalance } from "react-icons/md";
 import { HiArrowNarrowDown, HiArrowNarrowUp } from "react-icons/hi";
 import { createElement } from "react";
 
-const StatsCards = () => {
+const StatsCards = ({totalLeaves,totalPendingLeaves,totalUsers}:any) => {
   const StatsCardsData = [
     {
       key: "leave",
       title: "Total Leaves",
       change: -2,
-      value: 10,
+      value: totalLeaves,
       icon: TbListCheck,
     },
     {
       key: "user",
       title: "Total Users",
       change: 4,
-      value: 45,
+      value: totalUsers,
       icon: HiOutlineUserGroup,
     },
     {
       key: "event",
       title: "Pending Leaves",
       change: -20,
-      value: 5,
+      value: totalPendingLeaves,
       icon: BsCalendar4Event,
     },
     {
