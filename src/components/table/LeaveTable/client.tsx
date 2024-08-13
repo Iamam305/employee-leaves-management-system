@@ -11,10 +11,17 @@ import { Heading } from "@/components/ui/heading";
 export const LeaveTableClient: React.FC<any> = ({
   data,
   isLoading,
-  fetchdata
+  name,
+  setName,
+  orgs,
+  setOrgs,
+  setOrgId,
+  page,
+  setPage,
   // page,
   // setPage,
-  // totalPage,
+  totalPage,
+  fetchdata,
 }) => {
   return (
     <>
@@ -30,9 +37,14 @@ export const LeaveTableClient: React.FC<any> = ({
         columns={columns(fetchdata)}
         data={data}
         isLoading={isLoading}
-        // setPage={setPage}
-        // page={page}
-        // totalPage={totalPage}
+        name={name}
+        setName={setName}
+        orgs={orgs}
+        setOrgs={setOrgs}
+        setOrgId={setOrgId}
+        setPage={setPage}
+        page={page}
+        totalPage={totalPage}
       />
     </>
   );

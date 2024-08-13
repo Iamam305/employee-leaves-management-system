@@ -92,11 +92,11 @@ const LeaveModal: React.FC<{
           <ul className="grid gap-3">
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Employee Name</span>
-              <span>{accessorKey.user_id.name}</span>
+              <span>{accessorKey.user.name}</span>
             </li>
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Organization Name</span>
-              <span>{accessorKey.org_id.name}</span>
+              <span>{accessorKey.org.name}</span>
             </li>
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Start Date</span>
@@ -105,7 +105,7 @@ const LeaveModal: React.FC<{
             </li>
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">End Date</span>
-              <span>{FormateDate(accessorKey.start_date)}</span>
+              <span>{FormateDate(accessorKey.end_date)}</span>
               {/* <span>{accessorKey.end_date}</span> */}
             </li>
             <li className="flex items-center justify-between">
@@ -128,14 +128,14 @@ const LeaveModal: React.FC<{
             <li className="flex items-center justify-start gap-2">
               <span className="text-muted-foreground">Name</span>
               <span>
-                Vacations
+                {accessorKey.leave_type.name}
               </span>
             </li>
 
             <li className="flex flex-col items-start">
               <span className="text-muted-foreground">Description</span>
               <span className="text-justify">
-              {accessorKey.leave_type_id.description}
+              {accessorKey.leave_type.description}
               </span>
             </li>
             
