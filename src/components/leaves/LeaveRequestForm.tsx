@@ -32,7 +32,9 @@ const formSchema = z.object({
   start_date:  z.date({
     required_error: "Start Date is required.",
   }),
-  end_date: z.string().min(1, { message: "End Date is required." }),
+  end_date:   z.date({
+    required_error: "End Date is required.",
+  }),
   description: z.string().optional(), // Description is optional
 });
 
@@ -179,15 +181,21 @@ interface LeaveRequestFormProps {
                   mode="single"
                   selected={field.value}
                   onSelect={field.onChange}
-                  disabled={(date) =>
-                    date > new Date() || date < new Date("1900-01-01")
+                  disabled={(date) => date < new Date()
+                  //   {
+                  //   Reset the time of the current date to midnight
+                  //   const today = new Date();
+                  //   today.setHours(0, 0, 0, 0);
+                  //   Disable dates less than today's date
+                  //   return date < today;
+                  // }
                   }
                   initialFocus
                 />
               </PopoverContent>
             </Popover>
             <FormDescription>
-              Enter start date from leave will be count.
+            Select the start date from which the leave will be effective.
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -199,13 +207,57 @@ interface LeaveRequestFormProps {
           control={form.control}
           name="end_date"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>End Date</FormLabel>
-              <FormControl>
-                <Input type="date" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+            // <FormItem>
+            //   <FormLabel>End Date</FormLabel>
+            //   <FormControl>
+            //     <Input type="date" {...field} />
+            //   </FormControl>
+            //   <FormMessage />
+            // </FormItem>
+            <FormItem className="flex flex-col">
+            <FormLabel>Select End Date</FormLabel>
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[240px] pl-3 text-left font-normal",
+                      !field.value && "text-muted-foreground"
+                    )}
+                  >
+                    {field.value ? (
+                      format(field.value, "PPP")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={field.value}
+                  onSelect={field.onChange}
+                  disabled={(date) => date < new Date() || date < new Date(form.getValues("start_date"))
+                  //   {
+                  //   Reset the time of the current date to midnight
+                  //   const today = new Date();
+                  //   today.setHours(0, 0, 0, 0);
+                  //   Disable dates less than today's date
+                  //   return date < today;
+                  // }
+                  }
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            <FormDescription>
+            Select the end date up to which the leave will be effective.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
           )}
         />
 

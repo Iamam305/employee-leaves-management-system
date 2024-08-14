@@ -27,5 +27,5 @@ export const FormateDate =  (date:Date) => {
 export const getDays =  (startdate:Date , enddate:Date) => {
   const start = dayjs(startdate);
   const end = dayjs(enddate);
-  return end.diff(start,'days');
+  return end.diff(start,'days') + 1;
 }
