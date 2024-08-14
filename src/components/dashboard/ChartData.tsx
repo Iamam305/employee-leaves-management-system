@@ -4,44 +4,71 @@ import LineChart from "./stats/LineChart";
 import axios from "axios";
 import DoughnutChart from "./stats/DoughnutChart";
 import StatsCards from "./StateCards";
+import { useSearchParams } from "next/navigation";
 
 const ChartData = () => {
+  const searchParams = useSearchParams();
+  const org_id = searchParams.get("org_id");
+
   const [usersData, setUsersData] = useState<any>([]);
   const [leavesData, setLeavesData] = useState<any>([]);
   const [pendingLeaves, setPendingLeaves] = useState<any>([]);
   const [leavesInfo, setLeavesInfo] = useState<any>([]);
-  const [totalLeaves, setTotalLeaves] = useState<number>();
-  const [totalPendingLeaves, setTotalPendingLeaves] = useState<number>();
-  const[totalUsers,setTotalUsers] = useState<number>();
+  const [totalLeaves, setTotalLeaves] = useState<number>(0);
+  const [totalPendingLeaves, setTotalPendingLeaves] = useState<number>(0);
+  const [totalUsers, setTotalUsers] = useState<number>(0);
 
   const fetchAllUsers = async () => {
-    const { data } = await axios.get("/api/dashboard");
-    setUsersData(data.users[0].users);
-    setTotalUsers(data.users[0].totalUsers)
-    setLeavesData(data.leaves[0].leaves);
-    setTotalLeaves(data.leaves[0].totalLeaves);
-    setPendingLeaves(data.pending_leaves[0].pending_leaves);
-    setTotalPendingLeaves(data.pending_leaves[0].totalPendingLeaves)
-    setLeavesInfo(data.leaves_data);
-    console.log(data);
+    try {
+      const endpoint = org_id
+        ? `/api/dashboard?org_id=${org_id}`
+        : `/api/dashboard`;
+      const { data } = await axios.get(endpoint);
+      setUsersData(data.users[0]?.users || []);
+      setTotalUsers(data.users[0]?.totalUsers || 0);
+      setLeavesData(data.leaves[0]?.leaves || []);
+      setTotalLeaves(data.leaves[0]?.totalLeaves || 0);
+      setPendingLeaves(data.pending_leaves[0]?.pending_leaves || []);
+      setTotalPendingLeaves(data.pending_leaves[0]?.totalPendingLeaves || 0);
+      setLeavesInfo(data.leaves_data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
-
   useEffect(() => {
     fetchAllUsers();
-  }, []);
-
-  console.log("Leaves==> ", pendingLeaves);
+  }, [org_id]);
 
   return (
     <div>
-      <StatsCards totalLeaves={totalLeaves} totalPendingLeaves={totalPendingLeaves} totalUsers={totalUsers}/>
-      <div className=" flex md:flex-row flex-col md:max-w-[82vw] w-full  gap-6 mb-5 md:p-4 p-0">
-        <LineChart data={usersData} title={"Total Users"} />
-        <LineChart data={leavesData} title={"Total Leaves"} />
+      <StatsCards
+        totalLeaves={totalLeaves}
+        totalPendingLeaves={totalPendingLeaves}
+        totalUsers={totalUsers}
+      />
+      <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">
+        {usersData.length > 0 ? (
+          <LineChart data={usersData} title={"Total Users"} />
+        ) : (
+          <p>No user data available</p>
+        )}
+        {leavesData.length > 0 ? (
+          <LineChart data={leavesData} title={"Total Leaves"} />
+        ) : (
+          <p>No leaves data available</p>
+        )}
       </div>
-      <div className=" flex md:flex-row flex-col md:max-w-[82vw] w-full  gap-6 mb-5 md:p-4 p-0">
-        <LineChart data={pendingLeaves} title={"Pending Leaves"} />
-        <DoughnutChart data={leavesInfo} title={"Leaves Info"} />
+      <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">
+        {pendingLeaves.length > 0 ? (
+          <LineChart data={pendingLeaves} title={"Pending Leaves"} />
+        ) : (
+          <p>No pending leaves data available</p>
+        )}
+        {leavesInfo.length > 0 ? (
+          <DoughnutChart data={leavesInfo} title={"Leaves Info"} />
+        ) : (
+          <p>No leaves info available</p>
+        )}
       </div>
     </div>
   );

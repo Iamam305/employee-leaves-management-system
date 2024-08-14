@@ -1,33 +1,44 @@
-"use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import axios from "axios";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import axios from "axios";
-import { Button } from "../ui/button";
+  SelectContent,
+  SelectItem,
+  Select,
+} from "../ui/select"; // Replace with your actual import
 import { Separator } from "../ui/separator";
-import { Modal } from "../ui/modal";
-import Link from "next/link";
+import { toast } from "sonner";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "../ui/dialog";
+import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { toast } from "sonner";
 
-const Oraganization = () => {
-  const [orgs, setOrgs] = useState<any>([]);
+const Organization = () => {
+  const [orgs, setOrgs] = useState<any[]>([]);
+  const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
 
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const searchParams = useSearchParams();
+
+  const org_id = searchParams.get("org_id");
+
+  useEffect(() => {
+    fetch_all_orgs();
+    if (org_id) {
+      setSelectedOrgId(org_id);
+    } else {
+      setSelectedOrgId("none");
+    }
+  }, [org_id]);
 
   const fetch_all_orgs = async () => {
     try {
@@ -35,27 +46,35 @@ const Oraganization = () => {
       setOrgs(data.all_orgs);
     } catch (error) {
       console.log(error);
-      return error;
     }
   };
-  useEffect(() => {
-    fetch_all_orgs();
-  }, []);
+  const handleChange = async (selectedOrgId: string) => {
+    if (selectedOrgId !== "none") {
+      router.push(`?org_id=${selectedOrgId}`);
+    } else {
+      router.push(`${pathname}`);
+    }
+  };
+
   return (
-    <div >
-      <Select>
+    <div className="flex flex-col">
+      <Select value={selectedOrgId as any} onValueChange={handleChange}>
         <SelectTrigger>
           <SelectValue placeholder="Organizations" />
         </SelectTrigger>
-        <SelectContent className="max-w-full overflow-scroll  text-left">
+        <SelectContent className="max-w-full overflow-scroll text-left">
+          <SelectItem value={"none"} className="overflow-scroll text-left">
+            None
+          </SelectItem>
           {orgs.map((item: any, index: number) => (
             <SelectItem
               key={index}
-              value={item.name}
+              value={item._id}
               className="overflow-scroll text-left"
-              disabled
             >
-              {item.name.length > 15 ? item.name.substring(0,15) + "..." : item.name}
+              {item.name.length > 15
+                ? item.name.substring(0, 15) + "..."
+                : item.name}
             </SelectItem>
           ))}
           <Separator />
@@ -68,7 +87,7 @@ const Oraganization = () => {
   );
 };
 
-export default Oraganization;
+export default Organization;
 
 export function CreateOrgDialog() {
   const [name, setName] = useState<string>("");
@@ -113,7 +132,7 @@ export function CreateOrgDialog() {
                 id="name"
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e: any) => setName(e.target.value)}
                 placeholder="Enter the organization name"
               />
               <Button type="submit" disabled={loading}>
