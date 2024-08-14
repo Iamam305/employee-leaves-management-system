@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
 import React, { useEffect, useState } from "react";
-import { LeaveRequestForm } from "./LeaveRequestForm";
+import { LeaveTypeForm } from "./LeaveTypeForm";
 
 
 const truncateText = (text: any, length: number) => {
@@ -11,7 +11,7 @@ const truncateText = (text: any, length: number) => {
   return str.length <= length ? str : str.substring(0, length) + "...";
 };
 
-const LeaveRequestModal: React.FC<{
+const LeaveTypeModal: React.FC<{
   title: string;
 //   accessorKey: any
   // row: LeavetypeInterface;
@@ -37,7 +37,7 @@ const LeaveRequestModal: React.FC<{
       {/* {truncatedText !== "N/A" && ( */}
         <>
           <Modal
-            title="Request Leave Application"
+            title="Create Leave LeaveType"
             // description={accessorKey.status}
             isOpen={isOpen}
             onClose={handleclose}
@@ -45,7 +45,7 @@ const LeaveRequestModal: React.FC<{
             <div className="p-4 max-h-[60vh] overflow-y-auto">
             <Card className="overflow-hidden max-h-[774px]">
       <CardContent>
-        <LeaveRequestForm onclose={handleclose}/>
+        <LeaveTypeForm onclose={handleclose}/>
       </CardContent>
     </Card>
             </div>
@@ -55,4 +55,4 @@ const LeaveRequestModal: React.FC<{
   );
 };
 
-export default LeaveRequestModal;
+export default LeaveTypeModal;
