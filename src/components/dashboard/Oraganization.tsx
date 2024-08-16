@@ -19,26 +19,51 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { selectOrg, unSelectOrg } from "@/store/orgSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const Organization = () => {
   const [orgs, setOrgs] = useState<any[]>([]);
-  const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
-
+  const selectedOrgId = useSelector(
+    (state: any) => state.organization.selectedOrg
+  );
+  const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
-
   const searchParams = useSearchParams();
-
-  const org_id = searchParams.get("org_id");
 
   useEffect(() => {
     fetch_all_orgs();
-    if (org_id) {
-      setSelectedOrgId(org_id);
+    const queryOrgId = searchParams.get("org_id");
+    if (queryOrgId) {
+      dispatch(selectOrg(queryOrgId));
+      localStorage.setItem("selectedOrgId", queryOrgId);
     } else {
-      setSelectedOrgId("none");
+      const storedOrgId = localStorage.getItem("selectedOrgId");
+      if (storedOrgId) {
+        dispatch(selectOrg(storedOrgId));
+      } else {
+        dispatch(unSelectOrg());
+        localStorage.removeItem("selectedOrgId");
+      }
     }
-  }, [org_id]);
+  }, [searchParams, dispatch]);
+
+  useEffect(() => {
+    if (selectedOrgId) {
+      const queryParams = new URLSearchParams(window.location.search);
+      queryParams.set("org_id", selectedOrgId);
+      const newUrl = `${pathname}?${queryParams.toString()}`;
+      router.push(newUrl);
+      localStorage.setItem("selectedOrgId", selectedOrgId);
+    } else {
+      const queryParams = new URLSearchParams(window.location.search);
+      queryParams.delete("org_id");
+      const newUrl = `${pathname}?${queryParams.toString()}`;
+      router.push(newUrl);
+      localStorage.removeItem("selectedOrgId");
+    }
+  }, [selectedOrgId, pathname, router]);
 
   const fetch_all_orgs = async () => {
     try {
@@ -48,17 +73,23 @@ const Organization = () => {
       console.log(error);
     }
   };
-  const handleChange = async (selectedOrgId: string) => {
-    if (selectedOrgId !== "none") {
-      router.push(`?org_id=${selectedOrgId}`);
+
+  const handleChange = async (newOrgId: string) => {
+    if (newOrgId !== "none") {
+      dispatch(selectOrg(newOrgId));
+      localStorage.setItem("selectedOrgId", newOrgId);
     } else {
-      router.push(`${pathname}`);
+      dispatch(unSelectOrg());
+      localStorage.removeItem("selectedOrgId");
     }
   };
 
   return (
     <div className="flex flex-col">
-      <Select value={selectedOrgId as any} onValueChange={handleChange}>
+      <Select
+        value={(selectedOrgId as any) || "none"}
+        onValueChange={handleChange}
+      >
         <SelectTrigger>
           <SelectValue placeholder="Organizations" />
         </SelectTrigger>

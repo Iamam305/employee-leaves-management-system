@@ -27,7 +27,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   searchKey: string;
   isLoading: boolean;
-  page?: number;
+  page?: any;
   setPage?: any;
   totalPage?: any;
   name?: string;
@@ -80,7 +80,7 @@ export function DataTable<TData, TValue>({
               onChange={(e) => setName(e.target.value)}
               className="max-w-sm"
             />
-
+            {/* 
             <select
               name="group_name"
               id=""
@@ -94,7 +94,7 @@ export function DataTable<TData, TValue>({
                   {org.name}
                 </option>
               ))}
-            </select>
+            </select> */}
           </div>
         )}
 
@@ -170,7 +170,41 @@ export function DataTable<TData, TValue>({
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         </div>
-        {page ? (
+
+        {
+          Number(totalPage) > 1 && (
+            <div className="text-sm text-muted-foreground flex items-center gap-3">
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setPage(page - 1);
+                  // router.push(`${pathname}?page=${page - 1}`);
+                }}
+                disabled={page === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setPage(page + 1);
+                  // router.push(`${pathname}?page=${page + 1}`);
+                }}
+                disabled={page == totalPage}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            <div>
+              <span className="text-sm">{`Page  ${page} of ${totalPage}`}</span>
+            </div>
+          </div>
+          )
+        }
+        {/* {(page as any) > 1 ? (
           <div className="text-sm text-muted-foreground flex items-center gap-3">
             <div className="space-x-2">
               <Button
@@ -197,9 +231,7 @@ export function DataTable<TData, TValue>({
               </Button>
             </div>
             <div>
-              <span className="text-sm">
-                {`Page  ${page} of ${totalPage}`}
-              </span>
+              <span className="text-sm">{`Page  ${page} of ${totalPage}`}</span>
             </div>
           </div>
         ) : (
@@ -229,7 +261,7 @@ export function DataTable<TData, TValue>({
               </span>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </>
   );

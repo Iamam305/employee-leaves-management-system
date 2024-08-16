@@ -4,11 +4,10 @@ import LineChart from "./stats/LineChart";
 import axios from "axios";
 import DoughnutChart from "./stats/DoughnutChart";
 import StatsCards from "./StateCards";
-import { useSearchParams } from "next/navigation";
+import { useSelector } from "react-redux";
 
 const ChartData = () => {
-  const searchParams = useSearchParams();
-  const org_id = searchParams.get("org_id");
+  const org_id = useSelector((state: any) => state.organization.selectedOrg);
 
   const [usersData, setUsersData] = useState<any>([]);
   const [leavesData, setLeavesData] = useState<any>([]);
@@ -17,9 +16,11 @@ const ChartData = () => {
   const [totalLeaves, setTotalLeaves] = useState<number>(0);
   const [totalPendingLeaves, setTotalPendingLeaves] = useState<number>(0);
   const [totalUsers, setTotalUsers] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fetchAllUsers = async () => {
     try {
+      setLoading(true);
       const endpoint = org_id
         ? `/api/dashboard?org_id=${org_id}`
         : `/api/dashboard`;
@@ -31,8 +32,10 @@ const ChartData = () => {
       setPendingLeaves(data.pending_leaves[0]?.pending_leaves || []);
       setTotalPendingLeaves(data.pending_leaves[0]?.totalPendingLeaves || 0);
       setLeavesInfo(data.leaves_data || []);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setLoading(false);
     }
   };
   useEffect(() => {

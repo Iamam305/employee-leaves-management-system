@@ -51,6 +51,7 @@ const LineChart = ({ data, title }: any) => {
       },
       title: {
         display: true,
+        text: title 
       },
     },
     // scales: {
@@ -97,7 +98,7 @@ const LineChart = ({ data, title }: any) => {
     ),
     datasets: [
       {
-        label: title,
+        label: "dataset",
         data: (data || dummyData).map((item: any) => item.count),
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",

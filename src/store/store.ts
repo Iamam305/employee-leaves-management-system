@@ -12,6 +12,7 @@ import {
 import storage from "redux-persist/lib/storage";
 import authSlice from "./authSlice";
 import membershipSlice from "./membershipSlice";
+import organisationSlice from "./orgSlice";
 
 const persistConfig = {
   key: "root",
@@ -21,11 +22,13 @@ const persistConfig = {
 interface RootState {
   auth: any;
   membership: any;
+  organization:any
 }
 
 const rootReducer = combineReducers<RootState>({
   auth: authSlice,
   membership: membershipSlice,
+  organization:organisationSlice
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

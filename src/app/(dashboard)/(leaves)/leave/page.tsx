@@ -3,17 +3,20 @@ import { LeaveTableClient } from "@/components/table/LeaveTable/client";
 import axios from "axios";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const Page = () => {
   const [leaves, setLeaves] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [name, setName] = useState<string>("");
   const [orgs, setOrgs] = useState<any>([]);
-  const [orgId, setOrgId] = useState<string>("");
+  // const [orgId, setOrgId] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const router = useRouter();
   const pathname = usePathname();
+
+  const org_id = useSelector((state:any) => state. organization.selectedOrg)
 
   const fetchLeaves = async () => {
     try {
@@ -22,8 +25,8 @@ const Page = () => {
       if (name.trim() !== "") {
         queryString += `&name=${encodeURIComponent(name)}`;
       }
-      if (orgId.trim() !== "") {
-        queryString += `&org_id=${orgId}`;
+      if (org_id !== (null as any)) {
+        queryString += `&org_id=${org_id}`;
       }
       const response = await axios.get(`/api/leave?${queryString}`);
       const data = response.data;
@@ -37,32 +40,34 @@ const Page = () => {
     }
   };
 
+  
   useEffect(() => {
     const queryParams = new URLSearchParams();
     if (name) {
       queryParams.set("name", name);
     }
-    if (orgId) {
-      queryParams.set("org_id", orgId);
-    }
+    // if (org_id) {
+    //   queryParams.set("org_id", org_id);
+    // }
     if (page > 1) {
       queryParams.set("page", page.toString());
     }
     const queryString = queryParams.toString();
     const newPath = queryString ? `${pathname}?${queryString}` : pathname;
     router.push(newPath);
-  }, [name, orgId, page, pathname, router]);
+  }, [name, org_id, page, pathname, router]);
+
 
   useEffect(() => {
     setPage(1);
-  }, [name, orgId]);
+  }, [name, org_id]);
 
   useEffect(() => {
     const debounced = setTimeout(() => {
       fetchLeaves();
     }, 500);
     return () => clearTimeout(debounced);
-  }, [name, orgId, page]);
+  }, [name, org_id, page]);
 
   const fetchAllOrgs = async () => {
     try {
@@ -87,7 +92,7 @@ const Page = () => {
         setName={setName}
         orgs={orgs}
         setOrgs={setOrgs}
-        setOrgId={setOrgId}
+        // setOrgId={setOrgId}
         page={page}
         setPage={setPage}
         totalPage={totalPages}
