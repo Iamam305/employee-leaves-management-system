@@ -5,18 +5,25 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { TbListCheck } from "react-icons/tb";
 import Oraganization from "./Oraganization";
+import { useSelector } from "react-redux";
 
 const Sidebar = () => {
   const pathname = usePathname();
+
+  const user_role = useSelector(
+    (state: any) => state?.membership?.memberShipData?.role
+  );
 
   return (
     <>
       <div className="hidden border-r bg-muted/40  lg:w-[230px] w-[220px] md:block ">
         <div className="flex h-full  max-h-[100vh] flex-col gap-2 lg:w-[230px] w-[220px] sticky top-0 left-0  ">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6 g:w-[300px]">
-            <div className="w-full">
-              <Oraganization />
-            </div>
+            {user_role === "admin" && (
+              <div className="w-full">
+                <Oraganization />
+              </div>
+            )}
             {/* <Link href="/" className="flex items-center font-semibold ">
               <Image
                 src=""

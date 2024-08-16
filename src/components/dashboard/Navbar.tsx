@@ -38,6 +38,12 @@ import Oraganization from "./Oraganization";
 const Navbar = () => {
   const pathname = usePathname();
 
+  const user_role = useSelector(
+    (state: any) => state?.membership?.memberShipData?.role
+  );
+
+  console.log("User Role ===> ", user_role);
+
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -45,6 +51,7 @@ const Navbar = () => {
       const res = await axios.get("/api/logout");
       if (res.data) {
         toast.success(res.data.msg);
+        localStorage.removeItem("selectedOrgId");
         router.push("/login");
       }
     } catch (error) {
@@ -62,24 +69,26 @@ const Navbar = () => {
         </SheetTrigger>
         <SheetContent side="left" className="flex flex-col  w-[300px]">
           <nav className="grid gap-2 text-lg font-medium">
-            <div className=" w-full">
-              <Oraganization/>
-            </div>
+            {user_role === "admin" && (
+              <div className=" w-full">
+                <Oraganization />
+              </div>
+            )}
             {/* <Link
               href="#"
               className="flex items-center gap-2 text-lg font-semibold"
             >
               {/* <Image src="/logo.jpg" alt="Qtee.Ai" width="40" height="20" /> */}
-              <Image
-                src=""
-                alt="Logo"
-                width={100}
-                height={40}
-                className="filter invert"
-              />
-              {/* <span className="text-white">Qtee.Ai</span> */}
-              qtee
-            {/* </Link> */} 
+            <Image
+              src=""
+              alt="Logo"
+              width={100}
+              height={40}
+              className="filter invert"
+            />
+            {/* <span className="text-white">Qtee.Ai</span> */}
+            qtee
+            {/* </Link> */}
             <Link
               href={`/dashboard`}
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 
