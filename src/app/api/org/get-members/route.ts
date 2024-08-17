@@ -18,15 +18,13 @@ export async function GET(req: NextRequest) {
     const page = parseInt(req.nextUrl.searchParams.get("page") || "1");
     const limit = 10;
     const skip = (page - 1) * limit;
-
+    const name = req.nextUrl.searchParams.get("name");
+    let userQuery = {};
+    if (name) {
+      userQuery = { ...userQuery, name: { $regex: name, $options: "i" } };
+    }
     if (auth_data.membership.role === "admin") {
-      const name = req.nextUrl.searchParams.get("name");
       const org_id = req.nextUrl.searchParams.get("org_id");
-
-      let userQuery = {};
-      if (name) {
-        userQuery = { ...userQuery, name: { $regex: name, $options: "i" } };
-      }
       let membershipQuery = {};
       if (org_id) {
         membershipQuery = { org_id };
@@ -78,24 +76,28 @@ export async function GET(req: NextRequest) {
         { status: 200 }
       );
     } else {
-      const org = await Org.find({
-        _id: auth_data.membership.org_id,
-      });
-      const membership = await Membership.find({
+      // Non-admin
+      let membershipQuery: any = {
         org_id: auth_data.membership.org_id,
         user_id: { $ne: null },
-      })
+      };
+
+      if (name) {
+        const users = await User.find({
+          name: { $regex: name, $options: "i" },
+        }).select("_id");
+        const userIds = users.map((user) => user._id);
+        membershipQuery.user_id = { $in: userIds };
+      }
+
+      const membership = await Membership.find(membershipQuery)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .populate("user_id")
-        .populate("org_id");
+        .populate("user_id", "name email")
+        .populate("org_id", "name");
 
-      const totalUsers = await Membership.countDocuments({
-        org_id: auth_data.membership.org_id,
-        user_id: { $ne: null },
-      });
-
+      const totalUsers = await Membership.countDocuments(membershipQuery);
       const totalPages = Math.ceil(totalUsers / limit);
 
       return NextResponse.json({
@@ -106,7 +108,7 @@ export async function GET(req: NextRequest) {
           currentPage: page,
           limit,
         },
-        membership,
+        all_members: membership,
       });
     }
   } catch (error: any) {
