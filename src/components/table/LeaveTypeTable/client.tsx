@@ -12,17 +12,17 @@ import LeaveTypeModal from "@/components/leaves/LeaveTypeModal";
 export const LeaveTypeTableClient: React.FC<any> = ({
   data,
   isLoading,
-  // name,
-  // setName,
-  // orgs,
-  // setOrgs,
-  // setOrgId,
-  // page,
-  // setPage,
-  // totalPage,
+  name,
+  setName,
+  orgs,
+  setOrgs,
+  setOrgId,
+  page,
+  setPage,
+  totalPage,
   fetchData,
 }) => {
-  console.log('fetch data' , fetchData)
+  // console.log('fetch data' , fetchData)
   return (
     <>
       <div className="flex items-start justify-between   ">
@@ -38,14 +38,14 @@ export const LeaveTypeTableClient: React.FC<any> = ({
         columns={columns(fetchData)}
         data={data}
         isLoading={isLoading}
-        // name={name}
-        // setName={setName}
-        // orgs={orgs}
-        // setOrgs={setOrgs}
-        // setOrgId={setOrgId}
-        // setPage={setPage}
-        // page={page}
-        // totalPage={totalPage}
+        name={name}
+        setName={setName}
+        orgs={orgs}
+        setOrgs={setOrgs}
+        setOrgId={setOrgId}
+        setPage={setPage}
+        page={page}
+        totalPage={totalPage}
       />
     </>
   );

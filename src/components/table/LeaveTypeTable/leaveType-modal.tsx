@@ -93,7 +93,7 @@ const LeaveTypeTableModal: React.FC<{
             </li>
             <li className="flex items-center justify-between capitalize">
               <span className="text-muted-foreground">Organization Name</span>
-              <span>{accessorKey.org_id.name}</span>
+              <span>{accessorKey.org.name}</span>
             </li>
             <li className="flex items-center justify-between capitalize">
               <span className="text-muted-foreground">Carry Forward</span>
@@ -114,8 +114,7 @@ const LeaveTypeTableModal: React.FC<{
             <li className="flex flex-col items-start">
               <span className="text-muted-foreground">Description</span>
               <span className="text-justify mt-2">
-              {/* {accessorKey.description} */}
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis dolorum necessitatibus consequuntur illum iure officia magni dolor, eveniet impedit placeat soluta recusandae obcaecati suscipit quia eaque, quod, maxime numquam alias.
+              {accessorKey.description}
               </span>
             </li>
           </ul>

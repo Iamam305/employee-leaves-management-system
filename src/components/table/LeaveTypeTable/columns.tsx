@@ -51,7 +51,7 @@ export const columns = (fetchData: () => void): ColumnDef<ViewLeavetypeInterface
   {
     accessorKey: "org",
     header: "Orgnisation Name",
-    cell: ({ row }) => <LeaveToolTip data={row.original.org_id.name || "N/A"} />,
+    cell: ({ row }) => <LeaveToolTip data={row.original.org.name || "N/A"} />,
   },
   {
     accessorKey: "does_carry_forward",
