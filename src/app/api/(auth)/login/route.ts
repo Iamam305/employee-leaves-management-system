@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { connect_db } from "@/configs/db";
+import { Membership } from "@/models/membership.model";
 
 connect_db();
 
@@ -15,7 +16,11 @@ export const POST = async (req: NextRequest) => {
         { status: 400 }
       );
     }
-    const user = await User.findOne({ email });
+    // const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select(
+      "-createdAt -updatedAt -email_verified -verification_code"
+    );
+    const membership = await Membership.findOne({ user_id: user._id });
     if (!user) {
       return NextResponse.json({ msg: "user not found" }, { status: 400 });
     }
@@ -36,8 +41,13 @@ export const POST = async (req: NextRequest) => {
       }
     );
 
+    user.password = null;
+
     const response = NextResponse.json(
-      { msg: "login successful", token },
+      { msg: "login successful",
+        user,
+        membership
+       },
       { status: 200 }
     );
     response.cookies.set("token", token, {
