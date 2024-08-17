@@ -42,7 +42,7 @@ export const columns = (fetchData: () => void): ColumnDef<ViewLeavetypeInterface
   },
   {
     accessorKey: "createdAt",
-    header: "Created At",
+    header: "Date of Creation",
     cell: ({ row }:any) => (
       // truncateText(row.original.call_info?.unique_identifier || "", 10),
       <LeaveToolTip data={FormateDate(row.original.createdAt)} />

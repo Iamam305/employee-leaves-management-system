@@ -30,7 +30,7 @@ const LeaveTypeTableModal: React.FC<{
   const [isOpen, setIsOpen] = useState(false);
   const [status, setstatus] = useState("")
   const [isloading , setIsLoading] = useState(false)
-  console.log(accessorKey._id)
+  // console.log(accessorKey._id)
   
   const membership:any = useSelector((state:any) => state.membership.memberShipData)
   const handleAction = async (status: string) => {
