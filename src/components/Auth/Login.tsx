@@ -6,11 +6,16 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUserLogin } from "@/lib/react-query/queryAndMutation";
+import { useDispatch } from "react-redux";
+import authSlice, { login } from "@/store/authSlice";
+import { selectMembership } from "@/store/membershipSlice";
 
 const Login = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+
+  const dispatch = useDispatch();
 
   const router = useRouter();
 
@@ -31,6 +36,8 @@ const Login = () => {
 
       if (response.data) {
         toast.success(response.data.msg);
+        dispatch(login(response.data.user));
+        dispatch(selectMembership(response.data.membership));
         router.push("/dashboard");
       }
       console.log("Success response:", response.data);
