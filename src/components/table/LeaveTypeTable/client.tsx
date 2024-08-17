@@ -6,46 +6,46 @@ import { DataTable } from "@/components/ui/data-table";
 import { columns } from "./columns";
 import Link from "next/link";
 import { Heading } from "@/components/ui/heading";
+import LeaveTypeModal from "@/components/leaves/LeaveTypeModal";
 // import { ClientTableProps } from "@/lib/types";
 
-export const LeaveTableClient: React.FC<any> = ({
+export const LeaveTypeTableClient: React.FC<any> = ({
   data,
   isLoading,
-  name,
-  setName,
-  orgs,
-  setOrgs,
-  setOrgId,
-  page,
-  setPage,
+  // name,
+  // setName,
+  // orgs,
+  // setOrgs,
+  // setOrgId,
   // page,
   // setPage,
-  totalPage,
-  fetchdata,
+  // totalPage,
+  fetchData,
 }) => {
+  console.log('fetch data' , fetchData)
   return (
     <>
       <div className="flex items-start justify-between   ">
         <Heading
-          title={`All Leaves`}
-          description="All Leave Request Raised by Users"
+          title={`All Leaves Types`}
+          description="All Leave Types Created By Hr or Admin"
         />
-        <Link href="/leavetype"><Button variant="default">View Leave Types</Button></Link>
+        <LeaveTypeModal title="Add Leave Type" />
       </div>
       <Separator />
       <DataTable
         searchKey=""
-        columns={columns(fetchdata)}
+        columns={columns(fetchData)}
         data={data}
         isLoading={isLoading}
-        name={name}
-        setName={setName}
-        orgs={orgs}
-        setOrgs={setOrgs}
-        setOrgId={setOrgId}
-        setPage={setPage}
-        page={page}
-        totalPage={totalPage}
+        // name={name}
+        // setName={setName}
+        // orgs={orgs}
+        // setOrgs={setOrgs}
+        // setOrgId={setOrgId}
+        // setPage={setPage}
+        // page={page}
+        // totalPage={totalPage}
       />
     </>
   );

@@ -32,6 +32,17 @@ export interface LeavetypeInterface {
   updatedAt?: Date;
 }
 
+export interface ViewLeavetypeInterface {
+  _id: Types.ObjectId;
+  name:string;
+  description:string;
+  org_id: org_id;
+  does_carry_forward:boolean;
+  count_per_month:number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 
 // interface User {
 //   _id: string;

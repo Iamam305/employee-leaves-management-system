@@ -8,7 +8,7 @@ const Page = () => {
   return (
     <>
       <div className="w-full flex items-center justify-end p-2 gap-2">
-      <LeaveTypeModal title="Create Leave Type" />
+      {/* <LeaveTypeModal title="Create Leave Type" /> */}
       <LeaveRequestModal title="Apply For Leave"/>
       </div>
       <ChartData />

@@ -40,7 +40,7 @@ export const POST = async (req: NextRequest) => {
 // get all Leave Types
 export const GET = async (req: NextRequest) => {
     try {
-        const leavetypes = await LeaveType.find();
+        const leavetypes = await LeaveType.find().populate('org_id');
         return NextResponse.json({ msg: "All LeaveTypes fetched Successfully" , data: leavetypes}, { status: 200 });
         
     } catch (error) {
