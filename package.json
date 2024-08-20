@@ -23,6 +23,7 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
     "@reduxjs/toolkit": "^2.2.6",
+    "@syncfusion/ej2-react-calendars": "^26.2.8",
     "@tanstack/react-table": "^8.20.1",
     "axios": "^1.7.2",
     "bcrypt": "^5.1.1",
