@@ -42,7 +42,7 @@ export const columns = (fetchData: () => void): ColumnDef<ViewLeavetypeInterface
   },
   {
     accessorKey: "createdAt",
-    header: "Created At",
+    header: "Date of Creation",
     cell: ({ row }:any) => (
       // truncateText(row.original.call_info?.unique_identifier || "", 10),
       <LeaveToolTip data={FormateDate(row.original.createdAt)} />
@@ -51,7 +51,7 @@ export const columns = (fetchData: () => void): ColumnDef<ViewLeavetypeInterface
   {
     accessorKey: "org",
     header: "Orgnisation Name",
-    cell: ({ row }) => <LeaveToolTip data={row.original.org_id.name || "N/A"} />,
+    cell: ({ row }) => <LeaveToolTip data={row.original.org.name || "N/A"} />,
   },
   {
     accessorKey: "does_carry_forward",

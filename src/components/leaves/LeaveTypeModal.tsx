@@ -13,9 +13,9 @@ const truncateText = (text: any, length: number) => {
 
 const LeaveTypeModal: React.FC<{
   title: string;
-//   accessorKey: any
+  fetchData: () => void
   // row: LeavetypeInterface;
-}> = ({ title }) => {
+}> = ({ title , fetchData}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isloading , setIsLoading] = useState(false)
 //   console.log(accessorKey._id)
@@ -45,7 +45,7 @@ const LeaveTypeModal: React.FC<{
             <div className="p-4 max-h-[60vh] overflow-y-auto">
             <Card className="overflow-hidden max-h-[774px]">
       <CardContent>
-        <LeaveTypeForm onclose={handleclose}/>
+        <LeaveTypeForm fetchData={fetchData} onclose={handleclose}/>
       </CardContent>
     </Card>
             </div>

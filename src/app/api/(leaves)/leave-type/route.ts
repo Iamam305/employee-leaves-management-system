@@ -1,5 +1,6 @@
 import { connect_db } from "@/configs/db";
 import { LeaveType } from "@/models/leave-type.model";
+import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 connect_db();
@@ -38,13 +39,86 @@ export const POST = async (req: NextRequest) => {
 
 
 // get all Leave Types
+// export const GET = async (req: NextRequest) => {
+//     try {
+//         const leavetypes = await LeaveType.find().populate('org_id');
+//         return NextResponse.json({ msg: "All LeaveTypes fetched Successfully" , data: leavetypes}, { status: 200 });
+        
+//     } catch (error) {
+//         console.log(error);
+//         return NextResponse.json({ msg: "Something went wrong" }, { status: 500 });        
+//     }
+// }
+
 export const GET = async (req: NextRequest) => {
     try {
-        const leavetypes = await LeaveType.find().populate('org_id');
-        return NextResponse.json({ msg: "All LeaveTypes fetched Successfully" , data: leavetypes}, { status: 200 });
-        
-    } catch (error) {
-        console.log(error);
-        return NextResponse.json({ msg: "Something went wrong" }, { status: 500 });        
+        // Extract query parameters
+        const org_id = req.nextUrl.searchParams.get("org_id");
+        const name = req.nextUrl.searchParams.get("name");
+        const page = parseInt(req.nextUrl.searchParams.get("page") || "1");
+        const limit = 10; // Items per page
+        const skip = (page - 1) * limit;
+
+        // Build the query for leave types
+        let leaveTypeQuery: any = {};
+
+        if (org_id) {
+            leaveTypeQuery.org_id = new mongoose.Types.ObjectId(org_id);
+        }
+
+        if (name) {
+            leaveTypeQuery.name = {
+                $regex: name,
+                $options: "i" // Case-insensitive search
+            };
+        }
+
+        // Aggregate leave types with org details
+        let leaveTypeAggregation: any[] = [
+            { $match: leaveTypeQuery },
+            {
+                $lookup: {
+                    from: "orgs",
+                    localField: "org_id",
+                    foreignField: "_id",
+                    as: "org",
+                },
+            },
+            {
+                $unwind: "$org",
+            },
+            {
+                $project: {
+                    "org_id": 0, // Exclude org id
+                },
+            },
+            { $sort: { createdAt: -1 } }, // Sort by created date (if applicable)
+            { $skip: skip },
+            { $limit: limit }
+        ];
+
+        // Execute aggregation query with pagination
+        const leavetypes = await LeaveType.aggregate(leaveTypeAggregation);
+
+        // Calculate total documents for pagination
+        const totalLeaveTypes = await LeaveType.countDocuments(leaveTypeQuery);
+        const totalPages = Math.ceil(totalLeaveTypes / limit);
+
+        return NextResponse.json(
+            {
+                pagination: {
+                    totalLeaveTypes,
+                    totalPages,
+                    currentPage: page,
+                    limit,
+                },
+                data: leavetypes,
+                msg: "All LeaveTypes fetched Successfully",
+            },
+            { status: 200 }
+        );
+    } catch (error: any) {
+        console.error("Error fetching leave types:", error);
+        return NextResponse.json({ msg: "Something went wrong", error: error.message || "Internal Server Error" }, { status: 500 });
     }
 }

@@ -30,10 +30,11 @@ const formSchema = z.object({
 });
 
 interface LeaveTypeFormProps {
-  onclose: () => void;  // Define the onclose prop
+  fetchData: () => void; 
+  onclose : () => void; // Define the fetchData prop
 }
 
-export function LeaveTypeForm({ onclose }: LeaveTypeFormProps) {
+export function LeaveTypeForm({ fetchData , onclose }: LeaveTypeFormProps) {
   const [isloading, setIsloading] = useState(false)
 
   // Get membership data from Redux store
@@ -69,7 +70,8 @@ export function LeaveTypeForm({ onclose }: LeaveTypeFormProps) {
         toast.success("Leave Type Added Successfully");
       }
 
-      onclose();
+      onclose()
+      fetchData();
     } catch (error) {
       console.error("Error Requesting leave:", error);
       toast.error("An error occurred while processing your request.");

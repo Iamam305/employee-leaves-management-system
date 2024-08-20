@@ -32,7 +32,7 @@ const LeaveTypeEditModal: React.FC<{
   const [isOpen, setIsOpen] = useState(false);
   const [status, setstatus] = useState("")
   const [isloading , setIsLoading] = useState(false)
-  console.log(accessorKey._id)
+  // console.log(accessorKey._id)
   
   const membership:any = useSelector((state:any) => state.membership.memberShipData)
   
@@ -41,7 +41,7 @@ const LeaveTypeEditModal: React.FC<{
 //     onclose;
 //   }
 
-console.log('fetch modal' , fetchData)
+// console.log('fetch modal' , fetchData)
 
 
   return (

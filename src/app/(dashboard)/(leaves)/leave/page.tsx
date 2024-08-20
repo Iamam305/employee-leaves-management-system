@@ -16,7 +16,7 @@ const Page = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const org_id = useSelector((state:any) => state. organization.selectedOrg)
+  const org_id = useSelector((state:any) => state.organization.selectedOrg)
 
   const fetchLeaves = async () => {
     try {

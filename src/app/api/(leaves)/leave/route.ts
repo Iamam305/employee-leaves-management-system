@@ -1,6 +1,7 @@
 import { EmailVerification } from "@/components/email-temp/EmailVerificationTemplate";
 import { LeaveRequestEmail } from "@/components/email-temp/LeaveRequestTemplate";
 import { connect_db } from "@/configs/db";
+import { auth_middleware } from "@/lib/auth-middleware";
 import { LeaveType } from "@/models/leave-type.model";
 import { Leave } from "@/models/leave.model";
 import { Org } from "@/models/org.model";
@@ -82,130 +83,247 @@ export const POST = async (req : NextRequest) => {
 //     }
 // }
 
-export async function GET(req: NextRequest) {
-    try {
-      const org_id = req.nextUrl.searchParams.get("org_id");
-      const name = req.nextUrl.searchParams.get("name");
-      const status = req.nextUrl.searchParams.get("status");
-      const page = parseInt(req.nextUrl.searchParams.get("page") || "1");
-      const limit = 10;
-      const skip = (page - 1) * limit;
+// export async function GET(req: NextRequest) {
+//     try {
+//       const org_id = req.nextUrl.searchParams.get("org_id");
+//       const name = req.nextUrl.searchParams.get("name");
+//       const status = req.nextUrl.searchParams.get("status");
+//       const page = parseInt(req.nextUrl.searchParams.get("page") || "1");
+//       const limit = 10;
+//       const skip = (page - 1) * limit;
   
-      // Build the query for leaves
-      let leaveQuery: any = {};
-    //   if (org_id) {
-    //     leaveQuery.org._id = org_id;
-    //   }
-    //   if (name) {
-    //     leaveQuery.user_id.name = name;
-    //   }
-      if (status) {
-        leaveQuery.status = status;
-      }
-      let leaveAggregation: any[] = [
-        { $match: leaveQuery },
-        {
-          $lookup: {
-            from: "users",
-            localField: "user_id",
-            foreignField: "_id",
-            as: "user",
-          },
-        },
-        {
-          $unwind: "$user",
-        },
-        {
-          $lookup: {
-            from: "leavetypes",
-            localField: "leave_type_id",
-            foreignField: "_id",
-            as: "leave_type",
-          },
-        },
-        {
-          $unwind: "$leave_type",
-        },
-        {
-          $lookup: {
-            from: "orgs",
-            localField: "org_id",
-            foreignField: "_id",
-            as: "org",
-          },
-        },
-        {
-          $unwind: "$org",
-        },
-        {
-          $project: {
-            "user.password": 0, // Exclude password
-            "user.verification_code": 0, // Exclude verification_code
-            "user.createdAt": 0, // Exclude createdAt
-            "user.updatedAt": 0, // Exclude updatedAt
-            "user.is_verified": 0, // Exclude is_verified
-            "leave_type_id": 0, // Exclude leave_type id
-            "org_id": 0, // Exclude org id
-            "user_id": 0, // Exclude org id
-          },
-        },
-      ];
-  
-      if (name) {
-        leaveAggregation.push({
-          $match: {
-            "user.name": {
-              $regex: name,
-              $options: "i", // Case-insensitive search
-            },
-          },
-        });
-      }
+//       // Build the query for leaves
+//       let leaveQuery: any = {};
 
-      if (org_id) {
-        leaveAggregation.push({
-          $match: {
-            "org._id": new mongoose.Types.ObjectId(org_id),
-          },
-        });
-      }
+//       if (status) {
+//         leaveQuery.status = status;
+//       }
+//       let leaveAggregation: any[] = [
+//         { $match: leaveQuery },
+//         {
+//           $lookup: {
+//             from: "users",
+//             localField: "user_id",
+//             foreignField: "_id",
+//             as: "user",
+//           },
+//         },
+//         {
+//           $unwind: "$user",
+//         },
+//         {
+//           $lookup: {
+//             from: "leavetypes",
+//             localField: "leave_type_id",
+//             foreignField: "_id",
+//             as: "leave_type",
+//           },
+//         },
+//         {
+//           $unwind: "$leave_type",
+//         },
+//         {
+//           $lookup: {
+//             from: "orgs",
+//             localField: "org_id",
+//             foreignField: "_id",
+//             as: "org",
+//           },
+//         },
+//         {
+//           $unwind: "$org",
+//         },
+//         {
+//           $project: {
+//             "user.password": 0, // Exclude password
+//             "user.verification_code": 0, // Exclude verification_code
+//             "user.createdAt": 0, // Exclude createdAt
+//             "user.updatedAt": 0, // Exclude updatedAt
+//             "user.is_verified": 0, // Exclude is_verified
+//             "leave_type_id": 0, // Exclude leave_type id
+//             "org_id": 0, // Exclude org id
+//             "user_id": 0, // Exclude org id
+//           },
+//         },
+//       ];
   
-      leaveAggregation.push(
-        { $sort: { createdAt: -1 } },
-        { $skip: skip },
-        { $limit: limit }
-      );
+//       if (name) {
+//         leaveAggregation.push({
+//           $match: {
+//             "user.name": {
+//               $regex: name,
+//               $options: "i", // Case-insensitive search
+//             },
+//           },
+//         });
+//       }
+
+//       if (org_id) {
+//         leaveAggregation.push({
+//           $match: {
+//             "org._id": new mongoose.Types.ObjectId(org_id),
+//           },
+//         });
+//       }
   
-      const leaves = await Leave.aggregate(leaveAggregation);
+//       leaveAggregation.push(
+//         { $sort: { createdAt: -1 } },
+//         { $skip: skip },
+//         { $limit: limit }
+//       );
   
-      const totalLeaves = await Leave.countDocuments(leaveQuery);
-      const totalPages = Math.ceil(totalLeaves / limit);
+//       const leaves = await Leave.aggregate(leaveAggregation);
   
-    //   const leaves = await Leave.find(leaveQuery)
-    //     .populate("user_id", "-password -createdAt -updatedAt -verification_code -is_verified")
-    //     .populate("leave_type_id")
-    //     .populate("org_id", [], Org)
-    //     .sort({ createdAt: -1 })
-    //     .skip(skip)
-    //     .limit(limit);
+//       const totalLeaves = await Leave.countDocuments(leaveQuery);
+//       const totalPages = Math.ceil(totalLeaves / limit);
   
-      return NextResponse.json(
-        {
-          pagination: {
-            totalLeaves,
-            totalPages,
-            currentPage: page,
-            limit,
-          },
-          leaves,
-        },
-        { status: 200 }
-      );
-    } catch (error: any) {
-      console.error("Error fetching leaves:", error);
-      return NextResponse.json(
-        { error: error.message || "Internal Server Error" },
-        { status: 500 }
-      );
+//     //   const leaves = await Leave.find(leaveQuery)
+//     //     .populate("user_id", "-password -createdAt -updatedAt -verification_code -is_verified")
+//     //     .populate("leave_type_id")
+//     //     .populate("org_id", [], Org)
+//     //     .sort({ createdAt: -1 })
+//     //     .skip(skip)
+//     //     .limit(limit);
+  
+//       return NextResponse.json(
+//         {
+//           pagination: {
+//             totalLeaves,
+//             totalPages,
+//             currentPage: page,
+//             limit,
+//           },
+//           leaves,
+//         },
+//         { status: 200 }
+//       );
+//     } catch (error: any) {
+//       console.error("Error fetching leaves:", error);
+//       return NextResponse.json(
+//         { error: error.message || "Internal Server Error" },
+//         { status: 500 }
+//       );
+//     }
+//   }
+
+
+export async function GET(req: NextRequest) {
+  try {
+    const auth: any = await auth_middleware(req);
+    const org_id = req.nextUrl.searchParams.get("org_id");
+    const name = req.nextUrl.searchParams.get("name");
+    const status = req.nextUrl.searchParams.get("status");
+    const page = parseInt(req.nextUrl.searchParams.get("page") || "1");
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    // Authorization check
+    if (auth[0] === null || auth[1] !== null) {
+      console.error("Authentication error:", auth[1]);
+      return NextResponse.json({ msg: "Unauthorized" }, { status: 401 });
     }
+
+    const auth_data = auth[0];
+    let leaveQuery: any = {};
+
+    // Role-based leave query filtering
+    if (auth_data.membership.role === "admin") {
+      // Admin can view leaves of all users
+    } else if (auth_data.membership.role === "hr" || auth_data.membership.role === "manager") {
+      // HR/Managers can view leaves within their organization
+      leaveQuery.org_id = auth_data.membership.org_id;
+    } else {
+      // Employees can view only their own leaves
+      leaveQuery.user_id = auth_data.membership.user_id;
+    }
+
+    // Additional filters (status and name)
+    if (status) {
+      leaveQuery.status = status;
+    }
+
+    // Aggregation pipeline
+    let leaveAggregation: any[] = [
+      { $match: leaveQuery },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user_id",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      {
+        $lookup: {
+          from: "leavetypes",
+          localField: "leave_type_id",
+          foreignField: "_id",
+          as: "leave_type",
+        },
+      },
+      { $unwind: "$leave_type" },
+      {
+        $lookup: {
+          from: "orgs",
+          localField: "org_id",
+          foreignField: "_id",
+          as: "org",
+        },
+      },
+      { $unwind: "$org" },
+      {
+        $project: {
+          "user.password": 0,
+          "user.verification_code": 0,
+          "user.createdAt": 0,
+          "user.updatedAt": 0,
+          "user.is_verified": 0,
+          "leave_type_id": 0,
+          "org_id": 0,
+          "user_id": 0,
+        },
+      },
+    ];
+
+    // Filter by employee name (case-insensitive)
+    if (name) {
+      leaveAggregation.push({
+        $match: {
+          "user.name": {
+            $regex: name,
+            $options: "i",
+          },
+        },
+      });
+    }
+
+    // Add sorting, skipping, and limiting for pagination
+    leaveAggregation.push(
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit }
+    );
+
+    // Execute the aggregation
+    const leaves = await Leave.aggregate(leaveAggregation);
+
+    // Get the total number of leaves for pagination
+    const totalLeaves = await Leave.countDocuments(leaveQuery);
+    const totalPages = Math.ceil(totalLeaves / limit);
+
+    return NextResponse.json(
+      {
+        leaves,
+        totalPages,
+        currentPage: page,
+      },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || "Internal Server Error" },
+      { status: 500 }
+    );
   }
+}
