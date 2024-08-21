@@ -17,9 +17,8 @@ export const MemberTableClient: React.FC<any> = ({
   setOrgId,
   page,
   setPage,
-  // page,
-  // setPage,
   totalPage,
+  current_user_role,
 }) => {
   return (
     <>
@@ -35,7 +34,7 @@ export const MemberTableClient: React.FC<any> = ({
       <Separator />
       <DataTable
         searchKey=""
-        columns={columns}
+        columns={columns(current_user_role)}
         data={data}
         isLoading={isLoading}
         name={name}

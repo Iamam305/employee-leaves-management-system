@@ -9,6 +9,7 @@ const Page = () => {
   const [members, setMembers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [name, setName] = useState<string>("");
+  const [role, setRole] = useState<string>("");
   const [orgs, setOrgs] = useState<any>([]);
   // const [orgId, setOrgId] = useState<string>("");
   const [page, setPage] = useState<number>(1);
@@ -17,6 +18,10 @@ const Page = () => {
   const pathname = usePathname();
 
   const searchParams = useSearchParams();
+
+  const user_role = useSelector(
+    (state: any) => state.membership.memberShipData?.role
+  );
 
   const org_id = useSelector((state:any) => state. organization.selectedOrg)
 
@@ -41,6 +46,7 @@ const Page = () => {
         role: member.role,
         orgName: member.org_id?.name ?? "N/A",
       }));
+      setRole(user_role)
       setMembers(flattenedMembers);
       setTotalPages(data.pagination.totalPages);
     } catch (error) {
@@ -103,6 +109,7 @@ const Page = () => {
         page={page}
         setPage={setPage}
         totalPage={totalPages}
+        current_user_role={role}
       />
     </div>
   );
