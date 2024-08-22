@@ -1,136 +1,189 @@
-"use client";
 import React, { useEffect, useState } from "react";
-import { format, eachDayOfInterval, isSameDay, getYear, getMonth, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays } from "date-fns";
+import UserStatsCard from "./UserStatsCard";
+import LeaveCalendar from "./LeaveCalendar";
 import axios from "axios";
+import LineChart from "../dashboard/stats/LineChart";
+import DoughnutChart from "../dashboard/stats/DoughnutChart";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { usePathname, useRouter } from "next/navigation";
 
 const UserDashboard = () => {
-  const [leavePeriods, setLeavePeriods] = useState<any[]>([]);
-  const leaveDays = leavePeriods.flatMap(({ start, end }) =>
-    eachDayOfInterval({ start: new Date(start), end: new Date(end) })
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [acceptedLeavesData, setAcceptedLeavesData] = useState<any>([]);
+  const [rejectedLeavesData, setRejectedLeavesData] = useState<any>([]);
+  const [totalAcceptedLeaves, setTotalAcceptedLeaves] = useState<number>();
+  const [totalRejectedLeaves, setTotalRejectedLeaves] = useState<number>();
+  const [totalLeaves, setTotalLeaves] = useState<number>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [selectedMonth, setSelectedMonth] = useState<any>();
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear()
   );
 
-  console.log("Leave Days==> ", leaveDays);
-
-  const getLeavesDetails = async () => {
+  const fetchUserDashboardDetails = async () => {
     try {
-      const { data } = await axios.get(
-        `http://localhost:3000/api/org/get-members/66b5e16b725dba994dc40f7d`
-      );
-      console.log("Data===> ", data.leaves[0]?.leaves);
-      setLeavePeriods(data.leaves[0]?.leaves || []);
+      setLoading(true);
+      let queryString = `user_id=66b5e16b725dba994dc40f7d&org_id=669f97ab186ea1a384360673`;
+  
+      if (selectedMonth) {
+        const monthYear = format(selectedMonth, "yyyy-MM");
+        queryString += `&monthYear=${monthYear}`;
+      }
+  
+      const response = await axios.get(`/api/dashboard/user?${queryString}`);
+      const data = response.data;
+  
+      // Handling accepted leaves
+      const acceptedLeaves = data.accepted_leaves?.[0] || {};
+      setTotalAcceptedLeaves(acceptedLeaves.totalAcceptedLeaves || 0);
+      setAcceptedLeavesData(acceptedLeaves.accepted_leaves || []);
+  
+      // Handling rejected leaves
+      const rejectedLeaves = data.rejected_leaves?.[0] || {};
+      setTotalRejectedLeaves(rejectedLeaves.totalRejectedLeaves || 0);
+      setRejectedLeavesData(rejectedLeaves.rejecetd_leaves || []);
+  
+      // Handling total leaves
+      const totalLeavesData = data.totalLeaves?.[0] || {};
+      setTotalLeaves(totalLeavesData.totalLeaves || 0);
+  
     } catch (error) {
-      console.error("Error fetching leave details:", error);
+      console.error("API request failed:", error);
+      // Reset state in case of error
+      setTotalAcceptedLeaves(0);
+      setAcceptedLeavesData([]);
+      setTotalRejectedLeaves(0);
+      setRejectedLeavesData([]);
+      setTotalLeaves(0);
+    } finally {
+      setLoading(false);
     }
   };
+  
+  
 
   useEffect(() => {
-    getLeavesDetails();
-  }, []);
+    fetchUserDashboardDetails();
+  }, [selectedMonth,selectedYear]);
 
-  const generateCalendarDays = (year: number, month: number) => {
-    const firstDayOfMonth = startOfMonth(new Date(year, month));
-    const lastDayOfMonth = endOfMonth(new Date(year, month));
-    const startDate = startOfWeek(firstDayOfMonth);
-    const endDate = endOfWeek(lastDayOfMonth);
-    return eachDayOfInterval({ start: startDate, end: endDate });
-  };
+  useEffect(() => {
+    const query_params = new URLSearchParams();
+    if (selectedMonth) {
+      const formattedMonth = format(selectedMonth, "YYY-MM");
+      query_params.set("month", formattedMonth);
+    }
+    const queryString = query_params.toString();
+    const newPath = queryString ? `${pathname}?${queryString}` : pathname;
+    router.push(newPath);
+  }, [selectedMonth, selectedYear]);
 
-  const renderDashboard = (year: number, month: number) => {
-    const calendarDays = generateCalendarDays(year, month);
-    const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-    const cellWidth = 440 / 7; 
-
-    return (
-      <div key={`${month}-${year}`} className=" p-1 flex flex-col items-center justify-center h-max-content border ">
-        <h3>{format(new Date(year, month), "MMMM yyyy")}</h3>
-        <div className="flex flex-wrap" style={{ width: "440px" }}>
-          <div className="flex w-full mb-2">
-            {weekDays.map(day => (
-              <div
-                key={day}
-                className="text-center"
-                style={{ width: `${cellWidth}px`, height: "30px" }}
-              >
-                {day}
-              </div>
-            ))}
-          </div>
-          {calendarDays.map(day => {
-            const isCurrentMonth = getMonth(day) === month;
-            const isLeave = leaveDays.some(leaveDay =>
-              isSameDay(day, leaveDay)
-            );
-            return (
-              <div
-                key={format(day, "yyyy-MM-dd")}
-                className={`text-center mt-2 ${isLeave ? "bg-blue-400" : "bg-transparent"} ${isCurrentMonth ? "" : "text-gray-300"} border `}
-                style={{ width: `${cellWidth}px`, height: "30px" }}
-              >
-                {format(day, "d")}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  const currentDate = new Date();
-  const currentYear = getYear(currentDate);
-  const currentMonth = getMonth(currentDate);
-
-  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
-  const [selectedYear, setSelectedYear] = useState(currentYear);
-
-  const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedMonth(Number(event.target.value));
+  const handleMonthSelect = (monthIndex: number) => {
+    const updatedDate = new Date(selectedYear, monthIndex);
+    setSelectedMonth(updatedDate);
   };
 
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedYear(Number(event.target.value));
+    setSelectedYear(parseInt(event.target.value));
   };
 
   return (
     <div>
-      {/* <div>
-        <label htmlFor="month-select">Select Month: </label>
-        <select
-          id="month-select"
-          value={selectedMonth}
-          onChange={handleMonthChange}
-        >
-          {Array.from({ length: 12 }).map((_, index) => (
-            <option key={index} value={index}>
-              {format(new Date(currentYear, index), "MMMM")}
-            </option>
-          ))}
-        </select>
-        <label htmlFor="year-select"> Select Year: </label>
-        <select
-          id="year-select"
-          value={selectedYear}
-          onChange={handleYearChange}
-        >
-          {Array.from({ length: 10 }, (_, i) => currentYear - 5 + i).map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
-      </div> */}
-      {renderDashboard(selectedYear, selectedMonth)}
-      <div>
-        {/* <p>
-          Leave periods:
-          <br />
-          {leavePeriods.map(({ start, end }) => (
-            <span key={`${format(start, "yyyy-MM-dd")}`}>
-              {format(new Date(start), "dd MMM yyyy")} to {format(new Date(end), "dd MMM yyyy")}
-              <br />
-            </span>
-          ))}
-        </p> */}
+      <div className="flex items-center justify-center">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              id="month-year-picker"
+              variant={"outline"}
+              className={cn(
+                "w-[300px] justify-start text-left font-normal",
+                !selectedMonth && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {selectedMonth ? (
+                `${format(selectedMonth, "MMMM")} ${selectedYear}`
+              ) : (
+                <span>Pick a month and year</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-4" align="start">
+            <div className="flex justify-between mb-4">
+              <select
+                value={selectedYear}
+                onChange={handleYearChange}
+                className="border p-2 rounded"
+              >
+                {Array.from(
+                  { length: 10 },
+                  (_, i) => new Date().getFullYear() - i
+                ).map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {Array.from({ length: 12 }, (_, i) => (
+                <Button
+                  key={i}
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleMonthSelect(i)}
+                >
+                  {format(new Date(selectedYear, i), "MMMM")}
+                </Button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      <div className="w-full p-4 flex items-center gap-5 justify-around">
+        <div className="w-[40%] h-[40vh]">
+          <LeaveCalendar />
+        </div>
+        <div className="w-[60%]">
+          <UserStatsCard
+            totalLeaves={totalLeaves}
+            totalRejectedLeaves={totalRejectedLeaves}
+            totalAcceptedLeaves={totalAcceptedLeaves}
+            totalUsers={70}
+          />
+        </div>
+      </div>
+
+      <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">
+        {loading ? (
+          <p>Loading...</p>
+        ) : acceptedLeavesData.length > 0 ? (
+          <LineChart data={acceptedLeavesData} title={"Approved Leaves"} />
+        ) : (
+          <p>No approved leaves data available</p>
+        )}
+        {loading ? (
+          <p>Loading...</p>
+        ) : rejectedLeavesData.length > 0 ? (
+          <LineChart data={rejectedLeavesData} title={"Rejected Leaves"} />
+        ) : (
+          <p>No rejected leaves data available</p>
+        )}
+      </div>
+
+      <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">
+        <LineChart data={[]} title={"Balance History"} />
+        <DoughnutChart data={[]} title={"Leaves Info"} />
       </div>
     </div>
   );

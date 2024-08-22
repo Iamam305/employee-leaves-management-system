@@ -23,19 +23,8 @@ const Page = () => {
           <div className="w-full flex items-center justify-end p-2 gap-2">
             <LeaveRequestModal title="Apply For Leave" />
           </div>
-        <div className=" w-full p-4  flex items-center gap-5 justify-around ">
-            <div className=" w-[40%]  h-[40vh]">
           <UserDashboard />
-            </div>
-          <div className=" w-[60%]">
-            <UserStatsCard
-              totalLeaves={50}
-              totalPendingLeaves={60}
-              totalUsers={70}
-            />
-          </div>
-        </div>
-</>
+        </>
       )}
       {(user_role === "admin" ||
         user_role === "hr" ||

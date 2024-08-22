@@ -9,34 +9,31 @@ import { createElement } from "react";
 const UserStatsCard = ({
   totalLeaves,
   totalPendingLeaves,
-  totalUsers,
+  totalAcceptedLeaves,
+  totalRejectedLeaves
 }: any) => {
   const UserStatsCardData = [
     {
       key: "leave",
       title: "Total Leaves",
-      // change: -2,
       value: totalLeaves,
       icon: TbListCheck,
     },
     {
       key: "user",
       title: "Accepted Leaves",
-      // change: 4,
-      value: totalUsers,
+      value: totalAcceptedLeaves,
       icon: HiOutlineUserGroup,
     },
     {
       key: "event",
       title: "Rejected Leaves",
-      // change: -20,
-      value: totalPendingLeaves,
+      value: totalRejectedLeaves,
       icon: BsCalendar4Event,
     },
     {
       key: "balance",
       title: "Balance Left",
-      // change: 3,
       value: 20,
       icon: MdOutlineBalance,
     },
