@@ -13,9 +13,27 @@ export const columns = (role: string): ColumnDef<MemberTypeInterface>[] => {
       cell: ({ row }) => row.index + 1,
     },
     {
-      header: "username",
+      header: "Username",
       accessorKey: "name",
-      cell: ({ row }) => row.original.username,
+      cell: ({ row }) => {
+        const username = row.original.username;
+
+        if (
+          (role === "admin" || role === "hr" || role === "manager") &&
+          row.original.role === "employee"
+        ) {
+          return (
+            <Link
+              href={`/members/${row.original.id}`}
+              className="hover:underline"
+            >
+              {username}
+            </Link>
+          );
+        }
+
+        return <span>{username}</span>;
+      },
     },
     {
       header: "Email",
@@ -61,21 +79,7 @@ export const columns = (role: string): ColumnDef<MemberTypeInterface>[] => {
         </h1>
       ),
     });
-
-    baseColumns.push({
-      header: "View",
-      accessorKey: "View",
-      cell: ({ row }) => (
-
-        <div>
-          <Button className=" flex items-center justify-between">
-          <Link href={`/members/${row.original.id}`}>View</Link>
-          </Button>
-        </div>
-      ),
-    });
   }
 
-  // Always return the baseColumns array
   return baseColumns;
 };

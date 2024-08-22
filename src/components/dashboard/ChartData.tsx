@@ -5,6 +5,7 @@ import axios from "axios";
 import DoughnutChart from "./stats/DoughnutChart";
 import StatsCards from "./StateCards";
 import { useSelector } from "react-redux";
+import { Skeleton } from "../ui/skeleton";
 
 const ChartData = () => {
   const org_id = useSelector((state: any) => state.organization.selectedOrg);
@@ -44,30 +45,49 @@ const ChartData = () => {
 
   return (
     <div>
-      <StatsCards
-        totalLeaves={totalLeaves}
-        totalPendingLeaves={totalPendingLeaves}
-        totalUsers={totalUsers}
-      />
+      {loading ? (
+        <>
+          <div className=" flex items-center justify-between w-full gap-5">
+            <Skeleton className=" h-40 w-1/4" />
+            <Skeleton className=" h-40 w-1/4" />
+            <Skeleton className=" h-40 w-1/4" />
+            <Skeleton className=" h-40 w-1/4" />
+          </div>
+        </>
+      ) : (
+        <StatsCards
+          totalLeaves={totalLeaves}
+          totalPendingLeaves={totalPendingLeaves}
+          totalUsers={totalUsers}
+        />
+      )}
       <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">
-        {usersData.length > 0 ? (
+        {loading ? (
+          <Skeleton className="w-full h-64" />
+        ) : usersData.length > 0 ? (
           <LineChart data={usersData} title={"Total Users"} />
         ) : (
           <p>No user data available</p>
         )}
-        {leavesData.length > 0 ? (
+        {loading ? (
+          <Skeleton className="w-full h-64" />
+        ) : leavesData.length > 0 ? (
           <LineChart data={leavesData} title={"Total Leaves"} />
         ) : (
           <p>No leaves data available</p>
         )}
       </div>
       <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">
-        {pendingLeaves.length > 0 ? (
+        {loading ? (
+          <Skeleton className="w-full h-64" />
+        ) : pendingLeaves.length > 0 ? (
           <LineChart data={pendingLeaves} title={"Pending Leaves"} />
         ) : (
           <p>No pending leaves data available</p>
         )}
-        {leavesInfo.length > 0 ? (
+        {loading ? (
+          <Skeleton className="w-full h-64" />
+        ) : leavesInfo.length > 0 ? (
           <DoughnutChart data={leavesInfo} title={"Leaves Info"} />
         ) : (
           <p>No leaves info available</p>

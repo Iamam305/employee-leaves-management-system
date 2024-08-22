@@ -15,17 +15,18 @@ import { Button } from "../ui/button";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { usePathname, useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 
-interface UserDashboardProps {
-  id?: string;
-}
 
-const UserDashboard = ({ id }: UserDashboardProps) => {
+const UserDashboard = ({ id }: any) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Use provided id or fallback to default
-  const userId = id || "66b5e16b725dba994dc40f7d";
+  const current_user = useSelector((state: any) => state.auth.userData);
+
+  console.log("Auth Data==> ", current_user._id);
+
+  const userId = id || current_user._id;
 
   const [acceptedLeavesData, setAcceptedLeavesData] = useState<any>([]);
   const [rejectedLeavesData, setRejectedLeavesData] = useState<any>([]);
@@ -66,7 +67,6 @@ const UserDashboard = ({ id }: UserDashboardProps) => {
       // Handling total leaves
       const totalLeavesData = data.totalLeaves?.[0] || {};
       setTotalLeaves(totalLeavesData.totalLeaves || 0);
-
     } catch (error) {
       console.error("API request failed:", error);
       // Reset state in case of error
