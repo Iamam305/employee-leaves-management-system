@@ -41,6 +41,7 @@ const Page = () => {
       const response = await axios.get(`/api/org/get-members?${queryString}`);
       const data = response.data;
       const flattenedMembers = data.all_members.map((member: any) => ({
+        id:member.user_id?._id ?? "N/A",
         username: member.user_id?.name ?? "N/A",
         email: member.user_id?.email ?? "N/A",
         role: member.role,
@@ -95,6 +96,8 @@ const Page = () => {
   useEffect(() => {
     fetch_all_orgs();
   }, []);
+
+  console.log("mmebers ===> ",members)
 
   return (
     <div className="p-4">

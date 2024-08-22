@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
     const user_id = searchParams.get("user_id");
-    const org_id = searchParams.get("org_id");
+    // const org_id = searchParams.get("org_id");
     const monthYear = searchParams.get("monthYear");
 
     const matchFilter: any = {};
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       {
         $match: {
           status: "approved",
-          org_id: new ObjectId(org_id),
+          // org_id: new ObjectId(org_id),
           user_id: new ObjectId(user_id),
           ...matchFilter,
         },
@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
       {
         $match: {
           status: "rejected",
-          org_id: new ObjectId(org_id),
+          // org_id: new ObjectId(org_id),
           user_id: new ObjectId(user_id),
           ...matchFilter,
         },
@@ -133,7 +133,7 @@ export async function GET(req: NextRequest) {
     const totalLeaves = await Leave.aggregate([
       {
         $match: {
-          org_id: new ObjectId(org_id),
+          // org_id: new ObjectId(org_id),
           user_id: new ObjectId(user_id),
         },
       },

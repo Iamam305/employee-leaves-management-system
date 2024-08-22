@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import UserStatsCard from "./UserStatsCard";
 import LeaveCalendar from "./LeaveCalendar";
@@ -15,9 +16,16 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { usePathname, useRouter } from "next/navigation";
 
-const UserDashboard = () => {
+interface UserDashboardProps {
+  id?: string;
+}
+
+const UserDashboard = ({ id }: UserDashboardProps) => {
   const router = useRouter();
   const pathname = usePathname();
+
+  // Use provided id or fallback to default
+  const userId = id || "66b5e16b725dba994dc40f7d";
 
   const [acceptedLeavesData, setAcceptedLeavesData] = useState<any>([]);
   const [rejectedLeavesData, setRejectedLeavesData] = useState<any>([]);
@@ -30,33 +38,35 @@ const UserDashboard = () => {
     new Date().getFullYear()
   );
 
+  // &org_id=669f97ab186ea1a384360673
+
   const fetchUserDashboardDetails = async () => {
     try {
       setLoading(true);
-      let queryString = `user_id=66b5e16b725dba994dc40f7d&org_id=669f97ab186ea1a384360673`;
-  
+      let queryString = `user_id=${userId}`;
+
       if (selectedMonth) {
         const monthYear = format(selectedMonth, "yyyy-MM");
         queryString += `&monthYear=${monthYear}`;
       }
-  
+
       const response = await axios.get(`/api/dashboard/user?${queryString}`);
       const data = response.data;
-  
+
       // Handling accepted leaves
       const acceptedLeaves = data.accepted_leaves?.[0] || {};
       setTotalAcceptedLeaves(acceptedLeaves.totalAcceptedLeaves || 0);
       setAcceptedLeavesData(acceptedLeaves.accepted_leaves || []);
-  
+
       // Handling rejected leaves
       const rejectedLeaves = data.rejected_leaves?.[0] || {};
       setTotalRejectedLeaves(rejectedLeaves.totalRejectedLeaves || 0);
       setRejectedLeavesData(rejectedLeaves.rejecetd_leaves || []);
-  
+
       // Handling total leaves
       const totalLeavesData = data.totalLeaves?.[0] || {};
       setTotalLeaves(totalLeavesData.totalLeaves || 0);
-  
+
     } catch (error) {
       console.error("API request failed:", error);
       // Reset state in case of error
@@ -69,17 +79,15 @@ const UserDashboard = () => {
       setLoading(false);
     }
   };
-  
-  
 
   useEffect(() => {
     fetchUserDashboardDetails();
-  }, [selectedMonth,selectedYear]);
+  }, [selectedMonth, selectedYear]);
 
   useEffect(() => {
     const query_params = new URLSearchParams();
     if (selectedMonth) {
-      const formattedMonth = format(selectedMonth, "YYY-MM");
+      const formattedMonth = format(selectedMonth, "yyyy-MM");
       query_params.set("month", formattedMonth);
     }
     const queryString = query_params.toString();
@@ -152,7 +160,7 @@ const UserDashboard = () => {
 
       <div className="w-full p-4 flex items-center gap-5 justify-around">
         <div className="w-[40%] h-[40vh]">
-          <LeaveCalendar />
+          <LeaveCalendar userId={userId} />
         </div>
         <div className="w-[60%]">
           <UserStatsCard

@@ -70,4 +70,5 @@ export interface MemberTypeInterface{
   email: string;
   role: string;
   orgName: string;
+  id:string
 }

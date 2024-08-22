@@ -14,7 +14,7 @@ import {
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 
-const LeaveCalendar = () => {
+const LeaveCalendar = ({ userId }: any) => {
   const [leavePeriods, setLeavePeriods] = useState<any[]>([]);
   const searchParams = useSearchParams();
   const month_param = searchParams.get("month");
@@ -27,7 +27,7 @@ const LeaveCalendar = () => {
     if (month_param) {
       const [year, month] = month_param.split("-");
       setSelectedYear(parseInt(year, 10));
-      setSelectedMonth(parseInt(month, 10) - 1); 
+      setSelectedMonth(parseInt(month, 10) - 1);
     }
   }, [month_param]);
 
@@ -35,9 +35,11 @@ const LeaveCalendar = () => {
     eachDayOfInterval({ start: new Date(start), end: new Date(end) })
   );
 
+  const id = userId || "66b5e16b725dba994dc40f7d";
+
   const getLeavesDetails = async () => {
     try {
-      let api_url = `http://localhost:3000/api/org/get-members/66b5e16b725dba994dc40f7d`;
+      let api_url = `http://localhost:3000/api/org/get-members/${id}`;
 
       if (month_param) {
         api_url += `?month=${month_param}`;

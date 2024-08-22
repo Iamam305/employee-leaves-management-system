@@ -1,8 +1,9 @@
-"use client";
-import { ColumnDef } from "@tanstack/react-table";
-import { MemberTypeInterface } from "@/lib/type";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { MemberTypeInterface } from "@/lib/type";
+import { ColumnDef } from "@tanstack/react-table";
 import { Plus } from "lucide-react";
+import Link from "next/link";
 
 export const columns = (role: string): ColumnDef<MemberTypeInterface>[] => {
   const baseColumns: ColumnDef<MemberTypeInterface>[] = [
@@ -53,9 +54,28 @@ export const columns = (role: string): ColumnDef<MemberTypeInterface>[] => {
     baseColumns.push({
       header: "Credits",
       accessorKey: "credits",
-      cell: ({ row }) => <h1 className="flex items-center cursor-pointer text-blue-500"><Plus className="h-4 w-4"/>Add Credits</h1>,
+      cell: ({ row }) => (
+        <h1 className="flex items-center cursor-pointer text-blue-500">
+          <Plus className="h-4 w-4" />
+          Add Credits
+        </h1>
+      ),
+    });
+
+    baseColumns.push({
+      header: "View",
+      accessorKey: "View",
+      cell: ({ row }) => (
+
+        <div>
+          <Button className=" flex items-center justify-between">
+          <Link href={`/members/${row.original.id}`}>View</Link>
+          </Button>
+        </div>
+      ),
     });
   }
 
+  // Always return the baseColumns array
   return baseColumns;
 };
