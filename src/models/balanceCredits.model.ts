@@ -7,7 +7,7 @@ const balanceSchema = new mongoose.Schema(
       required: true,
     },
     userId: {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },
@@ -26,4 +26,4 @@ const balanceSchema = new mongoose.Schema(
   }
 );
 
-export const Balances = mongoose.model("Balances", balanceSchema);
+export const Balances = mongoose?.models?.Balances || mongoose.model("Balances", balanceSchema);

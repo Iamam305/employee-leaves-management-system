@@ -1,17 +1,16 @@
 import { Balances } from "@/models/balanceCredits.model";
 import { LeaveType } from "@/models/leave-type.model";
-import { type ClassValue, clsx } from "clsx"
+import { type ClassValue, clsx } from "clsx";
 import dayjs from "dayjs";
-import { twMerge } from "tailwind-merge"
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
-
-export const debounce = (func:any, delay:any) => {
-  let timeoutId:any;
-  return (...args:any) => {
+export const debounce = (func: any, delay: any) => {
+  let timeoutId: any;
+  return (...args: any) => {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
@@ -21,21 +20,21 @@ export const debounce = (func:any, delay:any) => {
   };
 };
 
-export const FormateDate =  (date:Date) => {
-  const convertedDate = dayjs(date).format("DD/MM/YYYY")
+export const FormateDate = (date: Date) => {
+  const convertedDate = dayjs(date).format("DD/MM/YYYY");
   return convertedDate;
-}
+};
 
-export const getDays =  (startdate:Date , enddate:Date) => {
+export const getDays = (startdate: Date, enddate: Date) => {
   const start = dayjs(startdate);
   const end = dayjs(enddate);
-  return end.diff(start,'days') + 1;
-}
+  return end.diff(start, "days") + 1;
+};
 
-export const initializeEmployeeBalance = async(userId:string, year:any) => {
+export const initializeEmployeeBalance = async (userId: string, year: any) => {
   const leaveTypes = await LeaveType.find();
 
-  const leaveBalances = leaveTypes.reduce((acc, leaveType) => {
+  const leaveBalances: any = leaveTypes.reduce((acc, leaveType) => {
     acc[leaveType.name] = {
       credit: 0,
       used: 0,
@@ -52,11 +51,15 @@ export const initializeEmployeeBalance = async(userId:string, year:any) => {
 
   await balance.save();
   return balance;
-}
+};
 
-
-export const updateEmployeeBalance = async(userId:string, year:any, leaveTypeName:string, credit:number) => {
-  const balance:any = await Balances.findOne({ userId, year });
+export const updateEmployeeBalance = async (
+  userId: string,
+  year: any,
+  leaveTypeName: string,
+  credit: number
+) => {
+  const balance: any = await Balances.findOne({ userId, year });
 
   if (!balance) {
     throw new Error("Balance not found for the specified user and year");
@@ -69,15 +72,14 @@ export const updateEmployeeBalance = async(userId:string, year:any, leaveTypeNam
   balance.leaveBalances.set(leaveTypeName, {
     credit,
     used: balance.leaveBalances.get(leaveTypeName).used,
-    available: credit - balance.leaveBalances.get(leaveTypeName).used
+    available: credit - balance.leaveBalances.get(leaveTypeName).used,
   });
 
   await balance.save();
   return balance;
-}
+};
 
-
-export const addNewLeaveTypeToAllEmployees = async(leaveTypeName:any) => {
+export const addNewLeaveTypeToAllEmployees = async (leaveTypeName: any) => {
   const employees = await Balances.find();
 
   for (const employee of employees) {
@@ -90,14 +92,13 @@ export const addNewLeaveTypeToAllEmployees = async(leaveTypeName:any) => {
       await employee.save();
     }
   }
-}
+};
 
-
-export const calculateAndUpdateBalances = async(
-  userId:string,
-  year:any,
-  leaveTypeName:string,
-  days:number
+export const calculateAndUpdateBalances = async (
+  userId: string,
+  year: any,
+  leaveTypeName: string,
+  days: number
 ) => {
   // Find the balance record for the specific user and year
   const balance = await Balances.findOne({ userId, year });
@@ -112,7 +113,7 @@ export const calculateAndUpdateBalances = async(
   }
 
   // Get the current balance for the specified leave type
-  const currentBalance:any = balance.leaveBalances.get(leaveTypeName);
+  const currentBalance: any = balance.leaveBalances.get(leaveTypeName);
 
   // Calculate the updated balance
   const updatedUsed = currentBalance.used + days;
@@ -129,6 +130,4 @@ export const calculateAndUpdateBalances = async(
   await balance.save();
 
   return balance;
-}
-
-
+};

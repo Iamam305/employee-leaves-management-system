@@ -10,15 +10,14 @@ const leave_type = new mongoose.Schema(
       type: String,
     },
     org_id: {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref:"Org"
+      ref: "Org",
     },
 
     does_carry_forward: {
       type: Boolean,
     },
-
     count_per_month: {
       type: Number,
     },
@@ -28,5 +27,7 @@ const leave_type = new mongoose.Schema(
   }
 );
 
-export const LeaveType =
-  mongoose.models.LeaveType || mongoose.model("LeaveType", leave_type);
+
+export const LeaveType = mongoose.models?.LeaveType || mongoose.model("LeaveType", leave_type);
+
+
