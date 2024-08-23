@@ -25,9 +25,9 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ msg: "Unauthorized" }, { status: 401 });
     }
     const authData = auth[0];
-    if (authData?.membership?.role !== "admin") {
+    if (authData?.membership?.role === "employee" ) {
       return NextResponse.json(
-        { msg: "Unauthorized - Admin access required" },
+        { msg: "Unauthorized -  access required" },
         { status: 403 }
       );
     }

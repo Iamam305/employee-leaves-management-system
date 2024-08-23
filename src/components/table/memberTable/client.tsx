@@ -6,6 +6,8 @@ import { DataTable } from "@/components/ui/data-table";
 import Link from "next/link";
 import { Heading } from "@/components/ui/heading";
 import { columns } from "./columns";
+import InviteMembers from "@/components/Invitations/InviteMember";
+import { useSelector } from "react-redux";
 
 export const MemberTableClient: React.FC<any> = ({
   data,
@@ -20,16 +22,17 @@ export const MemberTableClient: React.FC<any> = ({
   totalPage,
   current_user_role,
 }) => {
+  const user_role = useSelector(
+    (state: any) => state.membership.memberShipData?.role
+  );
+
   return (
     <>
       <div className="flex items-start justify-between   ">
         <Heading title={`All Members`} description="All Members Details" />
-        <Link href={"/members/invite-members"}>
-          <Button className=" flex items-center gap-2">
-            <PlusIcon className=" h-4 w-4" />
-            Invite Members
-          </Button>
-        </Link>
+        {/* <Link href={"/members/invite-members"}> */}
+        {user_role !== "employee" && <InviteMembers />}
+        {/* </Link> */}
       </div>
       <Separator />
       <DataTable
@@ -41,7 +44,7 @@ export const MemberTableClient: React.FC<any> = ({
         setName={setName}
         orgs={orgs}
         setOrgs={setOrgs}
-        setOrgId={  setOrgId}
+        setOrgId={setOrgId}
         setPage={setPage}
         page={page}
         totalPage={totalPage}
