@@ -16,7 +16,7 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { usePathname, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
-
+import { Skeleton } from "../ui/skeleton";
 
 const UserDashboard = ({ id }: any) => {
   const router = useRouter();
@@ -106,7 +106,7 @@ const UserDashboard = ({ id }: any) => {
 
   return (
     <div>
-      <div className="flex items-center justify-center">
+      <div className="flex items-start md:pl-10 md:mb-0 mb-4 ">
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -158,12 +158,13 @@ const UserDashboard = ({ id }: any) => {
         </Popover>
       </div>
 
-      <div className="w-full p-4 flex items-center gap-5 justify-around">
-        <div className="w-[40%] h-[40vh]">
-          <LeaveCalendar userId={userId} />
+      <div className="w-full md:p-4 p-1 flex md:flex-row  flex-col-reverse items-start gap-5 justify-around ">
+        <div className="md:w-[40%] h-[40vh]  w-full">
+          <LeaveCalendar userId={userId} loading={loading} />
         </div>
-        <div className="w-[60%]">
+        <div className="md:w-[60%] md:h-[40vh] w-full h-fit">
           <UserStatsCard
+            loading={loading}
             totalLeaves={totalLeaves}
             totalRejectedLeaves={totalRejectedLeaves}
             totalAcceptedLeaves={totalAcceptedLeaves}
@@ -174,25 +175,24 @@ const UserDashboard = ({ id }: any) => {
 
       <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">
         {loading ? (
-          <p>Loading...</p>
+          <Skeleton className="w-full h-64" />
         ) : acceptedLeavesData.length > 0 ? (
           <LineChart data={acceptedLeavesData} title={"Approved Leaves"} />
         ) : (
           <p>No approved leaves data available</p>
         )}
         {loading ? (
-          <p>Loading...</p>
+          <Skeleton className="w-full h-64" />
         ) : rejectedLeavesData.length > 0 ? (
           <LineChart data={rejectedLeavesData} title={"Rejected Leaves"} />
         ) : (
           <p>No rejected leaves data available</p>
         )}
       </div>
-
-      <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">
+      {/* <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">
         <LineChart data={[]} title={"Balance History"} />
         <DoughnutChart data={[]} title={"Leaves Info"} />
-      </div>
+      </div> */}
     </div>
   );
 };
