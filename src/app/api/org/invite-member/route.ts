@@ -8,6 +8,8 @@ import bcrypt from "bcrypt";
 import { Resend } from "resend";
 import { InviteEmailTemplate } from "@/components/email-temp/InviteMembersTemplate";
 import { connect_db } from "@/configs/db";
+import dayjs from "dayjs";
+import { initializeEmployeeBalance } from "@/lib/balanceservices";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -66,6 +68,11 @@ export const POST = async (req: NextRequest) => {
             org_id: new mongoose.Types.ObjectId(org_id),
             role,
           });
+
+          
+          // initailizing balance for created user
+          const year = dayjs().year();
+          const balanceofnewemployee = await initializeEmployeeBalance(user._id , year);
 
           const emailData = await resend.emails.send({
             from: `Ritik <team@qtee.ai>`,
