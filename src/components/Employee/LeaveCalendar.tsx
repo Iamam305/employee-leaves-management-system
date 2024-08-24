@@ -13,8 +13,9 @@ import {
 } from "date-fns";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
+import { Skeleton } from "../ui/skeleton";
 
-const LeaveCalendar = ({ userId }: any) => {
+const LeaveCalendar = ({ userId, loading }: any) => {
   const [leavePeriods, setLeavePeriods] = useState<any[]>([]);
   const searchParams = useSearchParams();
   const month_param = searchParams.get("month");
@@ -117,7 +118,15 @@ const LeaveCalendar = ({ userId }: any) => {
     month_param ? parseInt(month_param.split("-")[0], 10) : currentYear
   );
 
-  return <div>{renderDashboard(selectedYear, selectedMonth)}</div>;
+  return (
+    <div>
+      {loading ? (
+        <Skeleton className="h-[40vh] w-full"/>
+      ) : (
+        <div>{renderDashboard(selectedYear, selectedMonth)}</div>
+      )}
+    </div>
+  );
 };
 
 export default LeaveCalendar;
