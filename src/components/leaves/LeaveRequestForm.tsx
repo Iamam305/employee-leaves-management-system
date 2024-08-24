@@ -105,9 +105,15 @@ interface LeaveRequestFormProps {
         // Close the modal
         // setIsOpen(false);
         onclose();
-      } catch (error) {
+      } catch (error:any) {
         console.error("Error Requesting leave:", error);
-        toast.error("An error occurred while processing your request.");
+        if(error.response.status === 403)
+        {
+          toast.warning(error.response.data.msg);
+        }
+        else{
+          toast.error("An error occurred while processing your request.");
+        }
       } finally {
         setIsloading(false);
       }

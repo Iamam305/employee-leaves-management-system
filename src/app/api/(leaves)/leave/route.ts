@@ -2,6 +2,7 @@ import { EmailVerification } from "@/components/email-temp/EmailVerificationTemp
 import { LeaveRequestEmail } from "@/components/email-temp/LeaveRequestTemplate";
 import { connect_db } from "@/configs/db";
 import { auth_middleware } from "@/lib/auth-middleware";
+import { calculateLeaveBalance } from "@/lib/balanceservices";
 import { LeaveType } from "@/models/leave-type.model";
 import { Leave } from "@/models/leave.model";
 import { Org } from "@/models/org.model";
@@ -15,61 +16,120 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 connect_db();
 
 
-export const POST = async (req : NextRequest) => {
-    try {
+// export const POST = async (req : NextRequest) => {
+//     try {
 
-        // Extract data from the request body
-        const { user_id, leave_type_id, org_id, start_date, end_date, description } = await req.json();
+//         // Extract data from the request body
+//         const { user_id, leave_type_id, org_id, start_date, end_date, description } = await req.json();
 
-        // Validate required fields
-        if (!user_id || !leave_type_id || !org_id || !start_date || !end_date) {
-            return NextResponse.json({ msg: "All required fields must be provided" }, { status: 400 });
-        }
+//         // Validate required fields
+//         if (!user_id || !leave_type_id || !org_id || !start_date || !end_date) {
+//             return NextResponse.json({ msg: "All required fields must be provided" }, { status: 400 });
+//         }
 
-        // Create a new leave request
-        const newLeave = new Leave({
-            user_id,
-            leave_type_id,
-            org_id,
-            start_date,
-            end_date,
-            description,
-            status: "pending",
-        });
+//         // Create a new leave request
+//         const newLeave = new Leave({
+//             user_id,
+//             leave_type_id,
+//             org_id,
+//             start_date,
+//             end_date,
+//             description,
+//             status: "pending",
+//         });
 
-        // Save the new leave request to the database
-        await newLeave.save();
+//         // Save the new leave request to the database
+//         await newLeave.save();
 
-        const user = await User.findById(user_id);
+//         const user = await User.findById(user_id);
 
-        const leavetype = await LeaveType.findById(leave_type_id)
+//         const leavetype = await LeaveType.findById(leave_type_id)
 
-        // send message to manager
-        const { data, error } = await resend.emails.send({
-            from: "Acme <team@qtee.ai>",
-            to: "sgrlekhwani@gmail.com",
-            subject: "Leave Request Raised",
-            react: LeaveRequestEmail({
-                employeeName : user.name,
-                leaveStartDate : start_date,
-                leaveEndDate : end_date,
-                leaveReason : leavetype.name,
-            }),
-            html: "5",
-          });
+//         // send message to manager
+//         const { data, error } = await resend.emails.send({
+//             from: "Acme <team@qtee.ai>",
+//             to: "sgrlekhwani@gmail.com",
+//             subject: "Leave Request Raised",
+//             react: LeaveRequestEmail({
+//                 employeeName : user.name,
+//                 leaveStartDate : start_date,
+//                 leaveEndDate : end_date,
+//                 leaveReason : leavetype.name,
+//             }),
+//             html: "5",
+//           });
 
-        //if not manager than send to hr or admin
+//         //if not manager than send to hr or admin
 
 
-        // Respond with the created leave request
-        return NextResponse.json({ msg: "Leave request created successfully", data: {newLeave , data} }, { status: 201 });
+//         // Respond with the created leave request
+//         return NextResponse.json({ msg: "Leave request created successfully", data: {newLeave , data} }, { status: 201 });
 
-    } catch (error) {
-        console.error(error);
-        return NextResponse.json({ msg: "Something went wrong" }, { status: 500 });
-    }
+//     } catch (error) {
+//         console.error(error);
+//         return NextResponse.json({ msg: "Something went wrong" }, { status: 500 });
+//     }
+// };
+
+export const POST = async (req: NextRequest) => {
+  try {
+      // Extract data from the request body
+      const { user_id, leave_type_id, org_id, start_date, end_date, description } = await req.json();
+
+      // Validate required fields
+      if (!user_id || !leave_type_id || !org_id || !start_date || !end_date) {
+          return NextResponse.json({ msg: "All required fields must be provided" }, { status: 400 });
+      }
+
+      const user = await User.findById(user_id);
+      const leavetype = await LeaveType.findById(leave_type_id);
+
+      // Calculate the leave balance for the user
+      const leaveBalance = await calculateLeaveBalance(user_id, new Date(start_date).getFullYear(), leavetype.name);
+
+      // Check if the user has enough leave balance
+      if (leaveBalance.available <= 0) {
+          return NextResponse.json({ msg: "You cannot take this leave due to insufficient balance available" }, { status: 403 });
+      }
+
+      // Create a new leave request
+      const newLeave = new Leave({
+          user_id,
+          leave_type_id,
+          org_id,
+          start_date,
+          end_date,
+          description,
+          status: "pending",
+      });
+
+      // Save the new leave request to the database
+      await newLeave.save();
+
+
+
+      // Send message to manager
+      const { data, error } = await resend.emails.send({
+          from: "Acme <team@qtee.ai>",
+          to: "sgrlekhwani@gmail.com",
+          subject: "Leave Request Raised",
+          react: LeaveRequestEmail({
+              employeeName: user.name,
+              leaveStartDate: start_date,
+              leaveEndDate: end_date,
+              leaveReason: leavetype.name,
+          }),
+          html: "5",
+      });
+
+      // Respond with the created leave request and email response
+      return NextResponse.json({ msg: "Leave request created successfully", data: { newLeave, data } }, { status: 201 });
+
+  } catch (error) {
+      console.error(error);
+      return NextResponse.json({ msg: "Something went wrong" }, { status: 500 });
+  }
 };
-
 
 
 // export const GET = async (req: NextRequest) => {
