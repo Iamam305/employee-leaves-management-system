@@ -46,10 +46,10 @@ const UserStatsCard = ({
       {UserStatsCardData.map((stat) => (
         <>
           {loading ? (
-            <Skeleton className=" h-[15vh] flex flex-row items-center justify-between space-y-0 pb-2" />
+            <Skeleton className="h-[15vh] flex flex-row items-center justify-between space-y-0 pb-2" />
           ) : (
             <Card key={stat.key}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-5">
                 <CardTitle className="text-sm font-medium">
                   {stat.title}
                 </CardTitle>

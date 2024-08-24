@@ -106,7 +106,7 @@ const UserDashboard = ({ id }: any) => {
 
   return (
     <div>
-      <div className="flex items-center justify-center">
+      <div className="flex items-start md:pl-10 md:mb-0 mb-4 ">
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -158,11 +158,11 @@ const UserDashboard = ({ id }: any) => {
         </Popover>
       </div>
 
-      <div className="w-full p-4 flex items-center gap-5 justify-around">
-        <div className="w-[40%] h-[40vh]">
-          <LeaveCalendar userId={userId} loading={loading}/>
+      <div className="w-full md:p-4 p-1 flex md:flex-row  flex-col-reverse items-start gap-5 justify-around ">
+        <div className="md:w-[40%] h-[40vh]  w-full">
+          <LeaveCalendar userId={userId} loading={loading} />
         </div>
-        <div className="w-[60%]">
+        <div className="md:w-[60%] md:h-[40vh] w-full h-fit">
           <UserStatsCard
             loading={loading}
             totalLeaves={totalLeaves}

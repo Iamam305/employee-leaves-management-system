@@ -17,6 +17,8 @@ import { Skeleton } from "../ui/skeleton";
 
 const LeaveCalendar = ({ userId, loading }: any) => {
   const [leavePeriods, setLeavePeriods] = useState<any[]>([]);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const searchParams = useSearchParams();
   const month_param = searchParams.get("month");
 
@@ -40,12 +42,10 @@ const LeaveCalendar = ({ userId, loading }: any) => {
 
   const getLeavesDetails = async () => {
     try {
-      let api_url = `http://localhost:3000/api/org/get-members/${id}`;
-
+      let api_url = `/api/org/get-members/${id}`;
       if (month_param) {
         api_url += `?month=${month_param}`;
       }
-
       const { data } = await axios.get(api_url);
       setLeavePeriods(data.leaves[0]?.leaves || []);
     } catch (error) {
@@ -65,26 +65,23 @@ const LeaveCalendar = ({ userId, loading }: any) => {
     const calendarDays = generateCalendarDays(year, month);
     const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-    const cellWidth = 440 / 7;
-
     return (
       <div
         key={`${month}-${year}`}
-        className="p-1 flex flex-col items-center justify-center h-max-content border"
+        className="p-4 flex flex-col items-center justify-center w-full max-w-[440px] border"
       >
-        <h3>{format(new Date(year, month), "MMMM yyyy")}</h3>
-        <div className="flex flex-wrap" style={{ width: "440px" }}>
-          <div className="flex w-full mb-2">
-            {weekDays.map((day) => (
-              <div
-                key={day}
-                className="text-center"
-                style={{ width: `${cellWidth}px`, height: "30px" }}
-              >
-                {day}
-              </div>
-            ))}
-          </div>
+        <h3 className="text-lg font-semibold mb-2">
+          {format(new Date(year, month), "MMMM yyyy")}
+        </h3>
+        <div className="grid grid-cols-7 gap-1 w-full">
+          {weekDays.map((day) => (
+            <div
+              key={day}
+              className="text-center text-xs font-medium p-1 bg-gray-100"
+            >
+              {day}
+            </div>
+          ))}
           {calendarDays.map((day) => {
             const isCurrentMonth = getMonth(day) === month;
             const isLeave = leaveDays.some((leaveDay) =>
@@ -93,10 +90,9 @@ const LeaveCalendar = ({ userId, loading }: any) => {
             return (
               <div
                 key={format(day, "yyyy-MM-dd")}
-                className={`text-center mt-2 ${
+                className={`text-center p-1 ${
                   isLeave ? "bg-blue-400" : "bg-transparent"
-                } ${isCurrentMonth ? "" : "text-gray-300"} border`}
-                style={{ width: `${cellWidth}px`, height: "30px" }}
+                } ${isCurrentMonth ? "" : "text-gray-300"} border text-sm`}
               >
                 {format(day, "d")}
               </div>
@@ -107,23 +103,12 @@ const LeaveCalendar = ({ userId, loading }: any) => {
     );
   };
 
-  const currentDate = new Date();
-  const currentYear = getYear(currentDate);
-  const currentMonth = getMonth(currentDate);
-
-  const [selectedMonth, setSelectedMonth] = useState(
-    month_param ? parseInt(month_param.split("-")[1], 10) - 1 : currentMonth
-  );
-  const [selectedYear, setSelectedYear] = useState(
-    month_param ? parseInt(month_param.split("-")[0], 10) : currentYear
-  );
-
   return (
-    <div>
+    <div className="w-full max-w-[440px] mx-auto">
       {loading ? (
-        <Skeleton className="h-[40vh] w-full"/>
+        <Skeleton className="w-full h-[250px]" />
       ) : (
-        <div>{renderDashboard(selectedYear, selectedMonth)}</div>
+        renderDashboard(selectedYear, selectedMonth)
       )}
     </div>
   );
