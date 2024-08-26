@@ -1,4 +1,5 @@
 import { connect_db } from "@/configs/db";
+import { addNewLeaveTypeToAllEmployees } from "@/lib/balanceservices";
 import { LeaveType } from "@/models/leave-type.model";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
@@ -29,6 +30,9 @@ export const POST = async (req: NextRequest) => {
             count_per_month: count,
         }).save();
 
+        // adding new leave type to balance
+        await addNewLeaveTypeToAllEmployees(new_leavtype);
+
         return NextResponse.json({ msg: "New LeaveType created successfully", data: new_leavtype }, { status: 200 });
         
     } catch (error) {
@@ -53,6 +57,7 @@ export const POST = async (req: NextRequest) => {
 export const GET = async (req: NextRequest) => {
     try {
         // Extract query parameters
+        
         const org_id = req.nextUrl.searchParams.get("org_id");
         const name = req.nextUrl.searchParams.get("name");
         const page = parseInt(req.nextUrl.searchParams.get("page") || "1");

@@ -7,9 +7,9 @@ export const initializeEmployeeBalance = async(userId:string, year:any) => {
   
     const leaveBalances = leaveTypes.reduce((acc, leaveType) => {
       acc[leaveType.name] = {
-        credit: 0,
+        credit: leaveType.count_per_month * 12,
         used: 0,
-        available: 0,
+        available: leaveType.count_per_month * 12,
       };
       return acc;
     }, {});
@@ -83,16 +83,16 @@ export const initializeEmployeeBalance = async(userId:string, year:any) => {
   
   
   //call when new leavtype is created
-  export const addNewLeaveTypeToAllEmployees = async(leaveTypeName:any) => {
+  export const addNewLeaveTypeToAllEmployees = async(leaveType:any) => {
       // Fetch all employees' balances
       const allBalances = await Balances.find({});
   
       // Update leaveBalances for each employee
       for (const balance of allBalances) {
-        balance.leaveBalances.set(leaveTypeName, {
-          credit: 0, // default credit
+        balance.leaveBalances.set(leaveType.name, {
+          credit: leaveType.count_per_month * 12 , // default credit
           used: 0,   // default used
-          available: 0, // default available
+          available: leaveType.count_per_month * 12, // default available
         });
     
         await balance.save();
@@ -228,15 +228,15 @@ export const initializeEmployeeBalance = async(userId:string, year:any) => {
     }
   
     // Initialize total credit
-    let totalCredit = 0;
+    let totalAvailable = 0;
   
     // Iterate through all leave types and sum up the credits
     for (const leaveType of balance.leaveBalances.keys()) {
       const leaveBalance: any = balance.leaveBalances.get(leaveType);
-      totalCredit += leaveBalance.credit;
+      totalAvailable += leaveBalance.available;
     }
   
     // Return the total credit
-    return totalCredit;
+    return totalAvailable;
   };
   
