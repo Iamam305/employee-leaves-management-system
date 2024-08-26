@@ -32,7 +32,7 @@ const Page = () => {
       const data = response.data;
       console.log('fetch leeave data' , data)
       setLeaves(data.leaves);
-      setTotalPages(data.pagination.totalPages);
+      setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Error fetching leaves:", error);
     } finally {
@@ -81,6 +81,8 @@ const Page = () => {
   useEffect(() => {
     fetchAllOrgs();
   }, []);
+
+  console.log("Total Page==> ",totalPages)
 
   return (
     <div className="p-4">
