@@ -1,8 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { MemberTypeInterface } from "@/lib/type";
 import { ColumnDef } from "@tanstack/react-table";
-import { Plus } from "lucide-react";
 import Link from "next/link";
 
 export const columns = (role: string): ColumnDef<MemberTypeInterface>[] => {
@@ -68,18 +66,18 @@ export const columns = (role: string): ColumnDef<MemberTypeInterface>[] => {
     },
   ];
 
-  if (role === "admin") {
-    baseColumns.push({
-      header: "Credits",
-      accessorKey: "credits",
-      cell: ({ row }) => (
-        <h1 className="flex items-center cursor-pointer text-blue-500">
-          <Plus className="h-4 w-4" />
-          Add Credits
-        </h1>
-      ),
-    });
-  }
+  // if (role === "admin") {
+  //   baseColumns.push({
+  //     header: "Credits",
+  //     accessorKey: "credits",
+  //     cell: ({ row }) => (
+  //       <h1 className="flex items-center cursor-pointer text-blue-500">
+  //         <Plus className="h-4 w-4" />
+  //         Add Credits
+  //       </h1>
+  //     ),
+  //   });
+  // }
 
   return baseColumns;
 };
