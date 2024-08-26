@@ -3,6 +3,8 @@ import { LeaveRequestEmail } from "@/components/email-temp/LeaveRequestTemplate"
 import { LeaveStatusEmail } from "@/components/email-temp/LeaveStatusTemplate";
 import { connect_db } from "@/configs/db";
 import { auth_middleware } from "@/lib/auth-middleware";
+import { updateLeaveBalance } from "@/lib/balanceservices";
+import { getDays } from "@/lib/utils";
 import { LeaveType } from "@/models/leave-type.model";
 import { Leave } from "@/models/leave.model";
 import { User } from "@/models/user.model";
@@ -43,7 +45,14 @@ export const POST = async (req : NextRequest) => {
             { new: true , upsert:true}
         ).populate("leave_type_id").exec();
 
+        let updateuserbalance = {};
+
+        if(statusupdate === 'approved'){
+            updateuserbalance = await updateLeaveBalance(updateleave.user_id , new Date(updateleave.start_date).getFullYear() , updateleave.leave_type_id.name)   
+        }
+
         console.log('updateleave' , updateleave)
+        console.log('updatedbalance' , updateuserbalance)
 
 
 
@@ -69,7 +78,7 @@ export const POST = async (req : NextRequest) => {
 
 
         // Respond with the created leave request
-        return NextResponse.json({ msg: "Leave request updated successfully", data: updateleave }, { status: 201 });
+        return NextResponse.json({ msg: "Leave request updated successfully", updateleave , updateuserbalance}, { status: 201 });
 
     } catch (error) {
         console.error(error);
