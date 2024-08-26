@@ -9,12 +9,14 @@ import { Skeleton } from "../ui/skeleton";
 
 const ChartData = () => {
   const org_id = useSelector((state: any) => state.organization.selectedOrg);
+  const userData = useSelector((state: any) => state.auth.userData);
 
   const [usersData, setUsersData] = useState<any>([]);
   const [leavesData, setLeavesData] = useState<any>([]);
   const [pendingLeaves, setPendingLeaves] = useState<any>([]);
   const [leavesInfo, setLeavesInfo] = useState<any>([]);
   const [totalLeaves, setTotalLeaves] = useState<number>(0);
+  const [totalbalances, setTotalBalances] = useState<number>(0);
   const [totalPendingLeaves, setTotalPendingLeaves] = useState<number>(0);
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -39,8 +41,24 @@ const ChartData = () => {
       setLoading(false);
     }
   };
+
+  const fetchbalance = async() => {
+    try {
+      if(userData)
+        {
+          const {data} = await axios.get(`/api/balances/${userData._id}`)
+          console.log('totabalnce of user ', data)
+          setTotalBalances(data.totalbalancecredit)
+        }
+      
+    } catch (error) {
+      
+    }
+  }
+
   useEffect(() => {
     fetchAllUsers();
+    fetchbalance();
   }, [org_id]);
 
   return (
@@ -59,6 +77,7 @@ const ChartData = () => {
           totalLeaves={totalLeaves}
           totalPendingLeaves={totalPendingLeaves}
           totalUsers={totalUsers}
+          totalbalances={totalbalances}
         />
       )}
       <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">

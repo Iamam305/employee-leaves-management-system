@@ -6,7 +6,7 @@ import { MdOutlineBalance } from "react-icons/md";
 import { HiArrowNarrowDown, HiArrowNarrowUp } from "react-icons/hi";
 import { createElement } from "react";
 
-const StatsCards = ({totalLeaves,totalPendingLeaves,totalUsers}:any) => {
+const StatsCards = ({totalLeaves,totalPendingLeaves,totalUsers , totalbalances}:any) => {
   const StatsCardsData = [
     {
       key: "leave",
@@ -33,7 +33,7 @@ const StatsCards = ({totalLeaves,totalPendingLeaves,totalUsers}:any) => {
       key: "balance",
       title: "Balances Added",
       change: 3,
-      value: 20,
+      value: totalbalances,
       icon: MdOutlineBalance,
     },
   ];

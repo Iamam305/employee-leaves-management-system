@@ -46,11 +46,8 @@ export const POST  = async (req:NextRequest) => {
 
 export const GET = async(req:NextRequest) => {
     try{
-        const year = dayjs().year();
-        const userId = "6694dc4d1d2cd7102ba5972c";
-        const totalbalancecredit = await calculateTotalCredit(userId , year);
-        return NextResponse.json({msg:"total credit fetched succesfully ", totalbalancecredit},{status:200})
-
+        const balances = await Balances.find();
+        return NextResponse.json({msg:"All Balances fetched SuccessFully", balances},{status:200})
     }
     catch(error) {
         console.log('error occured' , error)
