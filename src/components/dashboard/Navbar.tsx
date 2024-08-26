@@ -34,6 +34,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { TbListCheck } from "react-icons/tb";
 import Oraganization from "./Oraganization";
+import ChangePasswordModal from "./ChangePassword";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -152,6 +153,7 @@ const Navbar = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel><ChangePasswordModal/></DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
