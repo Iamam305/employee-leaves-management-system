@@ -82,6 +82,8 @@ export const POST = async (req: NextRequest) => {
             html: "5",
           });
 
+          console.log("Email Data: ",emailData)
+
           return {
             msg: "Invitation Sent Successfully",
           };
