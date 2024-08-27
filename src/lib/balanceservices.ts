@@ -2,8 +2,8 @@ import { Balances } from "@/models/balanceCredits.model";
 import { LeaveType } from "@/models/leave-type.model";
 
 // call when new employee is created
-export const initializeEmployeeBalance = async(userId:string, year:any) => {
-    const leaveTypes = await LeaveType.find();
+export const initializeEmployeeBalance = async(userId:string, year:any , orgId:string) => {
+  const leaveTypes = await LeaveType.find({ org_id: orgId });
   
     const leaveBalances = leaveTypes.reduce((acc, leaveType) => {
       acc[leaveType.name] = {
@@ -85,7 +85,7 @@ export const initializeEmployeeBalance = async(userId:string, year:any) => {
   //call when new leavtype is created
   export const addNewLeaveTypeToAllEmployees = async(leaveType:any) => {
       // Fetch all employees' balances
-      const allBalances = await Balances.find({});
+      const allBalances = await Balances.find({org_id:leaveType.org_id});
   
       // Update leaveBalances for each employee
       for (const balance of allBalances) {

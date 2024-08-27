@@ -20,6 +20,11 @@ const balanceSchema = new mongoose.Schema(
       },
       default: {},
     },
+    org_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Org",
+      required: true,
+  },
   },
   {
     timestamps: true,

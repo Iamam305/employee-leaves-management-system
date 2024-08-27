@@ -72,7 +72,7 @@ export const POST = async (req: NextRequest) => {
           
           // initailizing balance for created user
           const year = dayjs().year();
-          const balanceofnewemployee = await initializeEmployeeBalance(user._id , year);
+          const balanceofnewemployee = await initializeEmployeeBalance(user._id , year , org_id);
 
           const emailData = await resend.emails.send({
             from: `Ritik <team@qtee.ai>`,
