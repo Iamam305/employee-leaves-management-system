@@ -89,7 +89,8 @@ const InviteMembers = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const currentOrgId = user_role === "admin" ? orgId : user_role.org_id;
+      const currentOrgId =
+        user_role?.role === "admin" ? orgId : user_role.org_id;
       const response = await axios.post("/api/org/invite-member", {
         emails,
         org_id: currentOrgId,
@@ -122,7 +123,7 @@ const InviteMembers = () => {
     fetch_all_orgs();
   }, []);
 
-  console.log("Org---> ", orgs);
+  // console.log("Org---> ", orgs);
 
   return (
     <div>
