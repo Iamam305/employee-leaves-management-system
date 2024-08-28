@@ -15,7 +15,7 @@ const Page = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [name, setName] = useState<string>("");
     const [orgs, setOrgs] = useState<any>([]);
-    // const [orgId, setOrgId] = useState<string>("");
+    const [role, setrole] = useState<string>("");
     const [page, setPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
 
@@ -23,6 +23,7 @@ const Page = () => {
     const pathname = usePathname();
   
     const org_id = useSelector((state:any) => state.organization.selectedOrg)
+    const currentrole = useSelector((state:any) => state.membership.memberShipData?.role)
 
     const fetchLeavesTypes = async () => {
         try {
@@ -33,6 +34,9 @@ const Page = () => {
             }
             if (org_id !== (null as any)) {
                 queryString += `&org_id=${org_id}`;
+            }
+            if(currentrole){
+              setrole(currentrole)
             }
             const response = await axios.get(`/api/leave-type?${queryString}`)
             console.log('leavetype', response.data)
@@ -102,7 +106,7 @@ const Page = () => {
                 setName={setName}
                 orgs={orgs}
                 setOrgs={setOrgs}
-                // setOrgId={setOrgId}
+                role={role}
                 page={page}
                 setPage={setPage}
                 totalPage={totalPages} 

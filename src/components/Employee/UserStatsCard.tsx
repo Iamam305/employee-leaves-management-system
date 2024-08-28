@@ -13,6 +13,7 @@ const UserStatsCard = ({
   totalAcceptedLeaves,
   totalRejectedLeaves,
   loading,
+  totalbalance
 }: any) => {
   const UserStatsCardData = [
     {
@@ -36,7 +37,7 @@ const UserStatsCard = ({
     {
       key: "balance",
       title: "Balance Left",
-      value: 20,
+      value: totalbalance,
       icon: MdOutlineBalance,
     },
   ];

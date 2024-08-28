@@ -21,6 +21,7 @@ export const LeaveTypeTableClient: React.FC<any> = ({
   setPage,
   totalPage,
   fetchData,
+  role,
 }) => {
   // console.log('fetch data' , fetchData)
   return (
@@ -30,12 +31,14 @@ export const LeaveTypeTableClient: React.FC<any> = ({
           title={`All Leaves Types`}
           description="All Leave Types Created By Hr or Admin"
         />
-        <LeaveTypeModal title="Add Leave Type" fetchData={fetchData}/>
+        {role === ('admin' || "hr") && (
+          <LeaveTypeModal title="Add Leave Type" fetchData={fetchData}/>
+        ) }
       </div>
       <Separator />
       <DataTable
         searchKey=""
-        columns={columns(fetchData)}
+        columns={columns(fetchData , role)}
         data={data}
         isLoading={isLoading}
         name={name}

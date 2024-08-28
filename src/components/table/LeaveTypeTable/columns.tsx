@@ -28,7 +28,8 @@ const truncateText = (text: any, length: number) => {
 //   createdAt?: Date;
 //   updatedAt?: Date;
 
-export const columns = (fetchData: () => void): ColumnDef<ViewLeavetypeInterface>[] => [
+export const columns = (fetchData: () => void , role:string): ColumnDef<ViewLeavetypeInterface>[] => {
+  const baseColumns: ColumnDef<ViewLeavetypeInterface>[] = [
   {
     accessorKey: "index",
     header: "S.No",
@@ -71,11 +72,25 @@ export const columns = (fetchData: () => void): ColumnDef<ViewLeavetypeInterface
       <LeaveTypeTableModal title="View" accessorKey={row.original}/>
     ),
   },
-  {
-    accessorKey: "",
-    header: "Edit",
-    cell: ({ row }) => (
-      <LeaveTypeEditModal title="Edit" accessorKey={row.original} fetchData={fetchData}/>
-    ),
-  },
+  // {
+  //   accessorKey: "",
+  //   header: "Edit",
+  //   cell: ({ row }) => (
+  //     <LeaveTypeEditModal title="Edit" accessorKey={row.original} fetchData={fetchData}/>
+  //   ),
+  // },
 ];
+
+if (role === ("admin" || "hr")) {
+    baseColumns.push(
+      {
+        accessorKey: "",
+        header: "Edit",
+        cell: ({ row }) => (
+          <LeaveTypeEditModal title="Edit" accessorKey={row.original} fetchData={fetchData}/>
+        ),
+      },);
+  }
+
+return baseColumns;
+}
