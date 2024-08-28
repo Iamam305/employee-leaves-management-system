@@ -42,19 +42,15 @@ const ChartData = () => {
     }
   };
 
-  const fetchbalance = async() => {
+  const fetchbalance = async () => {
     try {
-      if(userData)
-        {
-          const {data} = await axios.get(`/api/balances/${userData._id}`)
-          console.log('totabalnce of user ', data)
-          setTotalBalances(data.totalbalancecredit)
-        }
-      
-    } catch (error) {
-      
-    }
-  }
+      if (userData) {
+        const { data } = await axios.get(`/api/balances/${userData._id}`);
+        console.log("totabalnce of user ", data);
+        setTotalBalances(data.totalbalancecredit);
+      }
+    } catch (error) {}
+  };
 
   useEffect(() => {
     fetchAllUsers();
@@ -64,14 +60,12 @@ const ChartData = () => {
   return (
     <div>
       {loading ? (
-        <>
-          <div className=" flex items-center justify-between w-full gap-5">
-            <Skeleton className=" h-40 w-1/4" />
-            <Skeleton className=" h-40 w-1/4" />
-            <Skeleton className=" h-40 w-1/4" />
-            <Skeleton className=" h-40 w-1/4" />
-          </div>
-        </>
+        <div className="flex items-center justify-between w-full gap-5 mb-5">
+          <Skeleton className="h-40 w-1/4" />
+          <Skeleton className="h-40 w-1/4" />
+          <Skeleton className="h-40 w-1/4" />
+          <Skeleton className="h-40 w-1/4" />
+        </div>
       ) : (
         <StatsCards
           totalLeaves={totalLeaves}
@@ -80,36 +74,46 @@ const ChartData = () => {
           totalbalances={totalbalances}
         />
       )}
-      <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5 md:p-4 p-0">
         {loading ? (
-          <Skeleton className="w-full h-64" />
-        ) : usersData.length > 0 ? (
-          <LineChart data={usersData} title={"Total Users"} />
+          <Skeleton className=" w-full h-64" />
         ) : (
-          <p>No user data available</p>
+          <LineChart
+            className="w-full h-64"
+            data={usersData}
+            title={"Total Users"}
+          />
         )}
+
         {loading ? (
-          <Skeleton className="w-full h-64" />
-        ) : leavesData.length > 0 ? (
-          <LineChart data={leavesData} title={"Total Leaves"} />
+          <Skeleton className=" w-full h-64" />
         ) : (
-          <p>No leaves data available</p>
+          <LineChart
+            className="w-full h-64"
+            data={leavesData}
+            title={"Total Leaves"}
+          />
         )}
-      </div>
-      <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">
+
         {loading ? (
-          <Skeleton className="w-full h-64" />
-        ) : pendingLeaves.length > 0 ? (
-          <LineChart data={pendingLeaves} title={"Pending Leaves"} />
+          <Skeleton className=" w-full h-64" />
         ) : (
-          <p>No pending leaves data available</p>
+          <LineChart
+            className="w-full h-64"
+            data={pendingLeaves}
+            title={"Pending Leaves"}
+          />
         )}
+
         {loading ? (
-          <Skeleton className="w-full h-64" />
-        ) : leavesInfo.length > 0 ? (
-          <DoughnutChart data={leavesInfo} title={"Leaves Info"} />
+          <Skeleton className=" w-full h-64" />
         ) : (
-          <p>No leaves info available</p>
+          <DoughnutChart
+            className="w-full h-64"
+            data={leavesInfo}
+            title={"Leaves Info"}
+          />
         )}
       </div>
     </div>

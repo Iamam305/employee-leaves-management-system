@@ -108,7 +108,7 @@ const LineChart = ({ data, title }: any) => {
   };
 
   return (
-    <div className="md:w-6/12 w-full md:h-[400px] h-1/2 mx-auto ">
+    <div className="w-full h-full  mx-auto">
       <Line data={chart_data} options={options} />
     </div>
   );
