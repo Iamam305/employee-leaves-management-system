@@ -173,26 +173,27 @@ const UserDashboard = ({ id }: any) => {
         </div>
       </div>
 
-      <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5 md:p-4 p-0">
         {loading ? (
-          <Skeleton className="w-full h-64" />
-        ) : acceptedLeavesData.length > 0 ? (
-          <LineChart data={acceptedLeavesData} title={"Approved Leaves"} />
+          <Skeleton className=" w-full h-64" />
         ) : (
-          <p>No approved leaves data available</p>
+          <LineChart
+            className="w-full h-64"
+            data={acceptedLeavesData}
+            title={"Approved Leaves"}
+          />
         )}
+
         {loading ? (
-          <Skeleton className="w-full h-64" />
-        ) : rejectedLeavesData.length > 0 ? (
-          <LineChart data={rejectedLeavesData} title={"Rejected Leaves"} />
+          <Skeleton className=" w-full h-64" />
         ) : (
-          <p>No rejected leaves data available</p>
+          <LineChart
+            className="w-full h-64"
+            data={rejectedLeavesData}
+            title={"Rejected Leaves"}
+          />
         )}
       </div>
-      {/* <div className="flex md:flex-row flex-col md:max-w-[82vw] w-full gap-6 mb-5 md:p-4 p-0">
-        <LineChart data={[]} title={"Balance History"} />
-        <DoughnutChart data={[]} title={"Leaves Info"} />
-      </div> */}
     </div>
   );
 };
