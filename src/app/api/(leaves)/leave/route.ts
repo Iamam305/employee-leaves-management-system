@@ -88,8 +88,13 @@ export const POST = async (req: NextRequest) => {
       const leaveBalance = await calculateLeaveBalance(user_id, new Date(start_date).getFullYear(), leavetype.name);
 
       // Check if the user has enough leave balance
-      if (leaveBalance.available <= 0) {
-          return NextResponse.json({ msg: "You cannot take this leave due to insufficient balance available" }, { status: 403 });
+      if(leaveBalance.total.available <= 0){
+        return NextResponse.json({ msg: "You cannot take this leave due to insufficient balance available" }, { status: 403 });
+      }
+      else {
+        if (leaveBalance.monthly.available <= 0) {
+            return NextResponse.json({ msg: "You cannot take this leave due to insufficient balance available" }, { status: 403 });
+        }
       }
 
       // Create a new leave request
