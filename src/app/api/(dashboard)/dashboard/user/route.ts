@@ -1,4 +1,5 @@
 import { connect_db } from "@/configs/db";
+import { Balances } from "@/models/balanceCredits.model";
 import { Leave } from "@/models/leave.model";
 import { NextRequest, NextResponse } from "next/server";
 const { ObjectId } = require("mongodb");
@@ -159,9 +160,15 @@ export async function GET(req: NextRequest) {
       },
     ]);
 
+    const balances= await Balances.find(
+      { userId: user_id },
+      { leaveBalances: 1, _id: 0 }
+    );
+
     return NextResponse.json(
       {
         msg: "Api Working fine",
+        balances,
         totalLeaves,
         accepted_leaves,
         rejected_leaves,

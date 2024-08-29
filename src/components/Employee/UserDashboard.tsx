@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { usePathname, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { Skeleton } from "../ui/skeleton";
+import BalanceChart from "../dashboard/stats/BalanceChart";
 
 const UserDashboard = ({ id }: any) => {
   const router = useRouter();
@@ -39,6 +40,9 @@ const UserDashboard = ({ id }: any) => {
   const [selectedYear, setSelectedYear] = useState<number>(
     new Date().getFullYear()
   );
+
+  const[balanceData,setBalanceData] = useState<any>([]);
+
 
   // &org_id=669f97ab186ea1a384360673
 
@@ -68,6 +72,9 @@ const UserDashboard = ({ id }: any) => {
       // Handling total leaves
       const totalLeavesData = data.totalLeaves?.[0] || {};
       setTotalLeaves(totalLeavesData.totalLeaves || 0);
+
+      // Balance Data
+      setBalanceData(data.balances);
     } catch (error) {
       console.error("API request failed:", error);
       // Reset state in case of error
@@ -115,6 +122,8 @@ const UserDashboard = ({ id }: any) => {
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedYear(parseInt(event.target.value));
   };
+
+  // console.log("balances ==> ",balanceData[0]?.leaveBalances)
 
   return (
     <div>
@@ -206,6 +215,9 @@ const UserDashboard = ({ id }: any) => {
             title={"Rejected Leaves"}
           />
         )}
+
+        <BalanceChart balances={balanceData}  className="w-full h-64"/>
+
       </div>
     </div>
   );
