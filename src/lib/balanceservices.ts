@@ -322,26 +322,55 @@ export const initializeEmployeeBalance = async (userId: string, year: any, orgId
 
 
 // calculateTotalCredit
+// export const calculateTotalCredit = async (userId: string, year: any) => {
+//   // Find the balance record for the specific user and year
+//   const balance = await Balances.findOne({ userId, year });
+
+//   if (!balance) {
+//     // If no balance is found, return 0
+//     return 0;
+//   }
+
+//   // Initialize total available balance
+//   let totalAvailable = 0;
+
+//   // Iterate through all leave types and sum up the total available balances
+//   balance.leaveBalances.forEach((leaveTypeBalance: any) => {
+//     totalAvailable += leaveTypeBalance.total.available;
+//   });
+
+//   // Return the total available balance
+//   return totalAvailable;
+// };
+
+
 export const calculateTotalCredit = async (userId: string, year: any) => {
   // Find the balance record for the specific user and year
   const balance = await Balances.findOne({ userId, year });
 
   if (!balance) {
-    // If no balance is found, return 0
-    return 0;
+    // If no balance is found, return [0, []] (0 for totalCredit and an empty array for totalMonthCredits)
+    return [0, []];
   }
 
-  // Initialize total available balance
-  let totalAvailable = 0;
+  // Initialize total yearly available balance
+  let totalCredit = 0;
 
-  // Iterate through all leave types and sum up the total available balances
+  // Initialize an array to store total available monthly credits
+  const totalMonthCredits = Array(12).fill(0); // Array of 12 months initialized to 0
+
+  // Iterate through all leave types and calculate the total available balances
   balance.leaveBalances.forEach((leaveTypeBalance: any) => {
-    totalAvailable += leaveTypeBalance.total.available;
+    // Add to the total yearly credit
+    totalCredit += leaveTypeBalance.total.available;
+
+    // Calculate total available balance for each month
+    leaveTypeBalance.monthly.forEach((monthlyBalance: any, month: number) => {
+      totalMonthCredits[month] += monthlyBalance.available;
+    });
   });
 
-  // Return the total available balance
-  return totalAvailable;
+  // Return an array with totalCredit and totalMonthCredits
+  return [totalCredit, totalMonthCredits];
 };
-
-
   

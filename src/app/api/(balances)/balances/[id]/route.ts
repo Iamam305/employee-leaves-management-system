@@ -6,8 +6,8 @@ export const GET = async(req: NextRequest , { params } :any) => {
     try{
         const { id } = params
         const year = dayjs().year();
-        const totalbalancecredit = await calculateTotalCredit(id , year);
-        return NextResponse.json({msg:"total credit fetched succesfully ", totalbalancecredit},{status:200})
+        const totalbalance = await calculateTotalCredit(id , year);
+        return NextResponse.json({msg:"total credit fetched succesfully ", totalbalance},{status:200})
 
     }
     catch(error) {

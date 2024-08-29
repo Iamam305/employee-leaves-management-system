@@ -18,6 +18,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { Skeleton } from "../ui/skeleton";
 import BalanceChart from "../dashboard/stats/BalanceChart";
+import dayjs from "dayjs";
 
 const UserDashboard = ({ id }: any) => {
   const router = useRouter();
@@ -34,6 +35,7 @@ const UserDashboard = ({ id }: any) => {
   const [totalAcceptedLeaves, setTotalAcceptedLeaves] = useState<number>();
   const [totalRejectedLeaves, setTotalRejectedLeaves] = useState<number>();
   const [totalbalances, setTotalBalances] = useState<number>(0);
+  const [totalmonthbalances, setTotalMonthBalances] = useState<number>(0);
   const [totalLeaves, setTotalLeaves] = useState<number>();
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedMonth, setSelectedMonth] = useState<any>();
@@ -91,9 +93,17 @@ const UserDashboard = ({ id }: any) => {
   const fetchbalance = async () => {
     try {
       if (current_user) {
+        let month;
+        if(selectedMonth){
+          month = selectedMonth
+        }
+        else{
+          month = dayjs().month()
+        }
         const { data } = await axios.get(`/api/balances/${current_user._id}`);
         console.log("totabalnce of user ", data);
-        setTotalBalances(data.totalbalancecredit);
+        setTotalBalances(data.totalbalance[0]);
+        setTotalMonthBalances(data.totalbalance[1][month]);
       }
     } catch (error) {}
   };
@@ -191,6 +201,7 @@ const UserDashboard = ({ id }: any) => {
             totalAcceptedLeaves={totalAcceptedLeaves}
             totalUsers={70}
             totalbalance={totalbalances}
+            totalmonthbalances={totalmonthbalances}
           />
         </div>
       </div>
