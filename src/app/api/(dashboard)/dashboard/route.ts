@@ -1,5 +1,7 @@
 import { connect_db } from "@/configs/db";
 import { auth_middleware } from "@/lib/auth-middleware";
+import { Balances } from "@/models/balanceCredits.model";
+import { LeaveType } from "@/models/leave-type.model";
 import { Leave } from "@/models/leave.model";
 import { Membership } from "@/models/membership.model";
 import { NextRequest, NextResponse } from "next/server";
@@ -178,8 +180,63 @@ export async function GET(req: NextRequest) {
         },
       ]);
 
+      // const leaveType = await LeaveType.aggregate([
+      //   matchStage,
+      //   {
+      //     $group: {
+      //       _id: "$name",
+      //       count_per_month: {
+      //         $sum: "$count_per_month",
+      //       },
+      //     },
+      //   },
+      //   {
+      //     $project: {
+      //       _id: 0,
+      //       name: "$_id",
+      //       count_per_month: 1,
+      //     },
+      //   },
+      // ]);
+
+      const leaveType = await LeaveType.aggregate([
+        matchStage, // Include your match stage here if needed
+        {
+          $group: {
+            _id: "$name",
+            count_per_month: { $sum: "$count_per_month" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            name: "$_id",
+            count_per_month: 1,
+          },
+        },
+        {
+          $facet: {
+            leaveTypes: [{ $sort: { name: 1 } }],
+            total: [
+              {
+                $group: { _id: null, totalCount: { $sum: "$count_per_month" } },
+              },
+              { $project: { _id: 0, totalCount: 1 } },
+            ],
+          },
+        },
+      ]);
+
+      // Extract data from the aggregation result
+      const leaveTypes = leaveType[0].leaveTypes;
+      const total = leaveType[0].total[0]?.totalCount || 0;
+
+      console.log("Leave Types Data:", leaveTypes);
+      console.log("Total Count per Month:", total);
+
       return NextResponse.json(
         {
+          leaveType,
           leaves,
           users,
           leaves_data,
@@ -348,8 +405,64 @@ export async function GET(req: NextRequest) {
         },
       ]);
 
+      // const leaveType = await LeaveType.aggregate([
+      //   {
+      //     $match: {
+      //       org_id: auth_data.membership.org_id,
+      //     },
+      //   },
+      //   {
+      //     $group: {
+      //       _id: "$name",
+      //       count_per_month: {
+      //         $sum: "$count_per_month",
+      //       },
+      //     },
+      //   },
+      //   {
+      //     $project: {
+      //       _id: 0,
+      //       name: "$_id",
+      //       count_per_month: 1,
+      //     },
+      //   },
+      // ]);
+
+      const leaveType = await LeaveType.aggregate([
+        {
+          $match: {
+            org_id: auth_data.membership.org_id,
+          },
+        },
+        {
+          $group: {
+            _id: "$name",
+            count_per_month: { $sum: "$count_per_month" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            name: "$_id",
+            count_per_month: 1,
+          },
+        },
+        {
+          $facet: {
+            leaveTypes: [{ $sort: { name: 1 } }],
+            total: [
+              {
+                $group: { _id: null, totalCount: { $sum: "$count_per_month" } },
+              },
+              { $project: { _id: 0, totalCount: 1 } },
+            ],
+          },
+        },
+      ]);
+
       return NextResponse.json({
         msg: "You are hr or manager",
+        leaveType,
         users,
         leaves,
         pending_leaves,

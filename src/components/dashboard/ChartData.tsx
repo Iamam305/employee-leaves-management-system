@@ -6,6 +6,7 @@ import DoughnutChart from "./stats/DoughnutChart";
 import StatsCards from "./StateCards";
 import { useSelector } from "react-redux";
 import { Skeleton } from "../ui/skeleton";
+import TotalBalanceChart from "./stats/TotalBalanceChart";
 
 const ChartData = () => {
   const org_id = useSelector((state: any) => state.organization.selectedOrg);
@@ -16,10 +17,11 @@ const ChartData = () => {
   const [pendingLeaves, setPendingLeaves] = useState<any>([]);
   const [leavesInfo, setLeavesInfo] = useState<any>([]);
   const [totalLeaves, setTotalLeaves] = useState<number>(0);
-  const [totalbalances, setTotalBalances] = useState<number>(0);
+  const [totalbalances, setTotalBalances] = useState<number>();
   const [totalPendingLeaves, setTotalPendingLeaves] = useState<number>(0);
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
+  const [balanceHistory, setBalanceHistory] = useState<any>([]);
 
   const fetchAllUsers = async () => {
     try {
@@ -35,6 +37,8 @@ const ChartData = () => {
       setPendingLeaves(data.pending_leaves[0]?.pending_leaves || []);
       setTotalPendingLeaves(data.pending_leaves[0]?.totalPendingLeaves || 0);
       setLeavesInfo(data.leaves_data || []);
+      setBalanceHistory(data.leaveType[0].leaveTypes);
+      // setTotalBalances(data.leaveType[0].total[0]?.totalCount)
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -57,6 +61,8 @@ const ChartData = () => {
     fetchbalance();
   }, [org_id]);
 
+  console.log("Total Balance ==> ",totalbalances,typeof(totalbalances))
+
   return (
     <div>
       {loading ? (
@@ -71,7 +77,7 @@ const ChartData = () => {
           totalLeaves={totalLeaves}
           totalPendingLeaves={totalPendingLeaves}
           totalUsers={totalUsers}
-          totalbalances={totalbalances}
+          totalBalances ={totalbalances}
         />
       )}
 
@@ -109,12 +115,14 @@ const ChartData = () => {
         {loading ? (
           <Skeleton className=" w-full h-64" />
         ) : (
-          <DoughnutChart
-            className="w-full h-64"
-            data={leavesInfo}
-            title={"Leaves Info"}
-          />
+          <TotalBalanceChart data={balanceHistory} />
         )}
+
+        <DoughnutChart
+          className="w-full h-64"
+          data={leavesInfo}
+          title={"Leaves Info"}
+        />
       </div>
     </div>
   );
