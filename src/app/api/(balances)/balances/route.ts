@@ -54,3 +54,17 @@ export const GET = async(req:NextRequest) => {
         return NextResponse.json({msg:"error occured" , error}, {status:500})
     }
 }
+
+// export const GET = async(req:NextRequest) => {
+//     try{
+//         const org = "66cd85f17e350e405edeb614"
+//         const userid = "66cd89017e350e405edeb873"
+//         const year = '2024'
+//         const balances = await initializeEmployeeBalance(userid , year , org);
+//         return NextResponse.json({msg:"All Balances fetched SuccessFully", balances},{status:200})
+//     }
+//     catch(error) {
+//         console.log('error occured' , error)
+//         return NextResponse.json({msg:"error occured" , error}, {status:500})
+//     }
+// }

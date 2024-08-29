@@ -4,7 +4,7 @@ import { LeaveStatusEmail } from "@/components/email-temp/LeaveStatusTemplate";
 import { connect_db } from "@/configs/db";
 import { auth_middleware } from "@/lib/auth-middleware";
 import { updateLeaveBalance } from "@/lib/balanceservices";
-import { getDays } from "@/lib/utils";
+import { getDays, getMonth, getYear } from "@/lib/utils";
 import { LeaveType } from "@/models/leave-type.model";
 import { Leave } from "@/models/leave.model";
 import { User } from "@/models/user.model";
@@ -48,7 +48,9 @@ export const POST = async (req : NextRequest) => {
         let updateuserbalance = {};
 
         if(statusupdate === 'approved'){
-            updateuserbalance = await updateLeaveBalance(updateleave.user_id , new Date(updateleave.start_date).getFullYear() , updateleave.leave_type_id.name)   
+            const year = getYear(updateleave.end_date);
+            const month = getMonth(updateleave.end_date);
+            updateuserbalance = await updateLeaveBalance(updateleave.user_id , year , updateleave.leave_type_id.name , month)   
         }
 
         console.log('updateleave' , updateleave)

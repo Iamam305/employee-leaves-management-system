@@ -29,3 +29,13 @@ export const getDays = (startdate: Date, enddate: Date) => {
   return end.diff(start, "days") + 1;
 };
 
+export const getMonth = (date:Date) => {
+  const Cdate = dayjs(date);
+  return Cdate.month();
+}
+
+export const getYear = (date:Date) => {
+  const Cdate = dayjs(date);
+  return Cdate.year();
+}
+

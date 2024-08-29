@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 
+const leaveBalanceSchema = new mongoose.Schema({
+  credit: { type: Number, default: 0 },
+  used: { type: Number, default: 0 },
+  available: { type: Number, default: 0 },
+});
+
 const balanceSchema = new mongoose.Schema(
   {
     year: {
@@ -11,20 +17,26 @@ const balanceSchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
-    leaveBalances: {
-      type: Map,
-      of: {
-        credit: { type: Number, default: 0 },
-        used: { type: Number, default: 0 },
-        available: { type: Number, default: 0 },
-      },
-      default: {},
-    },
     org_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Org",
       required: true,
-  },
+    },
+    leaveBalances: {
+      type: Map,
+      of: new mongoose.Schema({
+        total: {
+          credit: { type: Number, default: 0 },
+          used: { type: Number, default: 0 },
+          available: { type: Number, default: 0 },
+        },
+        monthly: {
+          type: Map,
+          of: leaveBalanceSchema,
+        },
+      }),
+      default: {},
+    },
   },
   {
     timestamps: true,

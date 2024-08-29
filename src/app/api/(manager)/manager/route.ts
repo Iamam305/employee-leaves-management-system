@@ -9,6 +9,7 @@ import { LeaveType } from "@/models/leave-type.model";
 import { Leave } from "@/models/leave.model";
 import { Membership } from "@/models/membership.model";
 import { User } from "@/models/user.model";
+import dayjs from "dayjs";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
@@ -80,6 +81,7 @@ export const GET = async (req: NextRequest) => {
       const page = parseInt(req.nextUrl.searchParams.get("page") || "1");
       const limit = 10;
       const skip = (page - 1) * limit;
+      const month = dayjs().month();
   
       // Authorization check
       if (auth[0] === null || auth[1] !== null) {
@@ -158,6 +160,7 @@ export const GET = async (req: NextRequest) => {
           managers,
           totalPages,
           currentPage: page,
+          month,
         },
         { status: 200 }
       );

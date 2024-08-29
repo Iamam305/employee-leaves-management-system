@@ -2,27 +2,46 @@ import { Balances } from "@/models/balanceCredits.model";
 import { LeaveType } from "@/models/leave-type.model";
 
 // call when new employee is created
-export const initializeEmployeeBalance = async(userId:string, year:any , orgId:string) => {
+// update the function first change
+export const initializeEmployeeBalance = async (userId: string, year: any, orgId: string) => {
   const leaveTypes = await LeaveType.find({ org_id: orgId });
   
-    const leaveBalances = leaveTypes.reduce((acc, leaveType) => {
-      acc[leaveType.name] = {
+  const leaveBalances = leaveTypes.reduce((acc, leaveType) => {
+    const monthlyBalances = new Map();
+    
+    for (let month = 0; month < 12; month++) {
+      // Convert the numeric month to a string key
+      monthlyBalances.set(month.toString(), {
+        credit: leaveType.count_per_month,
+        used: 0,
+        available: leaveType.count_per_month,
+      });
+    }
+    
+    acc[leaveType.name] = {
+      total: {
         credit: leaveType.count_per_month * 12,
         used: 0,
         available: leaveType.count_per_month * 12,
-      };
-      return acc;
-    }, {});
-  
-    const balance = new Balances({
-      userId,
-      year,
-      leaveBalances,
-    });
-  
-    await balance.save();
-    return balance;
-  }
+      },
+      monthly: monthlyBalances,
+    };
+    
+    return acc;
+  }, {});
+
+  const balance = new Balances({
+    userId,
+    year,
+    org_id: orgId,
+    leaveBalances,
+  });
+
+  await balance.save();
+  return balance;
+};
+
+
   
   
   // export const updateEmployeeBalance = async(userId:string, year:any, leaveTypeName:string, credit:number) => {
@@ -52,8 +71,12 @@ export const initializeEmployeeBalance = async(userId:string, year:any , orgId:s
     [leaveTypeName: string]: number;
   }
   
-  // call when admin or hr add credits to employee
-  export const updateEmployeeBalance = async (userId: string, year: any, leaveCredits: LeaveCredits) => {
+  // call when admin or hr add credits to employee change this also
+  export const updateEmployeeBalance = async (
+    userId: string,
+    year: any,
+    leaveCredits: LeaveCredits
+  ) => {
     const balance: any = await Balances.findOne({ userId, year });
   
     if (!balance) {
@@ -63,13 +86,27 @@ export const initializeEmployeeBalance = async(userId:string, year:any , orgId:s
     for (const leaveTypeName in leaveCredits) {
       if (balance.leaveBalances.has(leaveTypeName)) {
         const credit = leaveCredits[leaveTypeName];
-        const used = balance.leaveBalances.get(leaveTypeName).used;
+        const leaveTypeBalance = balance.leaveBalances.get(leaveTypeName);
   
-        balance.leaveBalances.set(leaveTypeName, {
-          credit,
-          used,
-          available: credit - used,
+        // Update total balance
+        const totalUsed = leaveTypeBalance.total.used;
+        leaveTypeBalance.total.credit = credit;
+        leaveTypeBalance.total.available = credit - totalUsed;
+  
+        // Adjust each month's available balance based on the current used value
+        leaveTypeBalance.monthly.forEach((monthBalance: any, month: string) => {
+          const used = monthBalance.used;
+          const monthlyCredit = monthBalance.credit;
+  
+          // Update available balance for each month
+          leaveTypeBalance.monthly.set(month, {
+            credit: monthlyCredit,
+            used,
+            available: monthlyCredit - used,
+          });
         });
+  
+        balance.leaveBalances.set(leaveTypeName, leaveTypeBalance);
       } else {
         throw new Error(`Leave type ${leaveTypeName} not found for the user`);
       }
@@ -78,26 +115,49 @@ export const initializeEmployeeBalance = async(userId:string, year:any , orgId:s
     // Save the updated balance document
     await balance.save();
   
-    return balance ;
+    return balance;
   };
   
   
-  //call when new leavtype is created
-  export const addNewLeaveTypeToAllEmployees = async(leaveType:any) => {
-      // Fetch all employees' balances
-      const allBalances = await Balances.find({org_id:leaveType.org_id});
   
-      // Update leaveBalances for each employee
-      for (const balance of allBalances) {
-        balance.leaveBalances.set(leaveType.name, {
-          credit: leaveType.count_per_month * 12 , // default credit
-          used: 0,   // default used
-          available: leaveType.count_per_month * 12, // default available
+  
+  //call when new leavtype is created
+  export const addNewLeaveTypeToAllEmployees = async (leaveType: any) => {
+    // Fetch all employees' balances for the given organization
+    const allBalances = await Balances.find({ org_id: leaveType.org_id });
+  
+    // Update leaveBalances for each employee
+    for (const balance of allBalances) {
+      // Initialize monthly balances map
+      const monthlyBalances = new Map<string, any>();
+      
+      for (let month = 0; month < 12; month++) {
+        // Set default values for each month
+        monthlyBalances.set(month.toString(), {
+          credit: leaveType.count_per_month,
+          used: 0,
+          available: leaveType.count_per_month,
         });
-    
-        await balance.save();
       }
-  }
+      
+      // Define the new leave type balance
+      const newLeaveTypeBalance = {
+        total: {
+          credit: leaveType.count_per_month * 12, // Total credit
+          used: 0,   // Total used
+          available: leaveType.count_per_month * 12, // Total available
+        },
+        monthly: monthlyBalances,
+      };
+  
+      // Add the new leave type to the employee's leaveBalances
+      balance.leaveBalances.set(leaveType.name, newLeaveTypeBalance);
+  
+      // Save the updated balance document
+      await balance.save();
+    }
+  };
+  
   
   //call when employee applying for leave
   // export const calculateAndUpdateBalances = async(
@@ -143,100 +203,145 @@ export const initializeEmployeeBalance = async(userId:string, year:any , orgId:s
     userId: string,
     year: any,
     leaveTypeName: string
-) => {
+  ) => {
     // Find the balance record for the specific user and year
     const balance = await Balances.findOne({ userId, year });
-
+  
     if (!balance) {
-        throw new Error("Balance not found for the specified user and year");
+      throw new Error("Balance not found for the specified user and year");
     }
-
+  
     // Check if the leave type exists in the user's balance record
     if (!balance.leaveBalances.has(leaveTypeName)) {
-        throw new Error(`Leave type ${leaveTypeName} not found for the user`);
+      throw new Error(`Leave type ${leaveTypeName} not found for the user`);
     }
-
+  
     // Get the current balance for the specified leave type
-    const currentBalance: any = balance.leaveBalances.get(leaveTypeName);
-
-    // Return the current balance without modification
+    const leaveTypeBalance:any = balance.leaveBalances.get(leaveTypeName);
+  
+    // Convert the monthly Map to a plain object for easier manipulation
+    const monthlyBalances = Object.fromEntries(
+      Array.from(leaveTypeBalance.monthly.entries()).map(([month , balance]:any) => [
+        month,
+        {
+          credit: balance.credit,
+          used: balance.used,
+          available: balance.available,
+        }
+      ])
+    );
+  
+    // Return the current balance including the total and monthly balances
     return {
-        credit: currentBalance.credit,
-        used: currentBalance.used,
-        available: currentBalance.available,
+      total: {
+        credit: leaveTypeBalance.total.credit,
+        used: leaveTypeBalance.total.used,
+        available: leaveTypeBalance.total.available,
+      },
+      monthly: monthlyBalances,
     };
-};
+  };
+  
+  
 
 
-  // update balnce 
+  // update balnce change this function also
   export const updateLeaveBalance = async (
     userId: string,
     year: any,
-    leaveTypeName: string
-) => {
+    leaveTypeName: string,
+    month: number // Add month parameter to specify the month of leave
+  ) => {
     // Find the balance record for the specific user and year
     console.log("Entered values:", {
-        userId,
-        year,
-        leaveTypeName,
+      userId,
+      year,
+      leaveTypeName,
+      month,
     });
-
+  
     const balance = await Balances.findOne({ userId, year });
-
+  
     if (!balance) {
-        throw new Error("Balance not found for the specified user and year");
+      throw new Error("Balance not found for the specified user and year");
     }
-
+  
     // Check if the leave type exists in the user's balance record
     if (!balance.leaveBalances.has(leaveTypeName)) {
-        throw new Error(`Leave type ${leaveTypeName} not found for the user`);
+      throw new Error(`Leave type ${leaveTypeName} not found for the user`);
     }
-
+  
     // Get the current balance for the specified leave type
-    const currentBalance: any = balance.leaveBalances.get(leaveTypeName);
-
-    // Calculate the potential new used and available balances
-    const newUsed = currentBalance.used + 1; // Increment by 1 for each use
-    const newAvailable = currentBalance.credit - newUsed;
-
-    // Ensure the available balance does not go negative
-    if (newAvailable < 0) {
-        throw new Error(`Insufficient balance: cannot take more leaves. Only ${currentBalance.available} leaves available.`);
+    const leaveTypeBalance: any = balance.leaveBalances.get(leaveTypeName);
+  
+    // Convert month to a string for correct map handling
+    const monthKey = month.toString();
+  
+    // Check if the month balance exists in the leave type balance
+    if (!leaveTypeBalance.monthly.has(monthKey)) {
+      throw new Error(`Month ${month} not found for leave type ${leaveTypeName}`);
     }
-
-    // Update the balance in the map
-    balance.leaveBalances.set(leaveTypeName, {
-        credit: currentBalance.credit,
-        used: newUsed,
-        available: newAvailable,
+  
+    // Get the current month's balance
+    const currentMonthBalance = leaveTypeBalance.monthly.get(monthKey);
+  
+    // Calculate the new used and available balances for the month
+    const newMonthUsed = currentMonthBalance.used + 1; // Increment by 1 for each use
+    const newMonthAvailable = currentMonthBalance.credit - newMonthUsed;
+  
+    // Ensure the available monthly balance does not go negative
+    if (newMonthAvailable < 0) {
+      throw new Error(
+        `Insufficient balance: cannot take more leaves for the month. Only ${currentMonthBalance.available} leaves available for this month.`
+      );
+    }
+  
+    // Update the monthly balance in the map
+    leaveTypeBalance.monthly.set(monthKey, {
+      credit: currentMonthBalance.credit,
+      used: newMonthUsed,
+      available: newMonthAvailable,
     });
-
+  
+    // Update the total balance for the leave type
+    const totalUsed = leaveTypeBalance.total.used + 1;
+    const totalAvailable = leaveTypeBalance.total.credit - totalUsed;
+  
+    leaveTypeBalance.total.used = totalUsed;
+    leaveTypeBalance.total.available = totalAvailable;
+  
+    // Save the updated leave type balance back into the balance document
+    balance.leaveBalances.set(leaveTypeName, leaveTypeBalance);
+  
     // Save the updated balance record
     await balance.save();
-
+  
     return balance;
+  };
+  
+
+
+// calculateTotalCredit
+export const calculateTotalCredit = async (userId: string, year: any) => {
+  // Find the balance record for the specific user and year
+  const balance = await Balances.findOne({ userId, year });
+
+  if (!balance) {
+    // If no balance is found, return 0
+    return 0;
+  }
+
+  // Initialize total available balance
+  let totalAvailable = 0;
+
+  // Iterate through all leave types and sum up the total available balances
+  balance.leaveBalances.forEach((leaveTypeBalance: any) => {
+    totalAvailable += leaveTypeBalance.total.available;
+  });
+
+  // Return the total available balance
+  return totalAvailable;
 };
 
 
-  export const calculateTotalCredit = async (userId: string, year: any) => {
-    // Find the balance record for the specific user and year
-    const balance = await Balances.findOne({ userId, year });
-  
-    if (!balance) {
-      // throw new Error("Balance not found for the specified user and year");
-      return 0;
-    }
-  
-    // Initialize total credit
-    let totalAvailable = 0;
-  
-    // Iterate through all leave types and sum up the credits
-    for (const leaveType of balance.leaveBalances.keys()) {
-      const leaveBalance: any = balance.leaveBalances.get(leaveType);
-      totalAvailable += leaveBalance.available;
-    }
-  
-    // Return the total credit
-    return totalAvailable;
-  };
   
