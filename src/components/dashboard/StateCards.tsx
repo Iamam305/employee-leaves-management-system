@@ -7,9 +7,18 @@ import { HiArrowNarrowDown, HiArrowNarrowUp } from "react-icons/hi";
 import { createElement } from "react";
 import { useSelector } from "react-redux";
 
-const StatsCards = ({ totalLeaves, totalPendingLeaves, totalUsers, totalBalances }: any) => {
-  const selectedOrgId = useSelector((state: any) => state.organization.selectedOrg);
-  const current_user_role = useSelector((state: any) => state.membership.memberShipData.role);
+const StatsCards = ({
+  totalLeaves,
+  totalPendingLeaves,
+  totalUsers,
+  totalBalances,
+}: any) => {
+  const selectedOrgId = useSelector(
+    (state: any) => state.organization.selectedOrg
+  );
+  const current_user_role = useSelector(
+    (state: any) => state.membership.memberShipData.role
+  );
 
   // console.log("Selected Org ==> ", selectedOrgId);
   // console.log("CurrentUser ==> ", current_user_role);
@@ -38,7 +47,7 @@ const StatsCards = ({ totalLeaves, totalPendingLeaves, totalUsers, totalBalances
     },
     {
       key: "balance",
-      title: "Balances Added",
+      title: "Balances Added (Monthly)",
       change: 3,
       value: totalBalances,
       icon: MdOutlineBalance,
@@ -49,7 +58,8 @@ const StatsCards = ({ totalLeaves, totalPendingLeaves, totalUsers, totalBalances
     StatsCardsData = StatsCardsData.filter((stat) => stat.key !== "balance");
   }
 
-  const gridColumns = StatsCardsData.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-4'
+  const gridColumns =
+    StatsCardsData.length === 3 ? "md:grid-cols-3" : "md:grid-cols-4";
 
   return (
     <div className={`grid gap-4 ${gridColumns}`}>
@@ -58,10 +68,10 @@ const StatsCards = ({ totalLeaves, totalPendingLeaves, totalUsers, totalBalances
           key={stat.key}
           className={`${
             StatsCardsData.length === 1
-              ? 'col-span-full'
+              ? "col-span-full"
               : StatsCardsData.length === 2
-              ? 'col-span-1'
-              : 'col-span-1 lg:col-span-1'
+              ? "col-span-1"
+              : "col-span-1 lg:col-span-1"
           }`}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

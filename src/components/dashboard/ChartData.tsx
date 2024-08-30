@@ -10,7 +10,10 @@ import TotalBalanceChart from "./stats/TotalBalanceChart";
 
 const ChartData = () => {
   const org_id = useSelector((state: any) => state.organization.selectedOrg);
-  const userData = useSelector((state: any) => state.auth.userData);
+  const userRole = useSelector((state: any) => state.auth.userData);
+  const current_user_role = useSelector(
+    (state: any) => state.membership.memberShipData
+  );
 
   const [usersData, setUsersData] = useState<any>([]);
   const [leavesData, setLeavesData] = useState<any>([]);
@@ -38,7 +41,7 @@ const ChartData = () => {
       setTotalPendingLeaves(data.pending_leaves[0]?.totalPendingLeaves || 0);
       setLeavesInfo(data.leaves_data || []);
       setBalanceHistory(data.leaveType[0].leaveTypes);
-      // setTotalBalances(data.leaveType[0].total[0]?.totalCount)
+      setTotalBalances(data.leaveType[0].total[0]?.totalCount)
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -48,8 +51,8 @@ const ChartData = () => {
 
   const fetchbalance = async () => {
     try {
-      if (userData) {
-        const { data } = await axios.get(`/api/balances/${userData._id}`);
+      if (userRole) {
+        const { data } = await axios.get(`/api/balances/${userRole._id}`);
         console.log("totabalnce of user ", data);
         setTotalBalances(data.totalbalancecredit);
       }
@@ -61,7 +64,7 @@ const ChartData = () => {
     fetchbalance();
   }, [org_id]);
 
-  console.log("Total Balance ==> ",totalbalances,typeof(totalbalances))
+  console.log("Total Balance ==> ", totalbalances, typeof totalbalances);
 
   return (
     <div>
@@ -77,7 +80,7 @@ const ChartData = () => {
           totalLeaves={totalLeaves}
           totalPendingLeaves={totalPendingLeaves}
           totalUsers={totalUsers}
-          totalBalances ={totalbalances}
+          totalBalances={totalbalances}
         />
       )}
 
@@ -113,16 +116,27 @@ const ChartData = () => {
         )}
 
         {loading ? (
-          <Skeleton className=" w-full h-64" />
+          <Skeleton className="w-full h-64" />
         ) : (
-          <TotalBalanceChart data={balanceHistory} />
+          <>
+            {current_user_role.role === "admin" && org_id !== null ? (
+              <TotalBalanceChart data={balanceHistory} />
+            ) : current_user_role.role === "hr" ||
+              current_user_role.role === "manager" ? (
+              <TotalBalanceChart data={balanceHistory} />
+            ) : null}
+          </>
         )}
 
-        <DoughnutChart
-          className="w-full h-64"
-          data={leavesInfo}
-          title={"Leaves Info"}
-        />
+        {loading ? (
+          <Skeleton className=" w-full h-64" />
+        ) : (
+          <DoughnutChart
+            className="w-full h-64"
+            data={leavesInfo}
+            title={"Leaves Info"}
+          />
+        )}
       </div>
     </div>
   );
