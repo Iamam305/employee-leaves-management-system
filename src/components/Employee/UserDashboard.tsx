@@ -95,7 +95,7 @@ const UserDashboard = ({ id }: any) => {
       if (current_user) {
         let month;
         if(selectedMonth){
-          month = selectedMonth
+          month = dayjs(selectedMonth).month()
         }
         else{
           month = dayjs().month()
