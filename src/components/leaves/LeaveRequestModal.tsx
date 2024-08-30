@@ -42,7 +42,7 @@ const LeaveRequestModal: React.FC<{
           onClose={handleclose}
         >
           <div className="p-4 max-h-[60vh] overflow-y-auto">
-            <Card className="overflow-hidden max-h-[774px]">
+            <Card className="overflow-scroll max-h-[774px]">
               <CardContent>
                 <LeaveRequestForm onclose={handleclose} />
               </CardContent>

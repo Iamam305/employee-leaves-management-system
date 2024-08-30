@@ -74,7 +74,7 @@ connect_db();
 export const POST = async (req: NextRequest) => {
   try {
       // Extract data from the request body
-      const { user_id, leave_type_id, org_id, start_date, end_date, description } = await req.json();
+      const { user_id, leave_type_id, org_id, start_date, end_date, description,docs } = await req.json();
 
       // Validate required fields
       if (!user_id || !leave_type_id || !org_id || !start_date || !end_date) {
@@ -105,6 +105,7 @@ export const POST = async (req: NextRequest) => {
           start_date,
           end_date,
           description,
+          docs,
           status: "pending",
       });
 
