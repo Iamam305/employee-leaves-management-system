@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.637.0",
     "@hookform/resolvers": "^3.9.0",
     "@nextui-org/react": "^2.4.6",
     "@radix-ui/react-dialog": "^1.1.1",
@@ -25,6 +26,7 @@
     "@reduxjs/toolkit": "^2.2.6",
     "@syncfusion/ej2-react-calendars": "^26.2.8",
     "@tanstack/react-table": "^8.20.1",
+    "aws-sdk": "^2.1686.0",
     "axios": "^1.7.2",
     "bcrypt": "^5.1.1",
     "chart.js": "^4.4.3",
