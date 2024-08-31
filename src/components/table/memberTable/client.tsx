@@ -8,6 +8,7 @@ import { Heading } from "@/components/ui/heading";
 import { columns } from "./columns";
 import InviteMembers from "@/components/Invitations/InviteMember";
 import { useSelector } from "react-redux";
+import AssignManager from "@/components/dashboard/AssignManager";
 
 export const MemberTableClient: React.FC<any> = ({
   data,
@@ -28,11 +29,14 @@ export const MemberTableClient: React.FC<any> = ({
 
   return (
     <>
-      <div className="flex items-start justify-between   ">
-        <Heading title={`All Members`} description="All Members Details" />
-        {/* <Link href={"/members/invite-members"}> */}
-        {user_role !== "employee" && <InviteMembers />}
-        {/* </Link> */}
+      <div className="flex flex-col md:flex-row md:items-start justify-between space-y-4 md:space-y-0 md:space-x-4">
+        <Heading title="All Members" description="All Members Details" />
+        <div className="flex flex-wrap gap-4 md:flex-row md:space-x-4">
+          {user_role === "hr" || user_role === "admin" ? (
+            <AssignManager />
+          ) : null}
+          {user_role !== "employee" && <InviteMembers />}
+        </div>
       </div>
       <Separator />
       <DataTable

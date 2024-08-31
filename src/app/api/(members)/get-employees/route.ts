@@ -8,25 +8,28 @@ export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
     const org_id = searchParams.get("org_id");
-    const query = org_id ? { org_id } : {};
+    if (!org_id) {
+      return NextResponse.json({ msg: "org_id is required" }, { status: 400 });
+    }
+
     const membership_user_val = await Membership.find({
-      ...query,
+      org_id,
       role: "employee",
     }).populate("user_id");
+
     const membership_manager_val = await Membership.find({
-      ...query,
+      org_id,
       role: "manager",
     }).populate("user_id");
+
     const employees = membership_user_val.map((member) => member.user_id);
     const managers = membership_manager_val.map((member) => member.user_id);
+
     return NextResponse.json({
       employees,
       managers,
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to fetch data" },
-      { status: 500 }
-    );
+    return NextResponse.json({ msg: "Failed to fetch data" }, { status: 500 });
   }
 }
