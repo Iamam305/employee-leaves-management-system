@@ -105,17 +105,21 @@ const Page = () => {
 
   const fetchEmployee = async () => {
     try {
-      const { data } = await axios.get(`/api/org/get-members?org_id=${org_id}`);
+      const { data } = await axios.get(`/api/org/get-employees?org_id=${org_id}`);
       console.log(
         "Data Recieved => ",
         data.all_members.map((member: any) => member.user_id)
       );
-      setEmployees(
-        data.all_members.map((member: any) => ({
-          value: member.user_id._id,
-          label: member.user_id.name,
-        }))
-      );
+      setEmployees({
+        value:"",
+        label:""
+      })
+      // setEmployees(
+      //   data.all_members.map((member: any) => ({
+      //     value: member.user_id._id,
+      //     label: member.user_id.name,
+      //   }))
+      // );
     } catch (error) {
       console.log(error);
     }
