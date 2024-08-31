@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
 import React, { useEffect, useState } from "react";
 import { LeaveTypeForm } from "./LeaveTypeForm";
-
+import { PlusIcon } from "lucide-react";
 
 const truncateText = (text: any, length: number) => {
   const str = text ? String(text) : "";
@@ -13,44 +13,46 @@ const truncateText = (text: any, length: number) => {
 
 const LeaveTypeModal: React.FC<{
   title: string;
-  fetchData: () => void
+  fetchData: () => void;
   // row: LeavetypeInterface;
-}> = ({ title , fetchData}) => {
+}> = ({ title, fetchData }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isloading , setIsLoading] = useState(false)
-//   console.log(accessorKey._id)
+  const [isloading, setIsLoading] = useState(false);
+  //   console.log(accessorKey._id)
 
   const handleclose = () => {
-    setIsOpen(false)
-  }
-  
+    setIsOpen(false);
+  };
 
   return (
     <>
       <Button
         onClick={() => setIsOpen(true)}
         variant="default"
+        className=" flex items-center gap-2"
         // size="lg"
-      >{title}
+      >
+        <PlusIcon className="h-4 w-4" />
+        {title}
         {/* {truncatedText && truncatedText !== "N/A" ? "View" : "N/A"} */}
       </Button>
       {/* {truncatedText !== "N/A" && ( */}
-        <>
-          <Modal
-            title="Create Leave LeaveType"
-            // description={accessorKey.status}
-            isOpen={isOpen}
-            onClose={handleclose}
-          >
-            <div className="p-4 max-h-[60vh] overflow-y-auto">
+      <>
+        <Modal
+          title="Create Leave LeaveType"
+          // description={accessorKey.status}
+          isOpen={isOpen}
+          onClose={handleclose}
+        >
+          <div className="p-4 max-h-[60vh] overflow-y-auto">
             <Card className="overflow-hidden max-h-[774px]">
-      <CardContent>
-        <LeaveTypeForm fetchData={fetchData} onclose={handleclose}/>
-      </CardContent>
-    </Card>
-            </div>
-          </Modal>
-        </>
+              <CardContent>
+                <LeaveTypeForm fetchData={fetchData} onclose={handleclose} />
+              </CardContent>
+            </Card>
+          </div>
+        </Modal>
+      </>
     </>
   );
 };

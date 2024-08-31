@@ -1,13 +1,10 @@
-import { EmailVerification } from "@/components/email-temp/EmailVerificationTemplate";
 import { LeaveRequestEmail } from "@/components/email-temp/LeaveRequestTemplate";
 import { connect_db } from "@/configs/db";
 import { auth_middleware } from "@/lib/auth-middleware";
 import { calculateLeaveBalance } from "@/lib/balanceservices";
 import { LeaveType } from "@/models/leave-type.model";
 import { Leave } from "@/models/leave.model";
-import { Org } from "@/models/org.model";
-import { User } from "@/models/user.model";
-import mongoose from "mongoose";
+import { Membership } from "@/models/membership.model";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
@@ -15,137 +12,106 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 connect_db();
 
-
-// export const POST = async (req : NextRequest) => {
-//     try {
-
-//         // Extract data from the request body
-//         const { user_id, leave_type_id, org_id, start_date, end_date, description } = await req.json();
-
-//         // Validate required fields
-//         if (!user_id || !leave_type_id || !org_id || !start_date || !end_date) {
-//             return NextResponse.json({ msg: "All required fields must be provided" }, { status: 400 });
-//         }
-
-//         // Create a new leave request
-//         const newLeave = new Leave({
-//             user_id,
-//             leave_type_id,
-//             org_id,
-//             start_date,
-//             end_date,
-//             description,
-//             status: "pending",
-//         });
-
-//         // Save the new leave request to the database
-//         await newLeave.save();
-
-//         const user = await User.findById(user_id);
-
-//         const leavetype = await LeaveType.findById(leave_type_id)
-
-//         // send message to manager
-//         const { data, error } = await resend.emails.send({
-//             from: "Acme <team@qtee.ai>",
-//             to: "sgrlekhwani@gmail.com",
-//             subject: "Leave Request Raised",
-//             react: LeaveRequestEmail({
-//                 employeeName : user.name,
-//                 leaveStartDate : start_date,
-//                 leaveEndDate : end_date,
-//                 leaveReason : leavetype.name,
-//             }),
-//             html: "5",
-//           });
-
-//         //if not manager than send to hr or admin
-
-
-//         // Respond with the created leave request
-//         return NextResponse.json({ msg: "Leave request created successfully", data: {newLeave , data} }, { status: 201 });
-
-//     } catch (error) {
-//         console.error(error);
-//         return NextResponse.json({ msg: "Something went wrong" }, { status: 500 });
-//     }
-// };
-
 export const POST = async (req: NextRequest) => {
   try {
-      // Extract data from the request body
-      const { user_id, leave_type_id, org_id, start_date, end_date, description,docs } = await req.json();
+    const {
+      user_id,
+      leave_type_id,
+      org_id,
+      start_date,
+      end_date,
+      description,
+      docs,
+    } = await req.json();
 
-      // Validate required fields
-      if (!user_id || !leave_type_id || !org_id || !start_date || !end_date) {
-          return NextResponse.json({ msg: "All required fields must be provided" }, { status: 400 });
+    if (!user_id || !leave_type_id || !org_id || !start_date || !end_date) {
+      return NextResponse.json(
+        { msg: "All required fields must be provided" },
+        { status: 400 }
+      );
+    }
+
+    const membership = await Membership.findOne({ user_id })
+      .populate("user_id")
+      .populate("manager_id");
+
+    const leavetype = await LeaveType.findById(leave_type_id);
+
+    const leaveBalance = await calculateLeaveBalance(
+      user_id,
+      new Date(start_date).getFullYear(),
+      leavetype.name
+    );
+
+    if (leaveBalance.total.available <= 0) {
+      return NextResponse.json(
+        {
+          msg: "You cannot take this leave due to insufficient balance available",
+        },
+        { status: 403 }
+      );
+    } else {
+      if (leaveBalance.monthly.available <= 0) {
+        return NextResponse.json(
+          {
+            msg: "You cannot take this leave due to insufficient balance available",
+          },
+          { status: 403 }
+        );
       }
+    }
 
-      const user = await User.findById(user_id);
-      const leavetype = await LeaveType.findById(leave_type_id);
+    // Create a new leave request
+    const newLeave = new Leave({
+      user_id,
+      leave_type_id,
+      org_id,
+      start_date,
+      end_date,
+      description,
+      docs,
+      status: "pending",
+    });
 
-      // Calculate the leave balance for the user
-      const leaveBalance = await calculateLeaveBalance(user_id, new Date(start_date).getFullYear(), leavetype.name);
+    // Save the new leave request to the database
+    await newLeave.save();
 
-      // Check if the user has enough leave balance
-      if(leaveBalance.total.available <= 0){
-        return NextResponse.json({ msg: "You cannot take this leave due to insufficient balance available" }, { status: 403 });
-      }
-      else {
-        if (leaveBalance.monthly.available <= 0) {
-            return NextResponse.json({ msg: "You cannot take this leave due to insufficient balance available" }, { status: 403 });
-        }
-      }
+    // Send message to manager
+    const { data, error } = await resend.emails.send({
+      from: "Acme <team@qtee.ai>",
+      to: membership.manager_id.email,
+      subject: "Leave Request Raised",
+      react: LeaveRequestEmail({
+        employeeName: membership.manager_id.name,
+        leaveStartDate: start_date,
+        leaveEndDate: end_date,
+        leaveReason: leavetype.name,
+      }),
+      html: "5",
+    });
 
-      // Create a new leave request
-      const newLeave = new Leave({
-          user_id,
-          leave_type_id,
-          org_id,
-          start_date,
-          end_date,
-          description,
-          docs,
-          status: "pending",
-      });
-
-      // Save the new leave request to the database
-      await newLeave.save();
-
-
-
-      // Send message to manager
-      const { data, error } = await resend.emails.send({
-          from: "Acme <team@qtee.ai>",
-          to: "sgrlekhwani@gmail.com",
-          subject: "Leave Request Raised",
-          react: LeaveRequestEmail({
-              employeeName: user.name,
-              leaveStartDate: start_date,
-              leaveEndDate: end_date,
-              leaveReason: leavetype.name,
-          }),
-          html: "5",
-      });
-
-      // Respond with the created leave request and email response
-      return NextResponse.json({ msg: "Leave request created successfully", data: { newLeave, data } }, { status: 201 });
-
+    // Respond with the created leave request and email response
+    return NextResponse.json(
+      {
+        msg: "Leave request created successfully",
+        data: { membership, data },
+      },
+      { status: 201 }
+    );
   } catch (error) {
-      console.error(error);
-      return NextResponse.json({ msg: "Something went wrong" }, { status: 500 });
+    console.error(error);
+    return NextResponse.json({ msg: "Something went wrong" }, { status: 500 });
   }
 };
-
 
 // export const GET = async (req: NextRequest) => {
 //     try {
 //         const leaves = await Leave.find().populate('user_id' ,  "-password -createdAt -updatedAt -verification_code -is_verified").populate("leave_type_id").populate("org_id" , [] , Org);
 //         return NextResponse.json({ msg: "All Leaves fetched Successfully" , data: leaves}, { status: 200 });
-        
+
 //     } catch (error) {
 //         console.log(error);
-//         return NextResponse.json({ msg: "Something went wrong" }, { status: 500 });        
+//         return NextResponse.json({ msg: "Something went wrong" }, { status: 500 });
 //     }
 // }
 
@@ -157,7 +123,7 @@ export const POST = async (req: NextRequest) => {
 //       const page = parseInt(req.nextUrl.searchParams.get("page") || "1");
 //       const limit = 10;
 //       const skip = (page - 1) * limit;
-  
+
 //       // Build the query for leaves
 //       let leaveQuery: any = {};
 
@@ -212,7 +178,7 @@ export const POST = async (req: NextRequest) => {
 //           },
 //         },
 //       ];
-  
+
 //       if (name) {
 //         leaveAggregation.push({
 //           $match: {
@@ -231,18 +197,18 @@ export const POST = async (req: NextRequest) => {
 //           },
 //         });
 //       }
-  
+
 //       leaveAggregation.push(
 //         { $sort: { createdAt: -1 } },
 //         { $skip: skip },
 //         { $limit: limit }
 //       );
-  
+
 //       const leaves = await Leave.aggregate(leaveAggregation);
-  
+
 //       const totalLeaves = await Leave.countDocuments(leaveQuery);
 //       const totalPages = Math.ceil(totalLeaves / limit);
-  
+
 //     //   const leaves = await Leave.find(leaveQuery)
 //     //     .populate("user_id", "-password -createdAt -updatedAt -verification_code -is_verified")
 //     //     .populate("leave_type_id")
@@ -250,7 +216,7 @@ export const POST = async (req: NextRequest) => {
 //     //     .sort({ createdAt: -1 })
 //     //     .skip(skip)
 //     //     .limit(limit);
-  
+
 //       return NextResponse.json(
 //         {
 //           pagination: {
@@ -271,7 +237,6 @@ export const POST = async (req: NextRequest) => {
 //       );
 //     }
 //   }
-
 
 export async function GET(req: NextRequest) {
   try {
@@ -295,7 +260,10 @@ export async function GET(req: NextRequest) {
     // Role-based leave query filtering
     if (auth_data.membership.role === "admin") {
       // Admin can view leaves of all users
-    } else if (auth_data.membership.role === "hr" || auth_data.membership.role === "manager") {
+    } else if (
+      auth_data.membership.role === "hr" ||
+      auth_data.membership.role === "manager"
+    ) {
       // HR/Managers can view leaves within their organization
       leaveQuery.org_id = auth_data.membership.org_id;
     } else {
@@ -345,9 +313,9 @@ export async function GET(req: NextRequest) {
           "user.createdAt": 0,
           "user.updatedAt": 0,
           "user.is_verified": 0,
-          "leave_type_id": 0,
-          "org_id": 0,
-          "user_id": 0,
+          leave_type_id: 0,
+          org_id: 0,
+          user_id: 0,
         },
       },
     ];
