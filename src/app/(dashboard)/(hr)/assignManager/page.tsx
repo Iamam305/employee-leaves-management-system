@@ -28,6 +28,8 @@ import {
 
 import { MultiSelect } from "@/components/Multi-select/multi-select";
 import { toast } from "sonner";
+import axios from "axios";
+import { useSearchParams } from "next/navigation";
 
 // Sample array of employees
 const sampleEmployees = [
@@ -85,17 +87,44 @@ const sampleManagers = [
 ];
 
 const FormSchema = z.object({
-    employees: z.array(z.string().min(1)).min(1),
-    manager: z.string().min(1),
-  });
-  
-  const Page = () => {
-    const [employees, setEmployees] = useState(sampleEmployees);
-    const [managers, setManagers] = useState(sampleManagers);
-    const [loading, setLoading] = useState(false);
-  // Fetch employees and managers from an API (replace with actual API calls)
- 
+  employees: z.array(z.string().min(1)).min(1),
+  manager: z.string().min(1),
+});
+
+const Page = () => {
+  const searchParams = useSearchParams();
+
+  const org_id = searchParams.get("org_id");
+
+  console.log("Org Id==> ",org_id)
+
+  // const [employees, setEmployees] = useState(sampleEmployees);
+  const [employees, setEmployees] = useState<any>([]);
+  const [managers, setManagers] = useState(sampleManagers);
+  const [loading, setLoading] = useState(false);
+
+  const fetchEmployee = async () => {
+    try {
+      const { data } = await axios.get(`/api/org/get-members?org_id=${org_id}`);
+      console.log(
+        "Data Recieved => ",
+        data.all_members.map((member: any) => member.user_id)
+      );
+      setEmployees(
+        data.all_members.map((member: any) => ({
+          value: member.user_id._id,
+          label: member.user_id.name,
+        }))
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  console.log("Employees==> ", employees);
+
   useEffect(() => {
+    fetchEmployee();
     // Uncomment and replace with actual API calls if needed
     // const fetchEmployeesAndManagers = async () => {
     //   try {
@@ -126,7 +155,7 @@ const FormSchema = z.object({
     // };
 
     // fetchEmployeesAndManagers();
-  }, []);
+  }, [org_id]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -147,7 +176,7 @@ const FormSchema = z.object({
       return;
     }
 
-    console.log("submitted data" , data)
+    console.log("submitted data", data);
 
     // setLoading(true);
 
@@ -213,7 +242,10 @@ const FormSchema = z.object({
                 <FormItem>
                   <FormLabel>Manager</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select a manager" />
                       </SelectTrigger>
@@ -233,7 +265,12 @@ const FormSchema = z.object({
               )}
             />
 
-            <Button variant="default" type="submit" className="w-full" disabled={loading}>
+            <Button
+              variant="default"
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
               {loading ? "Submitting..." : "Submit"}
             </Button>
           </form>
