@@ -35,7 +35,9 @@ export const MemberTableClient: React.FC<any> = ({
           {user_role === "hr" || user_role === "admin" ? (
             <AssignManager />
           ) : null}
-          {user_role !== "employee" && <InviteMembers />}
+          {user_role === "hr" || user_role === "admin" ? (
+            <InviteMembers />
+          ) : null}
         </div>
       </div>
       <Separator />

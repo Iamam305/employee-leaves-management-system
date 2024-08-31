@@ -31,7 +31,9 @@ const Page = () => {
         user_role === "manager") && (
         <>
           <div className="w-full flex items-center justify-end p-2 gap-2">
-            <LeaveRequestModal title="Apply For Leave" />
+            {user_role === "admin" && (
+              <LeaveRequestModal title="Apply For Leave" />
+            )}
           </div>
           <ChartData />
         </>

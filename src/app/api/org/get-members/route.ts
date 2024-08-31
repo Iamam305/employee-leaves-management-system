@@ -3,6 +3,7 @@ import { auth_middleware } from "@/lib/auth-middleware";
 import { Membership } from "@/models/membership.model";
 import { Org } from "@/models/org.model";
 import { User } from "@/models/user.model";
+import { all } from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
 connect_db();
@@ -75,7 +76,7 @@ export async function GET(req: NextRequest) {
         },
         { status: 200 }
       );
-    } else {
+    } else if (auth_data.membership.role === "hr") {
       // Non-admin
       let membershipQuery: any = {
         org_id: auth_data.membership.org_id,
@@ -101,7 +102,7 @@ export async function GET(req: NextRequest) {
       const totalPages = Math.ceil(totalUsers / limit);
 
       return NextResponse.json({
-        msg: "Employee",
+        msg: "For Hr",
         pagination: {
           totalUsers,
           totalPages,
@@ -110,6 +111,61 @@ export async function GET(req: NextRequest) {
         },
         all_members: membership,
       });
+    } else if (auth_data.membership.role === "manager") {
+      let membershipQuery: any = {
+        org_id: auth_data.membership.org_id,
+        user_id: { $ne: null },
+      };
+
+      if (name) {
+        const users = await User.find({
+          name: { $regex: name, $options: "i" },
+        }).select("_id");
+        const userIds = users.map((user) => user._id);
+        membershipQuery.user_id = { $in: userIds };
+      }
+
+      let all_members = [];
+
+      const membershipHr = await Membership.find({
+        role: "hr",
+        org_id: auth_data.membership.org_id,
+      })
+        .populate("user_id")
+        .populate("org_id", "name");
+
+      const managedMemberships = await Membership.find({
+        manager_id: auth_data.membership.user_id,
+        ...membershipQuery,
+      })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("user_id", "name email")
+        .populate("org_id", "name");
+
+      all_members.push(membershipHr);
+      all_members.push(managedMemberships);
+
+      const totalUsers = await Membership.countDocuments(membershipQuery);
+      const totalPages = Math.ceil(totalUsers / limit);
+
+      const flattened_members = all_members.flat();
+
+      return NextResponse.json(
+        {
+          name,
+          // org_id,
+          pagination: {
+            totalUsers,
+            totalPages,
+            currentPage: page,
+            limit,
+          },
+          all_members: flattened_members,
+        },
+        { status: 200 }
+      );
     }
   } catch (error: any) {
     console.error("Error fetching users and memberships:", error);
