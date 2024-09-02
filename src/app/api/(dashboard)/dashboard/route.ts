@@ -405,29 +405,6 @@ export async function GET(req: NextRequest) {
         },
       ]);
 
-      // const leaveType = await LeaveType.aggregate([
-      //   {
-      //     $match: {
-      //       org_id: auth_data.membership.org_id,
-      //     },
-      //   },
-      //   {
-      //     $group: {
-      //       _id: "$name",
-      //       count_per_month: {
-      //         $sum: "$count_per_month",
-      //       },
-      //     },
-      //   },
-      //   {
-      //     $project: {
-      //       _id: 0,
-      //       name: "$_id",
-      //       count_per_month: 1,
-      //     },
-      //   },
-      // ]);
-
       const leaveType = await LeaveType.aggregate([
         {
           $match: {
@@ -459,9 +436,6 @@ export async function GET(req: NextRequest) {
           },
         },
       ]);
-
-      
-
       return NextResponse.json({
         msg: "You are hr or manager",
         leaveType,
@@ -520,76 +494,159 @@ export async function GET(req: NextRequest) {
         },
       ]);
 
-      const leaves:any = await Leave.find({
-        org_id:auth_data.membership.org_id
-      });
+      const leaves = await Leave.aggregate([
+        {
+          $match: {
+            org_id: auth_data.membership.org_id,
+            manager_id: auth_data.membership.user_id,
+          },
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" },
+              day: { $dayOfMonth: "$createdAt" },
+            },
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 },
+        },
+        {
+          $project: {
+            _id: 0,
+            date: {
+              $dateFromParts: {
+                year: "$_id.year",
+                month: "$_id.month",
+                day: "$_id.day",
+              },
+            },
+            count: 1,
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalLeaves: { $sum: "$count" },
+            leaves: { $push: { date: "$date", count: "$count" } },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            totalLeaves: 1,
+            leaves: 1,
+          },
+        },
+      ]);
 
-      const membership = await Membership.find({
-        user_id:leaves?.user_id as any
-      })
+      const leaveType = await LeaveType.aggregate([
+        {
+          $match: {
+            org_id: auth_data.membership.org_id,
+          },
+        },
+        {
+          $group: {
+            _id: "$name",
+            count_per_month: { $sum: "$count_per_month" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            name: "$_id",
+            count_per_month: 1,
+          },
+        },
+        {
+          $facet: {
+            leaveTypes: [{ $sort: { name: 1 } }],
+            total: [
+              {
+                $group: { _id: null, totalCount: { $sum: "$count_per_month" } },
+              },
+              { $project: { _id: 0, totalCount: 1 } },
+            ],
+          },
+        },
+      ]);
 
-      // const leaves = await Leave.aggregate([
-      //   {
-      //     $match: {
-      //       org_id: auth_data.membership.org_id,
-      //       manager_id: auth_data.membership.user_id,
-      //     },
-      //   },
-      //   {
-      //     $group: {
-      //       _id: {
-      //         year: { $year: "$createdAt" },
-      //         month: { $month: "$createdAt" },
-      //         day: { $dayOfMonth: "$createdAt" },
-      //       },
-      //       count: { $sum: 1 },
-      //     },
-      //   },
-      //   {
-      //     $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 },
-      //   },
-      //   {
-      //     $project: {
-      //       _id: 0,
-      //       date: {
-      //         $dateFromParts: {
-      //           year: "$_id.year",
-      //           month: "$_id.month",
-      //           day: "$_id.day",
-      //         },
-      //       },
-      //       count: 1,
-      //     },
-      //   },
-      //   {
-      //     $group: {
-      //       _id: null,
-      //       totalLeaves: { $sum: "$count" },
-      //       leaves: { $push: { date: "$date", count: "$count" } },
-      //     },
-      //   },
-      //   {
-      //     $project: {
-      //       _id: 0,
-      //       totalLeaves: 1,
-      //       leaves: 1,
-      //     },
-      //   },
-      // ]);
+      const pending_leaves = await Leave.aggregate([
+        {
+          $match: {
+            status: "pending",
+            org_id: auth_data.membership.org_id,
+            manager_id: auth_data.membership.user_id,
+          },
+        },
+        {
+          $group: {
+            _id: {
+              status: "$status",
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" },
+              day: { $dayOfMonth: "$createdAt" },
+            },
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 },
+        },
+        {
+          $project: {
+            _id: 0,
+            date: {
+              $dateFromParts: {
+                year: "$_id.year",
+                month: "$_id.month",
+                day: "$_id.day",
+              },
+            },
+            count: 1,
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalPendingLeaves: { $sum: "$count" },
+            pending_leaves: { $push: { date: "$date", count: "$count" } },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            totalPendingLeaves: 1,
+            pending_leaves: 1,
+          },
+        },
+      ]);
 
-      // const leaves_data = [];
-      // const leaveType = [];
-
-
+      const leaves_data = await Leave.aggregate([
+        {
+          $match: {
+            org_id: auth_data.membership.org_id,
+            manager_id: auth_data.membership.user_id,
+          },
+        },
+        {
+          $group: {
+            _id: "$status",
+            count: { $sum: 1 },
+          },
+        },
+      ]);
       return NextResponse.json({
         msg: "You are Manager",
-        // leaveType,
+        leaveType,
         users,
         leaves,
-        membership
-        // leaves,
-        // pending_leaves,
-        // leaves_data,
+        pending_leaves,
+        leaves_data,
       });
     }
   } catch (error: any) {
