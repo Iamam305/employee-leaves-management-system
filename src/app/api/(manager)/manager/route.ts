@@ -20,10 +20,7 @@ connect_db();
 
 export const POST = async (req: NextRequest) => {
   try {
-    // Check authentication
     const auth: any = await auth_middleware(req);
-
-    // Verify the user is `hr` or `admin`
     if (
       auth[0] === null ||
       ["employee", "manager"].includes(auth[0]?.membership?.role)
@@ -34,19 +31,8 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    // Extract data from the request body
     const { managerId, userIds } = await req.json();
 
-    // // Validate the manager ID and user IDs
-    // if (
-    //   !mongoose.Types.ObjectId.isValid(managerId) ||
-    //   !Array.isArray(userIds) ||
-    //   !userIds.every((id) => mongoose.Types.ObjectId.isValid(id))
-    // ) {
-    //   return NextResponse.json({ msg: "Invalid manager or user IDs" }, { status: 400 });
-    // }
-
-    // Check if the manager exists in the organization
     const managerMembership = await Membership.findOne({ user_id: managerId });
 
     if (!managerMembership) {
@@ -58,10 +44,9 @@ export const POST = async (req: NextRequest) => {
 
     const result: any = await Membership.updateMany(
       { user_id: { $in: userIds } },
-      { $push: { manager_id: managerId } }
+      { $set: { manager_id: managerId } }
     );
 
-    // Check if any users were updated
     if (result.nModified === 0) {
       return NextResponse.json(
         { msg: "No users were updated" },
@@ -69,7 +54,6 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    // Respond with success message
     return NextResponse.json(
       { msg: "Manager assigned to users successfully", result },
       { status: 200 }

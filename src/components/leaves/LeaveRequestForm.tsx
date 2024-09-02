@@ -59,6 +59,8 @@ export function LeaveRequestForm({ onclose }: LeaveRequestFormProps) {
     (state: any) => state.membership.memberShipData
   );
 
+  console.log("Leave Form Membership ==> ", membership);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
@@ -100,7 +102,6 @@ export function LeaveRequestForm({ onclose }: LeaveRequestFormProps) {
     }
   };
 
-  // Form submission handler
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log("leave", leaveTypes);
     const formData = {
@@ -108,6 +109,7 @@ export function LeaveRequestForm({ onclose }: LeaveRequestFormProps) {
       docs: fileKey,
       user_id: user._id,
       org_id: membership.org_id,
+      manager_id: membership.manager_id,
     };
 
     console.log("formData", formData);
