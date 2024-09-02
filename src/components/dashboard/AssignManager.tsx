@@ -32,6 +32,7 @@ import { Modal } from "../ui/modal";
 import { PlusIcon } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Heading } from "../ui/heading";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 // Sample array of employees
 const sampleEmployees = [
@@ -163,11 +164,17 @@ const AssignManager = () => {
     console.log("submitted data", data);
 
     try {
+      setLoading(true);
       const response = await axios.post("/api/manager", data);
       toast.success(response.data.msg);
     } catch (error: any) {
       // console.log(error);
       toast.error(error.response.data.msg);
+    }
+    finally{
+      setLoading(false);
+      setIsOpen(false);
+      form.reset();
     }
   };
 
@@ -249,15 +256,24 @@ const AssignManager = () => {
                     </FormItem>
                   )}
                 />
-
-                <Button
-                  variant="default"
-                  type="submit"
+                {loading ? (
+                  <Button 
                   className="w-full"
-                  disabled={loading}
-                >
-                  {loading ? "Submitting..." : "Submit"}
-                </Button>
+                  disabled>
+                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting ...
+                  </Button>
+                ) : (
+                  <Button
+                    variant="default"
+                    type="submit"
+                    className="w-full"
+                    disabled={loading}
+                  >
+                    Submit
+                  </Button>
+
+                )}
               </form>
             </Form>
           </Card>
