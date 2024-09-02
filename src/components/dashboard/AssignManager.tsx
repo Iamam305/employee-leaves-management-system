@@ -31,6 +31,7 @@ import axios from "axios";
 import { Modal } from "../ui/modal";
 import { PlusIcon } from "lucide-react";
 import { useSelector } from "react-redux";
+import { Heading } from "../ui/heading";
 
 // Sample array of employees
 const sampleEmployees = [
@@ -181,11 +182,10 @@ const AssignManager = () => {
           Assign Manager
         </Button>
       </div>
-      <Modal
-        onClose={() => setIsOpen(false)}
-        isOpen={isOpen}
-        title="Assign Manager"
-      >
+      <Modal onClose={() => setIsOpen(false)} isOpen={isOpen} title="">
+        <div className=" w-full flex items-center justify-center">
+          <Heading title="Assign Manager" description="" />
+        </div>
         <main className="flex min-h-screen:calc(100vh - 3rem) flex-col items-center justify-start space-y-3 p-3">
           <Card className="w-full max-w-xl p-5">
             <Form {...form}>

@@ -17,6 +17,16 @@ import { Modal } from "../ui/modal";
 import { PlusIcon } from "lucide-react";
 import { Dialog } from "@radix-ui/react-dialog";
 import { DialogContent } from "../ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Cross1Icon } from "@radix-ui/react-icons";
 
 const InviteMembers = () => {
   const [emails, setEmails] = useState<string[]>([""]);
@@ -42,7 +52,7 @@ const InviteMembers = () => {
 
   useEffect(() => {
     inputRefs.current = inputRefs.current.slice(0, emails.length);
-    console.log(inputRefs.current);
+    // console.log(inputRefs.current);
   }, [emails]);
 
   const handleChange =
@@ -85,6 +95,14 @@ const InviteMembers = () => {
     }
   };
 
+  const handleOrgChange = (selectedOrgId: any) => {
+    setOrgId(selectedOrgId);
+  };
+
+  const handleUserRole = (selectedUserRole: any) => {
+    setUserRole(selectedUserRole);
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -123,8 +141,6 @@ const InviteMembers = () => {
     fetch_all_orgs();
   }, []);
 
-  // console.log("Org---> ", orgs);
-
   return (
     <div>
       <Button
@@ -149,7 +165,7 @@ const InviteMembers = () => {
                 <label htmlFor="userEmail">User Email</label>
               </div>
               <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-                <div className="flex w-full p-3 gap-1 border-2 flex-wrap">
+                <div className="flex w-full p-3 gap-1 border-2 flex-wrap bg-white">
                   {emails.map((email, index) => (
                     <div
                       key={index}
@@ -168,7 +184,11 @@ const InviteMembers = () => {
                       border-0 border-none !outline-none !ring-0 !ring-offset-0
                       focus:border-0 focus:border-none focus:!outline-none focus:!ring-0 focus:!ring-offset-0
                       text-sm px-2 py-4 h-6  w-auto overflow-x-auto
-                      ${emails.length > 1 ? "bg-white text-black rounded" : ""}
+                      ${
+                        emails.length > 1
+                          ? "bg-black text-white rounded-lg"
+                          : ""
+                      }
                       ${
                         !validateEmail(email) && email !== ""
                           ? "text-red-500"
@@ -183,7 +203,7 @@ const InviteMembers = () => {
                           onClick={() => removeEmailField(index)}
                           className="absolute right-0.5 top-1/2 transform -translate-y-1/2 text-black cursor-pointer text-sm font-medium rounded-full bg-white h-4 w-4 flex items-center justify-center"
                         >
-                          X
+                          <Cross1Icon className=" h-4 w-4" />
                         </span>
                       )}
                     </div>
@@ -200,35 +220,46 @@ const InviteMembers = () => {
                 {user_role?.role === "admin" ? (
                   <div className="mt-4 flex flex-col gap-2">
                     <label htmlFor="group">Group Name</label>
-                    <select
-                      name="group_name"
-                      className="p-3 hover:cursor-pointer rounded-md"
-                      onChange={(e) => setOrgId(e.target.value)}
-                      required
+
+                    <Select
+                      onValueChange={handleOrgChange}
+                      value={orgId as any}
                     >
-                      <option value="">Select The Group</option>
-                      {orgs.map((org: any, index: any) => (
-                        <option key={index} value={org._id}>
-                          {org.name}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Group" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {/* <SelectLabel>Select Group</SelectLabel> */}
+                          {orgs.map((org: any, index: any) => (
+                            <SelectItem key={index} value={org._id}>
+                              {org.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </div>
                 ) : null}
 
                 <div className="mt-4 flex flex-col gap-2">
                   <label htmlFor="group">User Role</label>
-                  <select
-                    name="user_role"
-                    className="p-3 hover:cursor-pointer rounded-md"
-                    onChange={(e) => setUserRole(e.target.value)}
-                    required
+
+                  <Select
+                    value={userRole as any}
+                    onValueChange={handleUserRole}
                   >
-                    <option value="">Select The Role</option>
-                    <option value="hr">Hr</option>
-                    <option value="employee">Employee</option>
-                    <option value="manager">Manager</option>
-                  </select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="hr">Hr</SelectItem>
+                        <SelectItem value="employee">Employee</SelectItem>
+                        <SelectItem value="manager">Manager</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <Button type="submit" disabled={loading}>
                   {loading ? "Submitting ...." : "Submit"}

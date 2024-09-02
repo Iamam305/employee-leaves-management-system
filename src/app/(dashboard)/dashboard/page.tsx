@@ -1,11 +1,7 @@
 "use client";
 import ChartData from "@/components/dashboard/ChartData";
-import StatsCards from "@/components/dashboard/StateCards";
 import UserDashboard from "@/components/Employee/UserDashboard";
-import UserStatsCard from "@/components/Employee/UserStatsCard";
 import LeaveRequestModal from "@/components/leaves/LeaveRequestModal";
-import LeaveTypeModal from "@/components/leaves/LeaveTypeModal";
-import { user } from "@nextui-org/react";
 import React from "react";
 import { useSelector } from "react-redux";
 
@@ -13,8 +9,6 @@ const Page = () => {
   const user_role = useSelector(
     (state: any) => state.membership.memberShipData?.role
   );
-
-  console.log("User Role ==> ", user_role);
 
   return (
     <>
