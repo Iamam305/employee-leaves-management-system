@@ -147,7 +147,6 @@ export async function GET(req: NextRequest) {
       all_members.push(membershipHr);
       all_members.push(managedMemberships);
 
-      // const totalUsers = await Membership.countDocuments(membershipQuery);
       const totalUsers = all_members.length;
       const totalPages = Math.ceil(totalUsers / limit);
 
@@ -190,24 +189,33 @@ export async function GET(req: NextRequest) {
         .populate("user_id")
         .populate("org_id", "name");
 
-      const users: any = await Membership.findOne({
+      const userMembership: any = await Membership.findOne({
         user_id: auth_data.membership.user_id,
       })
         .populate("user_id")
         .populate("org_id", "name")
         .populate("manager_id");
 
-      const manager_membership = await Membership.findOne({
-        user_id: users.manager_id._id,
+      const current_user_manager = await Membership.findOne({
+        user_id: userMembership?.manager_id?._id,
       })
         .populate("user_id")
         .populate("org_id", "name");
 
-      all_members.push(membershipHr);
-      all_members.push(manager_membership);
-      all_members.push(users);
+      if (userMembership) {
+        const sameManagerUsers = await Membership.find({
+          manager_id: userMembership.manager_id._id,
+          ...membershipQuery,
+        })
+          .populate("user_id")
+          .populate("org_id", "name");
 
-      const totalUsers = await Membership.countDocuments(membershipQuery);
+        all_members.push(membershipHr);
+        all_members.push(current_user_manager);
+        all_members.push(...sameManagerUsers);
+      }
+
+      const totalUsers = all_members.length;
       const totalPages = Math.ceil(totalUsers / limit);
 
       const flattened_members = all_members.flat();
@@ -215,7 +223,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         {
           name,
-          // org_id,
           pagination: {
             totalUsers,
             totalPages,
