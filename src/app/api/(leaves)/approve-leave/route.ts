@@ -43,7 +43,10 @@ export const POST = async (req : NextRequest) => {
                 status: statusupdate
             },
             { new: true , upsert:true}
-        ).populate("leave_type_id").exec();
+        )
+        .populate("user_id")
+        .populate("leave_type_id")
+        .exec();
 
         let updateuserbalance = {};
 
@@ -64,7 +67,7 @@ export const POST = async (req : NextRequest) => {
         // send message to employee for status changed
         const { data, error } = await resend.emails.send({
             from: "Acme <team@qtee.ai>",
-            to: "sgrlekhwani@gmail.com",
+            to: `${updateleave.user_id.email}`,
             subject: "Leave Status changed",
             react: LeaveStatusEmail({
                 employeeName : `${updateleave.user_id.name}`,
