@@ -1,24 +1,11 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
 import { Separator } from "@/components/ui/separator";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { LeavetypeInterface } from "@/lib/type";
 import { FormateDate, getDays } from "@/lib/utils";
-import { Description } from "@radix-ui/react-dialog";
 import axios from "axios";
-import dayjs from "dayjs";
-import { set } from "mongoose";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 
@@ -43,6 +30,7 @@ const LeaveModal: React.FC<{
   const membership: any = useSelector(
     (state: any) => state.membership.memberShipData
   );
+
   const handleAction = async (status: string) => {
     try {
       setIsLoading(true);
@@ -176,7 +164,7 @@ const LeaveModal: React.FC<{
               </CardContent>
             </Card>
           </div>
-          {accessorKey.status === "pending" && (
+          {accessorKey.status === "pending" && membership.role !== 'employee' && (
             <>
               <Separator className="my-4" />
               <div className="flex items-center justify-between">
