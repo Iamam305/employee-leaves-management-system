@@ -147,6 +147,66 @@ export async function GET(req: NextRequest) {
       all_members.push(membershipHr);
       all_members.push(managedMemberships);
 
+      // const totalUsers = await Membership.countDocuments(membershipQuery);
+      const totalUsers = all_members.length;
+      const totalPages = Math.ceil(totalUsers / limit);
+
+      const flattened_members = all_members.flat();
+
+      return NextResponse.json(
+        {
+          name,
+          // org_id,
+          pagination: {
+            totalUsers,
+            totalPages,
+            currentPage: page,
+            limit,
+          },
+          all_members: flattened_members,
+        },
+        { status: 200 }
+      );
+    } else {
+      let membershipQuery: any = {
+        org_id: auth_data.membership.org_id,
+        user_id: { $ne: null },
+      };
+
+      if (name) {
+        const users = await User.find({
+          name: { $regex: name, $options: "i" },
+        }).select("_id");
+        const userIds = users.map((user) => user._id);
+        membershipQuery.user_id = { $in: userIds };
+      }
+
+      let all_members = [];
+
+      const membershipHr = await Membership.find({
+        role: "hr",
+        org_id: auth_data.membership.org_id,
+      })
+        .populate("user_id")
+        .populate("org_id", "name");
+
+      const users: any = await Membership.findOne({
+        user_id: auth_data.membership.user_id,
+      })
+        .populate("user_id")
+        .populate("org_id", "name")
+        .populate("manager_id");
+
+      const manager_membership = await Membership.findOne({
+        user_id: users.manager_id._id,
+      })
+        .populate("user_id")
+        .populate("org_id", "name");
+
+      all_members.push(membershipHr);
+      all_members.push(manager_membership);
+      all_members.push(users);
+
       const totalUsers = await Membership.countDocuments(membershipQuery);
       const totalPages = Math.ceil(totalUsers / limit);
 
