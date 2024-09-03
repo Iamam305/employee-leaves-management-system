@@ -81,7 +81,7 @@ export const columns = (fetchData: () => void , role:string): ColumnDef<ViewLeav
   // },
 ];
 
-if (role === ("admin" || "hr")) {
+if (role === "admin" || role === "hr") {
     baseColumns.push(
       {
         accessorKey: "",

@@ -31,7 +31,7 @@ export const LeaveTypeTableClient: React.FC<any> = ({
           title={`All Leaves Types`}
           description="All Leave Types Created By Hr or Admin"
         />
-        {role === ('admin' || "hr") && (
+        {role === 'admin' || role === "hr" && (
           <LeaveTypeModal title="Add Leave Type" fetchData={fetchData}/>
         ) }
       </div>
