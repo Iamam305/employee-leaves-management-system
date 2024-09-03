@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import axios from "axios";
 import {
+  Bell,
+  BellRing,
   Boxes,
   CircleUser,
   GroupIcon,
@@ -143,6 +145,15 @@ const Navbar = () => {
             /> */}
           </div>
         </form>
+      </div>
+      <div className="relative">
+      <div className="absolute h-6 w-6 bg-red-500 rounded-full flex items-center justify-center text-white text-sm -top-1 -left-1">
+        <span className="mb-1">10</span>
+      </div>
+      <Link href="/notifications">
+      <Button className="rounded-full cursor-pointer" variant="secondary" size="icon">
+      <Bell className="h-6 w-6" />
+      </Button></Link>
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
