@@ -22,16 +22,22 @@ export async function GET(req: NextRequest) {
     const name = req.nextUrl.searchParams.get("name");
     const manager_id = req.nextUrl.searchParams.get("manager_id");
 
-    let userQuery = {};
+    let userQuery: any = {};
     if (name) {
       userQuery = { ...userQuery, name: { $regex: name, $options: "i" } };
     }
+
     if (auth_data.membership.role === "admin") {
       const org_id = req.nextUrl.searchParams.get("org_id");
-      let membershipQuery = {};
+      let membershipQuery: any = {};
       if (org_id) {
         membershipQuery = { org_id };
       }
+
+      if (manager_id) {
+        membershipQuery.manager_id = manager_id;
+      }
+
       let userIds = [];
       if (org_id) {
         const memberships = await Membership.find(membershipQuery).distinct(
@@ -83,7 +89,6 @@ export async function GET(req: NextRequest) {
       let membershipQuery: any = {
         org_id: auth_data.membership.org_id,
         user_id: { $ne: null },
-        manager_id: { $exists: true },
       };
 
       if (name) {

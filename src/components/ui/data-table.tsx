@@ -21,6 +21,16 @@ import { ScrollArea, ScrollBar } from "./scroll-area";
 import { Skeleton } from "./skeleton";
 import { usePathname, useRouter } from "next/navigation";
 import { Input } from "./input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useSelector } from "react-redux";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -35,6 +45,10 @@ interface DataTableProps<TData, TValue> {
   orgs?: any;
   setOrgs?: any;
   setOrgId?: any;
+  managers?: any;
+  type?: string;
+  managerId?: string;
+  setManagerId?: any;
 }
 
 export function DataTable<TData, TValue>({
@@ -50,6 +64,10 @@ export function DataTable<TData, TValue>({
   orgs,
   setOrgs,
   setOrgId,
+  managers,
+  type,
+  managerId,
+  setManagerId,
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const pathname = usePathname();
@@ -69,6 +87,20 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  const current_user = useSelector(
+    (state: any) => state.membership.memberShipData
+  );
+
+  const handleManagerChange = (manager: any) => {
+    if (manager === "none") {
+      setManagerId("");
+    } else {
+      setManagerId(manager);
+    }
+
+    console.log("Manager ==> ", manager);
+  };
+
   return (
     <>
       <div className="flex flex-col space-y-4  md:w-full w-[85vw]">
@@ -80,6 +112,26 @@ export function DataTable<TData, TValue>({
               onChange={(e) => setName(e.target.value)}
               className="max-w-sm"
             />
+
+            {type === "Members" &&
+              (current_user.role === "hr" || current_user.role === "admin") && (
+                <Select value={managerId} onValueChange={handleManagerChange}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select a Manager" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value={"none"}>None</SelectItem>
+                      {managers.map((manager: any) => (
+                        <SelectItem key={manager._id} value={manager._id}>
+                          {manager.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
+
             {/* 
             <select
               name="group_name"
@@ -171,9 +223,8 @@ export function DataTable<TData, TValue>({
           </ScrollArea>
         </div>
 
-        {
-          Number(totalPage) > 1 && (
-            <div className="text-sm text-muted-foreground flex items-center gap-3">
+        {Number(totalPage) > 1 && (
+          <div className="text-sm text-muted-foreground flex items-center gap-3">
             <div className="space-x-2">
               <Button
                 variant="outline"
@@ -202,8 +253,7 @@ export function DataTable<TData, TValue>({
               <span className="text-sm">{`Page  ${page} of ${totalPage}`}</span>
             </div>
           </div>
-          )
-        }
+        )}
         {/* {(page as any) > 1 ? (
           <div className="text-sm text-muted-foreground flex items-center gap-3">
             <div className="space-x-2">

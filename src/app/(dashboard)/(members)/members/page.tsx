@@ -11,6 +11,9 @@ const Page = () => {
   const [name, setName] = useState<string>("");
   const [role, setRole] = useState<string>("");
   const [orgs, setOrgs] = useState<any>([]);
+  const [managers, setManagers] = useState<any>([]);
+  const [managerId, setManagerId] = useState<string>("");
+
   // const [orgId, setOrgId] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -19,14 +22,25 @@ const Page = () => {
 
   const searchParams = useSearchParams();
 
-  const user_role = useSelector(
-    (state: any) => state.membership.memberShipData?.role
+
+  const current_user = useSelector(
+    (state: any) => state.membership.memberShipData
   );
 
-  const org_id = useSelector((state:any) => state. organization.selectedOrg)
+  const selected_orgId = useSelector(
+    (state: any) => state.organization.selectedOrg
+  );
 
-  console.log("Selected org id==> ",org_id)
-
+  const fetchManagers = async () => {
+    try {
+      let org_id =
+        current_user.role === "admin" ? selected_orgId : current_user.org_id;
+      const { data } = await axios.get(`/api/get-employees?org_id=${org_id}`);
+      setManagers(data.managers);
+    } catch (error) {
+      console.error("Error fetching members:", error);
+    }
+  };
 
   const fetchMembers = async () => {
     try {
@@ -35,19 +49,22 @@ const Page = () => {
       if (name.trim() !== "") {
         queryString += `&name=${encodeURIComponent(name)}`;
       }
-      if (org_id !== (null as any)) {
-        queryString += `&org_id=${org_id}`;
+      if (managerId.trim() !== "") {
+        queryString += `&manager_id=${managerId}`;
+      }
+      if (selected_orgId !== (null as any)) {
+        queryString += `&org_id=${selected_orgId}`;
       }
       const response = await axios.get(`/api/org/get-members?${queryString}`);
       const data = response.data;
       const flattenedMembers = data.all_members.map((member: any) => ({
-        id:member.user_id?._id ?? "N/A",
+        id: member.user_id?._id ?? "N/A",
         username: member.user_id?.name ?? "N/A",
         email: member.user_id?.email ?? "N/A",
         role: member.role,
         orgName: member.org_id?.name ?? "N/A",
       }));
-      setRole(user_role)
+      setRole(current_user.role);
       setMembers(flattenedMembers);
       setTotalPages(data.pagination.totalPages);
     } catch (error) {
@@ -58,9 +75,18 @@ const Page = () => {
   };
 
   useEffect(() => {
+    console.log("selected_orgId changed: ", selected_orgId);
+    fetch_all_orgs();
+  }, [selected_orgId]);
+
+  useEffect(() => {
     const queryParams = new URLSearchParams();
     if (name) {
       queryParams.set("name", name);
+    }
+
+    if (managerId) {
+      queryParams.set("manager_id", managerId);
     }
     // if (org_id) {
     //   queryParams.set("org_id", org_id);
@@ -71,18 +97,22 @@ const Page = () => {
     const queryString = queryParams.toString();
     const newPath = queryString ? `${pathname}?${queryString}` : pathname;
     router.push(newPath);
-  }, [name, org_id, page, pathname, router]);
+  }, [name, selected_orgId, page, managerId, pathname, router]);
 
   useEffect(() => {
     setPage(1);
-  }, [name, org_id]);
+  }, [name, selected_orgId]);
 
   useEffect(() => {
     const debounced = setTimeout(() => {
       fetchMembers();
     }, 500);
     return () => clearTimeout(debounced);
-  }, [name, org_id, page]);
+  }, [name, selected_orgId, managerId, page]);
+
+  useEffect(() => {
+    fetchManagers();
+  }, []);
 
   const fetch_all_orgs = async () => {
     try {
@@ -93,9 +123,6 @@ const Page = () => {
       return error;
     }
   };
-  useEffect(() => {
-    fetch_all_orgs();
-  }, []);
 
   // console.log("mmebers ===> ",members)
 
@@ -108,6 +135,10 @@ const Page = () => {
         setName={setName}
         orgs={orgs}
         setOrgs={setOrgs}
+        managers={managers}
+        type="Members"
+        managerId={managerId}
+        setManagerId={setManagerId}
         // setOrgId={setOrgId}
         page={page}
         setPage={setPage}

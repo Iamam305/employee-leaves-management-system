@@ -22,6 +22,10 @@ export const MemberTableClient: React.FC<any> = ({
   setPage,
   totalPage,
   current_user_role,
+  managers,
+  type,
+  managerId,
+  setManagerId
 }) => {
   const user_role = useSelector(
     (state: any) => state.membership.memberShipData?.role
@@ -47,12 +51,16 @@ export const MemberTableClient: React.FC<any> = ({
         data={data}
         isLoading={isLoading}
         name={name}
+        setManagerId={setManagerId}
+        managers={managers}
         setName={setName}
         orgs={orgs}
         setOrgs={setOrgs}
         setOrgId={setOrgId}
         setPage={setPage}
+        type = {type}
         page={page}
+        managerId={managerId}
         totalPage={totalPage}
       />
     </>
