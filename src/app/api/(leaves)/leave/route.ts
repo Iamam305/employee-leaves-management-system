@@ -5,6 +5,7 @@ import { calculateLeaveBalance } from "@/lib/balanceservices";
 import { LeaveType } from "@/models/leave-type.model";
 import { Leave } from "@/models/leave.model";
 import { Membership } from "@/models/membership.model";
+import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
@@ -264,7 +265,7 @@ export const GET = async (req: NextRequest) => {
     if (auth_data.membership.role === "admin") {
       // Admin can view leaves of all users
       if (org_id) {
-        leaveQuery.org_id = org_id;
+        leaveQuery.org_id = new mongoose.Types.ObjectId(org_id);;
       }
     } else if (auth_data.membership.role === "hr") {
       // HR can view leaves within their organization
