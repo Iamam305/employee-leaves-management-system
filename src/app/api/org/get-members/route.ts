@@ -20,6 +20,8 @@ export async function GET(req: NextRequest) {
     const limit = 10;
     const skip = (page - 1) * limit;
     const name = req.nextUrl.searchParams.get("name");
+    const manager_id = req.nextUrl.searchParams.get("manager_id");
+
     let userQuery = {};
     if (name) {
       userQuery = { ...userQuery, name: { $regex: name, $options: "i" } };
@@ -81,6 +83,7 @@ export async function GET(req: NextRequest) {
       let membershipQuery: any = {
         org_id: auth_data.membership.org_id,
         user_id: { $ne: null },
+        manager_id: { $exists: true },
       };
 
       if (name) {
@@ -89,6 +92,10 @@ export async function GET(req: NextRequest) {
         }).select("_id");
         const userIds = users.map((user) => user._id);
         membershipQuery.user_id = { $in: userIds };
+      }
+
+      if (manager_id) {
+        membershipQuery.manager_id = manager_id;
       }
 
       const membership = await Membership.find(membershipQuery)

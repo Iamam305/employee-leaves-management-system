@@ -11,20 +11,20 @@ export async function GET(req: NextRequest) {
     if (!org_id) {
       return NextResponse.json({ msg: "org_id is required" }, { status: 400 });
     }
-
     const membership_user_val = await Membership.find({
       org_id,
       role: "employee",
+      manager_id: { $exists: false },
     }).populate("user_id");
-
     const membership_manager_val = await Membership.find({
       org_id,
       role: "manager",
     }).populate("user_id");
-
-    const employees = membership_user_val.map((member) => member.user_id);
+    const employees =
+      membership_user_val.length > 0
+        ? membership_user_val.map((member) => member.user_id)
+        : [];
     const managers = membership_manager_val.map((member) => member.user_id);
-
     return NextResponse.json({
       employees,
       managers,
