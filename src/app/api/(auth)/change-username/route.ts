@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     logged_in_user.name = name;
     await logged_in_user.save();
 
-    const data = await resend.emails.send({
+    await resend.emails.send({
       from: "Ritik <team@qtee.ai>",
       to: logged_in_user.email,
       subject: "Username Has Been Changed Successfully",
@@ -30,7 +30,6 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json({
       msg: "Username Changed Successfully",
-      data,
     });
   } catch (error) {
     return NextResponse.json(

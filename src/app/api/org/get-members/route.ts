@@ -134,6 +134,12 @@ export async function GET(req: NextRequest) {
         .populate("user_id")
         .populate("org_id", "name");
 
+      const current_user = await Membership.find({
+        user_id: auth_data.membership.user_id,
+      })
+        .populate("user_id")
+        .populate("org_id", "name");
+
       const managedMemberships = await Membership.find({
         manager_id: auth_data.membership.user_id,
         ...membershipQuery,
@@ -145,6 +151,7 @@ export async function GET(req: NextRequest) {
         .populate("org_id", "name");
 
       all_members.push(membershipHr);
+      all_members.push(current_user);
       all_members.push(managedMemberships);
 
       const totalUsers = all_members.length;
@@ -212,7 +219,8 @@ export async function GET(req: NextRequest) {
 
         all_members.push(membershipHr);
         all_members.push(current_user_manager);
-        all_members.push(...sameManagerUsers);
+        all_members.push(userMembership);
+        // all_members.push(...sameManagerUsers);
       }
 
       const totalUsers = all_members.length;
