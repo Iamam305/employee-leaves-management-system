@@ -1,5 +1,8 @@
+import { connect_db } from "@/configs/db";
 import { startCronJob } from "@/lib/cron";
 import { NextRequest, NextResponse } from "next/server";
+
+connect_db();
 
 export const GET = async(req:NextRequest) => {
     try{
