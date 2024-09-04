@@ -37,6 +37,7 @@ import { toast } from "sonner";
 import { TbListCheck } from "react-icons/tb";
 import Oraganization from "./Oraganization";
 import ChangePasswordModal from "./ChangePassword";
+import ChangeUsernameModal from "./ChangeUsernameModal";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -147,13 +148,18 @@ const Navbar = () => {
         </form>
       </div>
       <div className="relative">
-      <div className="absolute h-6 w-6 bg-red-500 rounded-full flex items-center justify-center text-white text-sm -top-1 -left-1">
-        <span className="mb-1">10</span>
-      </div>
-      <Link href="/notifications">
-      <Button className="rounded-full cursor-pointer" variant="secondary" size="icon">
-      <Bell className="h-6 w-6" />
-      </Button></Link>
+        <div className="absolute h-6 w-6 bg-red-500 rounded-full flex items-center justify-center text-white text-sm -top-1 -left-1">
+          <span className="mb-1">10</span>
+        </div>
+        <Link href="/notifications">
+          <Button
+            className="rounded-full cursor-pointer"
+            variant="secondary"
+            size="icon"
+          >
+            <Bell className="h-6 w-6" />
+          </Button>
+        </Link>
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -164,10 +170,16 @@ const Navbar = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuLabel><ChangePasswordModal/></DropdownMenuLabel>
+          <DropdownMenuLabel className=" cursor-pointer">
+            <ChangeUsernameModal />
+          </DropdownMenuLabel>
+          <DropdownMenuLabel className=" cursor-pointer">
+            <ChangePasswordModal />
+          </DropdownMenuLabel>
+
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem>Support</DropdownMenuItem>
+          {/* <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuItem>Support</DropdownMenuItem> */}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
