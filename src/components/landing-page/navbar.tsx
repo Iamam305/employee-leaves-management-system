@@ -34,7 +34,7 @@ const Navbar = () => {
             href="#"
             aria-label="Brand"
           >
-          Leave Management System
+          MW Leaves Management System
           </a>
           <div className="sm:hidden">
             <button
