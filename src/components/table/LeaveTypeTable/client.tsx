@@ -23,7 +23,7 @@ export const LeaveTypeTableClient: React.FC<any> = ({
   fetchData,
   role,
 }) => {
-  // console.log('fetch data' , fetchData)
+  console.log('fetch data', role)
   return (
     <>
       <div className="flex items-start justify-between   ">
@@ -31,14 +31,15 @@ export const LeaveTypeTableClient: React.FC<any> = ({
           title={`All Leaves Types`}
           description="All Leave Types Created By Hr or Admin"
         />
-        {role === 'admin' || role === "hr" && (
-          <LeaveTypeModal title="Add Leave Type" fetchData={fetchData}/>
-        ) }
+        {(role === 'admin' || role === "hr") && (
+          <LeaveTypeModal title="Add Leave Type" fetchData={fetchData} />
+        )}
+
       </div>
       <Separator />
       <DataTable
         searchKey=""
-        columns={columns(fetchData , role)}
+        columns={columns(fetchData, role)}
         data={data}
         isLoading={isLoading}
         name={name}
