@@ -25,12 +25,19 @@ const BalanceChart = ({ balances }: any) => {
     "Dec",
   ];
 
-  const months = Object.keys(leaveBalances[leaveTypes[0]].monthly).map(
-    (month) => {
+  // const months = Object.keys(leaveBalances[leaveTypes[0]]?.monthly).map(
+  //   (month) => {
+  //     const monthIndex = parseInt(month);
+  //     return monthNames[monthIndex];
+  //   }
+  // );
+
+  const months = leaveBalances[leaveTypes[0]]?.monthly
+  ? Object.keys(leaveBalances[leaveTypes[0]]?.monthly).map((month) => {
       const monthIndex = parseInt(month);
       return monthNames[monthIndex];
-    }
-  );
+    })
+  : [];
 
 
   const colors = [

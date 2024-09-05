@@ -27,7 +27,10 @@ export async function POST(req: NextRequest) {
         msg: "Only admin can create the organization",
       });
     }
-    const new_org = await Org.create({ name });
+    const new_org = await Org.create({
+      name,
+      user_id: auth_data.user._id,
+    });
     return NextResponse.json(
       {
         msg: "Organization Created Successfully",
@@ -45,7 +48,18 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const all_orgs = await Org.find();
+    const auth: any = await auth_middleware(req);
+    if (auth[0] === null || auth[1] !== null) {
+      console.error("Authentication error:", auth[1]);
+      return NextResponse.json({ msg: "Unauthorized" }, { status: 401 });
+    }
+    const auth_data = auth[0];
+    if (auth_data.membership.role !== "admin") {
+      return NextResponse.json({
+        msg: "Only admin can create the organization",
+      });
+    }
+    const all_orgs = await Org.find({ user_id: auth_data.user._id });
     return NextResponse.json(
       {
         all_orgs,

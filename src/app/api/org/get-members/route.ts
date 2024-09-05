@@ -3,7 +3,6 @@ import { auth_middleware } from "@/lib/auth-middleware";
 import { Membership } from "@/models/membership.model";
 import { Org } from "@/models/org.model";
 import { User } from "@/models/user.model";
-import { all } from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
 connect_db();
@@ -33,19 +32,27 @@ export async function GET(req: NextRequest) {
       if (org_id) {
         membershipQuery = { org_id };
       }
-
       if (manager_id) {
         membershipQuery.manager_id = manager_id;
       }
-
       let userIds = [];
       if (org_id) {
-        const memberships = await Membership.find(membershipQuery).distinct(
-          "user_id"
-        );
-        userIds = memberships;
-        userQuery = { ...userQuery, _id: { $in: userIds } };
+        membershipQuery.org_id = org_id;
+        if (manager_id) {
+          membershipQuery.manager_id = manager_id;
+        }
+        userIds = await Membership.find(membershipQuery).distinct("user_id");
+        userQuery._id = { $in: userIds };
+      } else {
+        const adminOrgs = await Org.find({ user_id: auth_data.user._id });
+        const adminOrgIds = adminOrgs.map((org) => org._id);
+        if (adminOrgIds.length > 0) {
+          membershipQuery.org_id = { $in: adminOrgIds };
+          userIds = await Membership.find(membershipQuery).distinct("user_id");
+          userQuery._id = { $in: userIds };
+        }
       }
+
       const totalUsers = await User.countDocuments(userQuery);
       const totalPages = Math.ceil(totalUsers / limit);
       let users = await User.find(userQuery as any)
@@ -85,7 +92,6 @@ export async function GET(req: NextRequest) {
         { status: 200 }
       );
     } else if (auth_data.membership.role === "hr") {
-      // Non-admin
       let membershipQuery: any = {
         org_id: auth_data.membership.org_id,
         user_id: { $ne: null },
@@ -98,21 +104,17 @@ export async function GET(req: NextRequest) {
         const userIds = users.map((user) => user._id);
         membershipQuery.user_id = { $in: userIds };
       }
-
       if (manager_id) {
         membershipQuery.manager_id = manager_id;
       }
-
       const membership = await Membership.find(membershipQuery)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .populate("user_id", "name email")
         .populate("org_id", "name");
-
       const totalUsers = await Membership.countDocuments(membershipQuery);
       const totalPages = Math.ceil(totalUsers / limit);
-
       return NextResponse.json({
         msg: "For Hr",
         pagination: {

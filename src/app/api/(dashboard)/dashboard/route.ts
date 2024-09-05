@@ -4,6 +4,7 @@ import { Balances } from "@/models/balanceCredits.model";
 import { LeaveType } from "@/models/leave-type.model";
 import { Leave } from "@/models/leave.model";
 import { Membership } from "@/models/membership.model";
+import { Org } from "@/models/org.model";
 import { NextRequest, NextResponse } from "next/server";
 const { ObjectId } = require("mongodb");
 
@@ -21,25 +22,31 @@ export async function GET(req: NextRequest) {
 
     const auth_data = auth[0];
 
+    const getOrgs = await Org.find({
+      user_id: auth_data.user._id,
+    });
+
+    const orgIds = getOrgs.map((org) => org._id);
+
     if (auth_data.membership.role === "admin") {
       const matchStage = org_id
         ? { $match: { org_id: new ObjectId(org_id) } }
-        : { $match: {} };
+        : { $match: { org_id: { $in: orgIds } } };
 
       const matchStage_pending_leaves = (org_id: any) => {
         const matchStage: any = {
           status: "pending",
         };
-
         if (org_id) {
           matchStage.org_id = new ObjectId(org_id);
+        } else {
+          matchStage.org_id = { $in: orgIds };
         }
         return { $match: matchStage };
       };
       const [users, leaves, pending_leaves, leaves_data, leaveType] =
         await Promise.all([
-          //  For Users
-          Membership.aggregate([
+          await Membership.aggregate([
             matchStage,
             {
               $group: {

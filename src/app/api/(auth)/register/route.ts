@@ -48,6 +48,7 @@ export const POST = async (req: NextRequest) => {
 
     const new_org = new Org({
       name: org_name,
+      user_id: new_user._id,
     });
 
     const new_membership = new Membership({
