@@ -117,7 +117,8 @@ export const POST = async (req: NextRequest) => {
   }
 };
 
-// export async function GET(req: NextRequest) {
+
+// export const GET = async (req: NextRequest) => {
 //   try {
 //     const auth: any = await auth_middleware(req);
 //     const org_id = req.nextUrl.searchParams.get("org_id");
@@ -139,12 +140,15 @@ export const POST = async (req: NextRequest) => {
 //     // Role-based leave query filtering
 //     if (auth_data.membership.role === "admin") {
 //       // Admin can view leaves of all users
-//     } else if (
-//       auth_data.membership.role === "hr" ||
-//       auth_data.membership.role === "manager"
-//     ) {
-//       // HR/Managers can view leaves within their organization
+//       if (org_id) {
+//         leaveQuery.org_id = new mongoose.Types.ObjectId(org_id);;
+//       }
+//     } else if (auth_data.membership.role === "hr") {
+//       // HR can view leaves within their organization
 //       leaveQuery.org_id = auth_data.membership.org_id;
+//     } else if (auth_data.membership.role === "manager") {
+//       // Managers can view leaves of users under their management
+//       leaveQuery.manager_id = auth_data.membership.user_id;
 //     } else {
 //       // Employees can view only their own leaves
 //       leaveQuery.user_id = auth_data.membership.user_id;
@@ -195,6 +199,7 @@ export const POST = async (req: NextRequest) => {
 //           leave_type_id: 0,
 //           org_id: 0,
 //           user_id: 0,
+//           manager_id: 0,
 //         },
 //       },
 //     ];
@@ -248,6 +253,7 @@ export const GET = async (req: NextRequest) => {
     const org_id = req.nextUrl.searchParams.get("org_id");
     const name = req.nextUrl.searchParams.get("name");
     const status = req.nextUrl.searchParams.get("status");
+    const manager_id = req.nextUrl.searchParams.get("manager_id"); // Query param for filtering by manager
     const page = parseInt(req.nextUrl.searchParams.get("page") || "1");
     const limit = 10;
     const skip = (page - 1) * limit;
@@ -263,13 +269,21 @@ export const GET = async (req: NextRequest) => {
 
     // Role-based leave query filtering
     if (auth_data.membership.role === "admin") {
-      // Admin can view leaves of all users
+      // Admin can view leaves of all users and can filter by org_id and manager_id
       if (org_id) {
-        leaveQuery.org_id = new mongoose.Types.ObjectId(org_id);;
+        leaveQuery.org_id = new mongoose.Types.ObjectId(org_id);
+      }
+      if (manager_id) {
+        leaveQuery.manager_id = new mongoose.Types.ObjectId(manager_id);
       }
     } else if (auth_data.membership.role === "hr") {
-      // HR can view leaves within their organization
+      // HR can only view leaves within their organization
       leaveQuery.org_id = auth_data.membership.org_id;
+
+      // HR can filter by manager within their organization
+      if (manager_id) {
+        leaveQuery.manager_id = new mongoose.Types.ObjectId(manager_id);
+      }
     } else if (auth_data.membership.role === "manager") {
       // Managers can view leaves of users under their management
       leaveQuery.manager_id = auth_data.membership.user_id;
@@ -368,4 +382,4 @@ export const GET = async (req: NextRequest) => {
       { status: 500 }
     );
   }
-}
+};
