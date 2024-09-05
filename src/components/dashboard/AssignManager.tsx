@@ -114,7 +114,8 @@ const AssignManager = () => {
   const fetchEmployee = async () => {
     try {
       if (current_user.role === "admin" && !selected_orgId) {
-        return toast.error("Please Select Any Organization");
+        // return toast.error("Please Select Any Organization");
+        console.log("Please Select One Org")
       }
       org_id =
         current_user.role === "admin" ? selected_orgId : current_user.org_id;

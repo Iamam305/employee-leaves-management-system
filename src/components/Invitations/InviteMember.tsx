@@ -160,7 +160,7 @@ const InviteMembers = () => {
               </h1>
             </div>
 
-            <div className="bg-gray-100 p-8 pb-10 w-full max-h-[80vh] overflow-auto rounded-lg mx-auto">
+            <div className="bg-gray-100 p-8 pb-10 w-full max-h-[80vh] overflow-auto rounded-lg mx-auto invite_modal">
               <div className="mb-3">
                 <label htmlFor="userEmail">User Email</label>
               </div>
