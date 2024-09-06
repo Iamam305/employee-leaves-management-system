@@ -98,6 +98,38 @@ const LeaveModal: React.FC<{
               </CardHeader>
               <CardContent className="p-6 text-sm">
                 <div className="grid gap-3">
+                {(membership.role !== 'employee' && membership.role !== 'manager') && (
+              accessorKey.manager ? (
+                <>
+                 <div className="font-semibold">Manager Details</div>
+                  <ul className="grid gap-3">
+                    <li className="flex items-center justify-between">
+                      <span className="text-muted-foreground">
+                        Manager Name
+                      </span>
+                      <span>{accessorKey.manager.name}</span>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span className="text-muted-foreground">
+                        Manager Email
+                      </span>
+                      <span>{accessorKey.manager.email}</span>
+                    </li>
+                  </ul>
+                </>
+              )
+              : (
+                <>
+                 <div className="font-semibold">Manager Details</div>
+                  <ul className="grid gap-3">
+                    <li className="flex items-center justify-between">
+                     No Manager Alloted
+                    </li>
+                  </ul>
+                </>
+              )
+            )}
+                  <Separator className="my-2" />
                   <div className="font-semibold">Leave Details</div>
                   <ul className="grid gap-3">
                     <li className="flex items-center justify-between">
