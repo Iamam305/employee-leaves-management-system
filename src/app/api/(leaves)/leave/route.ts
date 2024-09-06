@@ -33,7 +33,6 @@ export const POST = async (req: NextRequest) => {
         { status: 400 }
       );
     }
-
     const membership = await Membership.findOne({ user_id })
       .populate("user_id")
       .populate("manager_id");
@@ -42,6 +41,21 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json(
         { msg: "Manager not found for the user" },
         { status: 404 }
+      );
+    }
+    const overLappedLeaves = await Leave.find({
+      user_id: user_id,
+      start_date: { $lt: new Date(end_date) },
+      end_date: { $gt: new Date(start_date) },
+      status: { $ne: "rejected" },
+    });
+
+    if (overLappedLeaves) {
+      return NextResponse.json(
+        {
+          msg: "You already applied for the leave on following dates",
+        },
+        { status: 403 }
       );
     }
 
@@ -403,7 +417,6 @@ export const GET = async (req: NextRequest) => {
     );
   }
 };
-
 
 // export const GET = async (req: NextRequest) => {
 //   try {
