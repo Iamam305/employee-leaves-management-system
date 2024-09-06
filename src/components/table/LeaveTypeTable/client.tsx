@@ -32,9 +32,12 @@ export const LeaveTypeTableClient: React.FC<any> = ({
           description="All Leave Types Created By Hr or Admin"
         />
         {(role === 'admin' || role === "hr") && (
-          <LeaveTypeModal title="Add Leave Type" fetchData={fetchData} />
+          <LeaveTypeModal
+            title="Add Leave Type"
+            fetchData={fetchData}
+            orgs={role === 'admin' ? orgs : undefined}  // Conditionally pass orgs based on role
+          />
         )}
-
       </div>
       <Separator />
       <DataTable
