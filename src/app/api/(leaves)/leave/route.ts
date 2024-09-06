@@ -328,6 +328,19 @@ export const GET = async (req: NextRequest) => {
         },
       },
       { $unwind: "$org" },
+
+      // Lookup for manager_id
+      {
+        $lookup: {
+          from: "users",
+          localField: "manager_id",
+          foreignField: "_id",
+          as: "manager", // Aggregate manager data
+        },
+      },
+      { $unwind: { path: "$manager", preserveNullAndEmptyArrays: true } }, // Unwind but keep null if no manager
+
+      // Filter out unnecessary fields and keep only required ones
       {
         $project: {
           "user.password": 0,
@@ -335,6 +348,11 @@ export const GET = async (req: NextRequest) => {
           "user.createdAt": 0,
           "user.updatedAt": 0,
           "user.is_verified": 0,
+          "manager.password": 0,
+          "manager.verification_code": 0,
+          "manager.createdAt": 0,
+          "manager.updatedAt": 0,
+          "manager.is_verified": 0,
           leave_type_id: 0,
           org_id: 0,
           user_id: 0,
@@ -385,6 +403,7 @@ export const GET = async (req: NextRequest) => {
     );
   }
 };
+
 
 // export const GET = async (req: NextRequest) => {
 //   try {
