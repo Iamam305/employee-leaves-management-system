@@ -11,11 +11,12 @@ const truncateText = (text: any, length: number) => {
   return str.length <= length ? str : str.substring(0, length) + "...";
 };
 
+
 const LeaveTypeModal: React.FC<{
   title: string;
   fetchData: () => void;
-  // row: LeavetypeInterface;
-}> = ({ title, fetchData }) => {
+  orgs?:[];  // row: LeavetypeInterface;
+}> = ({ title, fetchData , orgs }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isloading, setIsLoading] = useState(false);
   //   console.log(accessorKey._id)
@@ -23,6 +24,12 @@ const LeaveTypeModal: React.FC<{
   const handleclose = () => {
     setIsOpen(false);
   };
+
+   // Map the original org structure to the desired id and name structure
+   const mappedOrgs = orgs?.map((org:any) => ({
+    id: org._id, // Use _id for id
+    name: org.name, // Keep the name field as it is
+  }));
 
   return (
     <>
@@ -47,7 +54,7 @@ const LeaveTypeModal: React.FC<{
           <div className="p-4 max-h-[60vh] overflow-y-auto">
             <Card className="overflow-hidden max-h-[774px]">
               <CardContent>
-                <LeaveTypeForm fetchData={fetchData} onclose={handleclose} />
+                <LeaveTypeForm fetchData={fetchData} onclose={handleclose} organizations={mappedOrgs}/>
               </CardContent>
             </Card>
           </div>
