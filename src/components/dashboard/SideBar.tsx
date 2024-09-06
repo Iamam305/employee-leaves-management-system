@@ -19,10 +19,12 @@ const Sidebar = () => {
       <div className="hidden border-r bg-muted/40  lg:w-[230px] w-[220px] md:block ">
         <div className="flex h-full  max-h-[100vh] flex-col gap-2 lg:w-[230px] w-[220px] sticky top-0 left-0  ">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6 g:w-[300px]">
-            {user_role === "admin" && (
+            {user_role === "admin" ? (
               <div className="w-full">
                 <Oraganization />
               </div>
+            ) : (
+              <h1 className=" text-black font-semibold">MW LEAVES</h1>
             )}
             {/* <Link href="/" className="flex items-center font-semibold ">
               <Image

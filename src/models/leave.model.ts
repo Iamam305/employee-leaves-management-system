@@ -39,7 +39,6 @@ const leave_schema = new mongoose.Schema(
     manager_id: {
       type: mongoose.Types.ObjectId,
       ref: "User",
-      required: true,
     }
   },
   {

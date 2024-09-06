@@ -27,14 +27,7 @@ export const POST = async (req: NextRequest) => {
       manager_id,
     } = await req.json();
 
-    if (
-      !user_id ||
-      !leave_type_id ||
-      !org_id ||
-      !start_date ||
-      !end_date ||
-      !manager_id
-    ) {
+    if (!user_id || !leave_type_id || !org_id || !start_date || !end_date) {
       return NextResponse.json(
         { msg: "All required fields must be provided" },
         { status: 400 }
@@ -45,7 +38,7 @@ export const POST = async (req: NextRequest) => {
       .populate("user_id")
       .populate("manager_id");
 
-    if (!membership?.manager_id) {
+    if (!membership?.manager_id && membership.role !== "admin") {
       return NextResponse.json(
         { msg: "Manager not found for the user" },
         { status: 404 }
@@ -117,7 +110,6 @@ export const POST = async (req: NextRequest) => {
     return NextResponse.json({ msg: "Something went wrong" }, { status: 500 });
   }
 };
-
 
 // export const GET = async (req: NextRequest) => {
 //   try {
@@ -246,7 +238,6 @@ export const POST = async (req: NextRequest) => {
 //     );
 //   }
 // }
-
 
 export const GET = async (req: NextRequest) => {
   try {
@@ -531,5 +522,3 @@ export const GET = async (req: NextRequest) => {
 //     );
 //   }
 // };
-
-

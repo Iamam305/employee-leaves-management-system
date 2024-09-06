@@ -1,16 +1,7 @@
-import { EmailVerification } from "@/components/email-temp/EmailVerificationTemplate";
-import { LeaveRequestEmail } from "@/components/email-temp/LeaveRequestTemplate";
-import { LeaveStatusEmail } from "@/components/email-temp/LeaveStatusTemplate";
 import { connect_db } from "@/configs/db";
 import { auth_middleware } from "@/lib/auth-middleware";
-import { updateLeaveBalance } from "@/lib/balanceservices";
-import { getDays } from "@/lib/utils";
-import { LeaveType } from "@/models/leave-type.model";
-import { Leave } from "@/models/leave.model";
 import { Membership } from "@/models/membership.model";
-import { User } from "@/models/user.model";
 import dayjs from "dayjs";
-import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 

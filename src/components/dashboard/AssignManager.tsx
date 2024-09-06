@@ -115,7 +115,7 @@ const AssignManager = () => {
     try {
       if (current_user.role === "admin" && !selected_orgId) {
         // return toast.error("Please Select Any Organization");
-        console.log("Please Select One Org")
+        console.log("Please Select One Org");
       }
       org_id =
         current_user.role === "admin" ? selected_orgId : current_user.org_id;
@@ -166,13 +166,12 @@ const AssignManager = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post("/api/manager", data);
+      const response = await axios.post("/api/assign-manager", data);
       toast.success(response.data.msg);
     } catch (error: any) {
       // console.log(error);
       toast.error(error.response.data.msg);
-    }
-    finally{
+    } finally {
       setLoading(false);
       setIsOpen(false);
       form.reset();
@@ -258,9 +257,7 @@ const AssignManager = () => {
                   )}
                 />
                 {loading ? (
-                  <Button 
-                  className="w-full"
-                  disabled>
+                  <Button className="w-full" disabled>
                     <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
                     Submitting ...
                   </Button>
@@ -273,7 +270,6 @@ const AssignManager = () => {
                   >
                     Submit
                   </Button>
-
                 )}
               </form>
             </Form>

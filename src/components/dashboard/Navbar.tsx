@@ -73,10 +73,12 @@ const Navbar = () => {
         </SheetTrigger>
         <SheetContent side="left" className="flex flex-col  w-[300px]">
           <nav className="grid gap-2 text-lg font-medium">
-            {user_role === "admin" && (
+            {user_role === "admin" ? (
               <div className=" w-full">
                 <Oraganization />
               </div>
+            ):(
+              <h1 className=" text-black font-semibold">MW LEAVES</h1>
             )}
             {/* <Link
               href="#"
@@ -90,9 +92,7 @@ const Navbar = () => {
               height={40}
               className="filter invert"
             />
-            {/* <span className="text-white">Qtee.Ai</span> */}
-            qtee
-            {/* </Link> */}
+
             <Link
               href={`/dashboard`}
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 
@@ -123,7 +123,7 @@ const Navbar = () => {
               href="/leave"
               className={`mx-[-0.65rem] flex items-center gap-4
               ${
-                pathname.includes("members")
+                pathname.includes("leave")
                   ? "bg-muted text-primary"
                   : "text-muted-foreground"
               } 

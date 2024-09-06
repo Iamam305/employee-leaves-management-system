@@ -94,7 +94,7 @@ const DoughnutChart = ({ data, title }: any) => {
   };
 
   return (
-    <div className="w-5/12 h-[300px] mx-auto  flex items-center justify-center mb-10">
+    <div className="w-full h-[300px] mx-auto  flex items-center justify-center mb-10">
       <Doughnut data={chart_data} options={options} />
     </div>
   );

@@ -7,7 +7,7 @@ import {
   SelectContent,
   SelectItem,
   Select,
-} from "../ui/select"; // Replace with your actual import
+} from "../ui/select";
 import { Separator } from "../ui/separator";
 import { toast } from "sonner";
 import {
@@ -21,6 +21,12 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { selectOrg, unSelectOrg } from "@/store/orgSlice";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Organization = () => {
   const [orgs, setOrgs] = useState<any[]>([]);
@@ -103,9 +109,18 @@ const Organization = () => {
               value={item._id}
               className="overflow-scroll text-left"
             >
-              {item.name.length > 15
-                ? item.name.substring(0, 15) + "..."
-                : item.name}
+              <TooltipProvider delayDuration={100}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    {item.name.length > 15
+                      ? item.name.substring(0, 15) + "..."
+                      : item.name}
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{item.name}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </SelectItem>
           ))}
           <Separator />
