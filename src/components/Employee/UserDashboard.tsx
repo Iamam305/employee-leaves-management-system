@@ -31,7 +31,7 @@ const UserDashboard = ({ id }: any) => {
 
   console.log(`Auth Data==> ${isHrOrAdmin} and ${current_user.role} `);
 
-  const userId = id || current_user._id;
+  const userId = id || current_user.user_id;
 
   const [acceptedLeavesData, setAcceptedLeavesData] = useState<any>([]);
   const [rejectedLeavesData, setRejectedLeavesData] = useState<any>([]);
