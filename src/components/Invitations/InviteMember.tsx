@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Cross1Icon } from "@radix-ui/react-icons";
+import { useTheme } from "@/context/ThemeContext";
 
 const InviteMembers = () => {
   const [emails, setEmails] = useState<string[]>([""]);
@@ -36,6 +37,8 @@ const InviteMembers = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const theme = useTheme();
 
   const user_role = useSelector(
     (state: any) => state.membership.memberShipData
@@ -160,12 +163,14 @@ const InviteMembers = () => {
               </h1>
             </div>
 
-            <div className="bg-gray-100 p-8 pb-10 w-full max-h-[80vh] overflow-auto rounded-lg mx-auto invite_modal">
+            <div
+              className={` p-8 pb-10 w-full max-h-[80vh] overflow-auto rounded-lg mx-auto invite_modal`}
+            >
               <div className="mb-3">
                 <label htmlFor="userEmail">User Email</label>
               </div>
               <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-                <div className="flex w-full p-3 gap-1 border-2 flex-wrap bg-white">
+                <div className={`flex w-full p-3 gap-1 border-2 flex-wrap `}>
                   {emails.map((email, index) => (
                     <div
                       key={index}
@@ -180,21 +185,25 @@ const InviteMembers = () => {
                         required
                         placeholder="Enter email"
                         className={`
-                      flex-grow-0 bg-transparent
-                      border-0 border-none !outline-none !ring-0 !ring-offset-0
-                      focus:border-0 focus:border-none focus:!outline-none focus:!ring-0 focus:!ring-offset-0
-                      text-sm px-2 py-4 h-6  w-auto overflow-x-auto
-                      ${
-                        emails.length > 1
-                          ? "bg-black text-white rounded-lg"
-                          : ""
-                      }
-                      ${
-                        !validateEmail(email) && email !== ""
-                          ? "text-red-500"
-                          : ""
-                      }
-                    `}
+                          flex-grow-0 bg-transparent
+                          border-0 border-none !outline-none !ring-0 !ring-offset-0
+                          focus:border-0 focus:border-none focus:!outline-none focus:!ring-0 focus:!ring-offset-0
+                          text-sm px-2 py-4 h-6 w-auto overflow-x-auto
+                          ${
+                            emails.length > 1
+                              ? `${
+                                  theme === "dark"
+                                    ? "bg-white text-black rounded-lg"
+                                    : "bg-black text-white rounded-lg"
+                                }`
+                              : ""
+                          }
+                          ${
+                            !validateEmail(email) && email !== ""
+                              ? "text-red-500"
+                              : ""
+                          }
+                        `}
                         style={{ boxShadow: "none" }}
                         ref={(el: any) => (inputRefs.current[index] = el)}
                       />

@@ -49,7 +49,7 @@ const StatsCards = ({
       key: "balance",
       title: "Balances Added (Monthly)",
       change: 3,
-      value: totalBalances,
+      value: totalBalances || 0,
       icon: MdOutlineBalance,
     },
   ];

@@ -14,7 +14,7 @@ const UserStatsCard = ({
   totalRejectedLeaves,
   loading,
   totalbalance,
-  totalmonthbalances
+  totalmonthbalances,
 }: any) => {
   const UserStatsCardData = [
     {
@@ -38,7 +38,7 @@ const UserStatsCard = ({
     {
       key: "balance",
       title: "Balance Left",
-      value: [totalbalance , totalmonthbalances],
+      value: [totalbalance, totalmonthbalances],
       icon: MdOutlineBalance,
     },
     // {
@@ -65,18 +65,18 @@ const UserStatsCard = ({
                   size: 24,
                 })}
               </CardHeader>
-                {stat.key === 'balance' ? (
-              <CardContent>
-                <div className="text-lg  font-sans flex items-center justify-start gap-4">
-                 <span> Annual : {stat.value[0]} </span> <span> Month : {stat.value[1]} </span>
-                </div>
-              </CardContent>
-                ) : 
-                (
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-              </CardContent>
-                )}
+              {stat.key === "balance" ? (
+                <CardContent>
+                  <div className="text-lg  font-sans flex items-center justify-start gap-4">
+                    <span> Annual : {stat.value[0]} </span>{" "}
+                    <span> Month : {stat.value[1]} </span>
+                  </div>
+                </CardContent>
+              ) : (
+                <CardContent>
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                </CardContent>
+              )}
             </Card>
           )}
         </>
