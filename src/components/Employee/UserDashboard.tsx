@@ -43,8 +43,7 @@ const UserDashboard = ({ id }: any) => {
     new Date().getFullYear()
   );
 
-  const[balanceData,setBalanceData] = useState<any>([]);
-
+  const [balanceData, setBalanceData] = useState<any>([]);
 
   // &org_id=669f97ab186ea1a384360673
 
@@ -94,11 +93,10 @@ const UserDashboard = ({ id }: any) => {
     try {
       if (current_user) {
         let month;
-        if(selectedMonth){
-          month = dayjs(selectedMonth).month()
-        }
-        else{
-          month = dayjs().month()
+        if (selectedMonth) {
+          month = dayjs(selectedMonth).month();
+        } else {
+          month = dayjs().month();
         }
         const { data } = await axios.get(`/api/balances/${current_user._id}`);
         console.log("totabalnce of user ", data);
@@ -161,7 +159,7 @@ const UserDashboard = ({ id }: any) => {
               <select
                 value={selectedYear}
                 onChange={handleYearChange}
-                className="border p-2 rounded"
+                className="border p-2 rounded bg-gray-400 text-black"
               >
                 {Array.from(
                   { length: 10 },
@@ -227,8 +225,7 @@ const UserDashboard = ({ id }: any) => {
           />
         )}
 
-        <BalanceChart balances={balanceData}  className="w-full h-64"/>
-
+        <BalanceChart balances={balanceData} className="w-full h-64" />
       </div>
     </div>
   );

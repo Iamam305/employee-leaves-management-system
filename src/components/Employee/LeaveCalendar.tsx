@@ -75,10 +75,7 @@ const LeaveCalendar = ({ userId, loading }: any) => {
         </h3>
         <div className="grid grid-cols-7 gap-1 w-full">
           {weekDays.map((day) => (
-            <div
-              key={day}
-              className="text-center text-xs font-medium p-1 bg-gray-100"
-            >
+            <div key={day} className="text-center text-xs font-medium p-1">
               {day}
             </div>
           ))}
@@ -92,7 +89,7 @@ const LeaveCalendar = ({ userId, loading }: any) => {
                 key={format(day, "yyyy-MM-dd")}
                 className={`text-center p-1 ${
                   isLeave ? "bg-blue-400" : "bg-transparent"
-                } ${isCurrentMonth ? "" : "text-gray-300"} border text-sm`}
+                } ${isCurrentMonth ? "" : "text-gray-500"} border text-sm`}
               >
                 {format(day, "d")}
               </div>
