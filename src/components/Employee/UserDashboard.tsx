@@ -24,9 +24,12 @@ const UserDashboard = ({ id }: any) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const current_user = useSelector((state: any) => state.auth.userData);
+  const current_user:any = useSelector((state: any) => state.membership.memberShipData);
 
-  console.log("Auth Data==> ", current_user._id);
+  const isHrOrAdmin =
+    current_user.role === "hr" || current_user.role === "admin";
+
+  console.log(`Auth Data==> ${isHrOrAdmin} and ${current_user.role} `);
 
   const userId = id || current_user._id;
 
@@ -89,21 +92,40 @@ const UserDashboard = ({ id }: any) => {
     }
   };
 
+  // const fetchbalance = async () => {
+  //   try {
+  //     if (current_user) {
+  //       let month;
+  //       if (selectedMonth) {
+  //         month = dayjs(selectedMonth).month();
+  //       } else {
+  //         month = dayjs().month();
+  //       }
+  //       const { data } = await axios.get(`/api/balances/${current_user.user_id}`);
+  //       console.log("totabalnce of user ", data);
+  //       setTotalBalances(data.totalbalance[0]);
+  //       setTotalMonthBalances(data.totalbalance[1][month]);
+  //     }
+  //   } catch (error) {}
+  // };
+
+
   const fetchbalance = async () => {
     try {
-      if (current_user) {
-        let month;
-        if (selectedMonth) {
-          month = dayjs(selectedMonth).month();
-        } else {
-          month = dayjs().month();
-        }
-        const { data } = await axios.get(`/api/balances/${current_user._id}`);
-        console.log("totabalnce of user ", data);
-        setTotalBalances(data.totalbalance[0]);
-        setTotalMonthBalances(data.totalbalance[1][month]);
+      const balanceUserId = isHrOrAdmin && id ? id : current_user.user_id;
+      let month;
+      if (selectedMonth) {
+        month = dayjs(selectedMonth).month();
+      } else {
+        month = dayjs().month();
       }
-    } catch (error) {}
+      const { data } = await axios.get(`/api/balances/${balanceUserId}`);
+      console.log("totabalnce of user ", data);
+      setTotalBalances(data.totalbalance[0]);
+      setTotalMonthBalances(data.totalbalance[1][month]);
+    } catch (error) {
+      console.error("Balance fetch error: ", error);
+    }
   };
 
   useEffect(() => {
