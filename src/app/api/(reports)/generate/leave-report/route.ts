@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     }
     if (auth_data.membership.role === "hr") {
       matchFilter = {
-        org_id: org_id,
+        org_id: auth_data.membership.org_id,
       };
     }
     const data = await Leave.aggregate([
