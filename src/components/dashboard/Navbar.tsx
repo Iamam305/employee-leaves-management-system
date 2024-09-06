@@ -17,11 +17,13 @@ import {
   Home,
   LineChart,
   Menu,
+  MoonIcon,
   Package,
   Package2,
   Phone,
   Search,
   ShoppingCart,
+  SunIcon,
   User,
   Users,
   UsersIcon,
@@ -30,7 +32,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -38,9 +39,12 @@ import { TbListCheck } from "react-icons/tb";
 import Oraganization from "./Oraganization";
 import ChangePasswordModal from "./ChangePassword";
 import ChangeUsernameModal from "./ChangeUsernameModal";
+import { useTheme } from "@/context/ThemeContext";
 
 const Navbar = () => {
   const pathname = usePathname();
+
+  const { theme, toggleTheme } = useTheme();
 
   const user_role = useSelector(
     (state: any) => state?.membership?.memberShipData?.role
@@ -48,7 +52,6 @@ const Navbar = () => {
 
   console.log("User Role ===> ", user_role);
 
-  const router = useRouter();
 
   const handleLogout = async () => {
     try {
@@ -56,7 +59,8 @@ const Navbar = () => {
       if (res.data) {
         toast.success(res.data.msg);
         localStorage.removeItem("selectedOrgId");
-        router.push("/login");
+        window.location.href = "/login";
+        // router.push("/login");
       }
     } catch (error) {
       console.log(error);
@@ -77,7 +81,7 @@ const Navbar = () => {
               <div className=" w-full">
                 <Oraganization />
               </div>
-            ):(
+            ) : (
               <h1 className=" text-black font-semibold">MW LEAVES</h1>
             )}
             {/* <Link
@@ -161,6 +165,15 @@ const Navbar = () => {
           </Button>
         </Link>
       </div>
+
+      {/* <button onClick={toggleTheme}>
+        <div>Toggle Theme</div>
+      </button> */}
+
+      <div className=" cursor-pointer" onClick={toggleTheme}>
+        {theme === "light" ? <SunIcon /> : <MoonIcon />}
+      </div>
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="secondary" size="icon" className="rounded-full">
