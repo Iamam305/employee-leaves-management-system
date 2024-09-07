@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
   try {
     const searchParams = await req.nextUrl.searchParams;
     const org_id = searchParams.get("org_id");
+    const monthParam = searchParams.get("month");
     const auth: any = await auth_middleware(req);
     if (auth[0] === null || auth[1] !== null) {
       console.error("Authentication error:", auth[1]);
@@ -36,6 +37,18 @@ export async function GET(req: NextRequest) {
         org_id: auth_data.membership.org_id,
       };
     }
+
+    if (monthParam) {
+      const [year, month] = monthParam.split("-");
+      const startDate = new Date(`${year}-${month}-01`);
+      const endDate = new Date(startDate);
+      endDate.setMonth(endDate.getMonth() + 1);
+      matchFilter.start_date = {
+        $gte: startDate,
+        $lt: endDate,
+      };
+    }
+
     const data = await Leave.aggregate([
       { $match: matchFilter },
       {
@@ -102,7 +115,7 @@ export async function GET(req: NextRequest) {
       },
     ]);
 
-    // console.log(data);
+    console.log(data);
 
     // return NextResponse.json({
     //   //   auth_data,
