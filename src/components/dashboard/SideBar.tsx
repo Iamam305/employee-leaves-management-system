@@ -24,7 +24,7 @@ const Sidebar = () => {
                 <Oraganization />
               </div>
             ) : (
-              <h1 className=" text-black font-semibold">MW LEAVES</h1>
+              <h1 className=" font-semibold">MW LEAVES</h1>
             )}
             {/* <Link href="/" className="flex items-center font-semibold ">
               <Image
