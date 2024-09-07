@@ -52,7 +52,7 @@ const LeaveTypeModal: React.FC<{
           onClose={handleclose}
         >
           <div className="p-4 max-h-[60vh] overflow-y-auto">
-            <Card className="overflow-hidden max-h-[774px]">
+            <Card className="min-h-[504px]">
               <CardContent>
                 <LeaveTypeForm fetchData={fetchData} onclose={handleclose} organizations={mappedOrgs}/>
               </CardContent>
