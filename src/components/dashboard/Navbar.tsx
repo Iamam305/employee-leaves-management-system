@@ -82,7 +82,7 @@ const Navbar = () => {
                 <Oraganization />
               </div>
             ) : (
-              <h1 className=" text-black font-semibold">MW LEAVES</h1>
+              <h1 className="  font-semibold">MW LEAVES</h1>
             )}
             {/* <Link
               href="#"

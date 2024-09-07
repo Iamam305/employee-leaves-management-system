@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, DownloadCloudIcon } from "lucide-react";
 import { format } from "date-fns";
 import { usePathname, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -24,7 +24,9 @@ const UserDashboard = ({ id }: any) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const current_user:any = useSelector((state: any) => state.membership.memberShipData);
+  const current_user: any = useSelector(
+    (state: any) => state.membership.memberShipData
+  );
 
   const isHrOrAdmin =
     current_user.role === "hr" || current_user.role === "admin";
@@ -109,7 +111,6 @@ const UserDashboard = ({ id }: any) => {
   //   } catch (error) {}
   // };
 
-
   const fetchbalance = async () => {
     try {
       const balanceUserId = isHrOrAdmin && id ? id : current_user.user_id;
@@ -157,7 +158,7 @@ const UserDashboard = ({ id }: any) => {
 
   return (
     <div>
-      <div className="flex items-start md:pl-10 md:mb-0 mb-4 ">
+      <div className="flex md:flex-row flex-col items-center gap-4 justify-between md:pl-10 md:mb-0 mb-4 ">
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -207,6 +208,18 @@ const UserDashboard = ({ id }: any) => {
             </div>
           </PopoverContent>
         </Popover>
+        {(current_user.role === "admin" ||
+          current_user.role === "hr" ||
+          current_user.role === "manager") && (
+            <Button
+            className=" flex gap-2 items-center"
+            // onClick={handleDownloadReports}
+            disabled={loading}
+          >
+            <DownloadCloudIcon className=" h-4 w-4" />
+            {loading ? "Downloading..." : "Download Reports"}
+          </Button>
+          )}
       </div>
 
       <div className="w-full md:p-4 p-1 flex md:flex-row  flex-col-reverse items-start gap-5 justify-around ">

@@ -38,7 +38,7 @@ const LeaveCalendar = ({ userId, loading }: any) => {
     eachDayOfInterval({ start: new Date(start), end: new Date(end) })
   );
 
-  const id = userId || "66b5e16b725dba994dc40f7d";
+  const id = userId;
 
   const getLeavesDetails = async () => {
     try {

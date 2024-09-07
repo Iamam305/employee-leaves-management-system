@@ -25,7 +25,6 @@ export const ThemeContextProvider = ({ children }: any) => {
   };
 
   useEffect(() => {
-    // Apply the theme class to the document element
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(theme);
   }, [theme]);
