@@ -19,6 +19,7 @@ import { useSelector } from "react-redux";
 import { Skeleton } from "../ui/skeleton";
 import BalanceChart from "../dashboard/stats/BalanceChart";
 import dayjs from "dayjs";
+import LeaveRequestModal from "../leaves/LeaveRequestModal";
 
 const UserDashboard = ({ id }: any) => {
   const router = useRouter();
@@ -47,10 +48,7 @@ const UserDashboard = ({ id }: any) => {
   const [selectedYear, setSelectedYear] = useState<number>(
     new Date().getFullYear()
   );
-
   const [balanceData, setBalanceData] = useState<any>([]);
-
-  // &org_id=669f97ab186ea1a384360673
 
   const fetchUserDashboardDetails = async () => {
     try {
@@ -94,23 +92,6 @@ const UserDashboard = ({ id }: any) => {
     }
   };
 
-  // const fetchbalance = async () => {
-  //   try {
-  //     if (current_user) {
-  //       let month;
-  //       if (selectedMonth) {
-  //         month = dayjs(selectedMonth).month();
-  //       } else {
-  //         month = dayjs().month();
-  //       }
-  //       const { data } = await axios.get(`/api/balances/${current_user.user_id}`);
-  //       console.log("totabalnce of user ", data);
-  //       setTotalBalances(data.totalbalance[0]);
-  //       setTotalMonthBalances(data.totalbalance[1][month]);
-  //     }
-  //   } catch (error) {}
-  // };
-
   const fetchbalance = async () => {
     try {
       const balanceUserId = isHrOrAdmin && id ? id : current_user.user_id;
@@ -128,12 +109,10 @@ const UserDashboard = ({ id }: any) => {
       console.error("Balance fetch error: ", error);
     }
   };
-
   useEffect(() => {
     fetchUserDashboardDetails();
     fetchbalance();
   }, [selectedMonth, selectedYear]);
-
   useEffect(() => {
     const query_params = new URLSearchParams();
     if (selectedMonth) {
@@ -149,15 +128,17 @@ const UserDashboard = ({ id }: any) => {
     const updatedDate = new Date(selectedYear, monthIndex);
     setSelectedMonth(updatedDate);
   };
-
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedYear(parseInt(event.target.value));
   };
 
-  // console.log("balances ==> ",balanceData[0]?.leaveBalances)
-
   return (
     <div>
+      {current_user.role === "employee" && (
+        <div className="w-full flex items-center justify-end p-2 gap-2">
+          <LeaveRequestModal title="Apply For Leave" />
+        </div>
+      )}
       <div className="flex md:flex-row flex-col items-center gap-4 justify-between md:pl-10 md:mb-0 mb-4 ">
         <Popover>
           <PopoverTrigger asChild>
@@ -211,15 +192,11 @@ const UserDashboard = ({ id }: any) => {
         {(current_user.role === "admin" ||
           current_user.role === "hr" ||
           current_user.role === "manager") && (
-            <Button
-            className=" flex gap-2 items-center"
-            // onClick={handleDownloadReports}
-            disabled={loading}
-          >
+          <Button className=" flex gap-2 items-center mr-6" disabled={loading}>
             <DownloadCloudIcon className=" h-4 w-4" />
             {loading ? "Downloading..." : "Download Reports"}
           </Button>
-          )}
+        )}
       </div>
 
       <div className="w-full md:p-4 p-1 flex md:flex-row  flex-col-reverse items-start gap-5 justify-around ">

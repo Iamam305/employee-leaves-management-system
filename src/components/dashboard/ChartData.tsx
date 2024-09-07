@@ -7,6 +7,10 @@ import StatsCards from "./StateCards";
 import { useSelector } from "react-redux";
 import { Skeleton } from "../ui/skeleton";
 import TotalBalanceChart from "./stats/TotalBalanceChart";
+import { DownloadCloudIcon } from "lucide-react";
+import { Button } from "../ui/button";
+import LeaveRequestModal from "../leaves/LeaveRequestModal";
+import { toast } from "sonner";
 
 const ChartData = () => {
   const org_id = useSelector((state: any) => state.organization.selectedOrg);
@@ -25,6 +29,7 @@ const ChartData = () => {
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [balanceHistory, setBalanceHistory] = useState<any>([]);
+  const [reportloading, setReportLoading] = useState<boolean>(false);
 
   const fetchAllUsers = async () => {
     try {
@@ -41,7 +46,7 @@ const ChartData = () => {
       setTotalPendingLeaves(data.pending_leaves[0]?.totalPendingLeaves || 0);
       setLeavesInfo(data.leaves_data || []);
       setBalanceHistory(data.leaveType[0].leaveTypes);
-      setTotalBalances(data.leaveType[0].total[0]?.totalCount)
+      setTotalBalances(data.leaveType[0].total[0]?.totalCount);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -64,10 +69,50 @@ const ChartData = () => {
     fetchbalance();
   }, [org_id]);
 
+  const handleDownloadReports = async () => {
+    try {
+      setReportLoading(true);
+      let url = "/api/generate/leave-report";
+      if (current_user_role.role === "admin" && org_id !== null) {
+        url += `?org_id=${org_id}`;
+      }
+      const response = await axios.get(url, {
+        responseType: "blob",
+      });
+      const download_url = URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = download_url;
+      link.setAttribute("download", `leave-report.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setReportLoading(false);
+    } catch (error) {
+      toast.error("Something Unexpected Happpened! We are trying to fix");
+      setReportLoading(false);
+    }
+  };
+
   console.log("Total Balance ==> ", totalbalances, typeof totalbalances);
 
   return (
     <div>
+      <div className="w-full flex items-center justify-end p-2 gap-2 mb-4">
+        {current_user_role.role !== "manager" && (
+          <Button
+            className=" flex gap-2 items-center"
+            onClick={handleDownloadReports}
+            disabled={reportloading}
+          >
+            <DownloadCloudIcon className=" h-4 w-4" />
+            {reportloading ? "Downloading..." : "Download Reports"}
+          </Button>
+        )}
+        {current_user_role.role === "admin" && (
+          <LeaveRequestModal title="Apply For Leave" />
+        )}
+      </div>
+
       {loading ? (
         <div className="flex items-center justify-between w-full gap-5 mb-5">
           <Skeleton className="h-40 w-1/4" />
