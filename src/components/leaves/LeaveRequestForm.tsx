@@ -47,7 +47,7 @@ const formSchema = z.object({
 
 interface LeaveRequestFormProps {
   onclose: () => void;
-  fetchData: () => void; 
+  fetchData?: () => void; 
 }
 
 export function LeaveRequestForm({ onclose , fetchData}: LeaveRequestFormProps) {
@@ -123,7 +123,9 @@ export function LeaveRequestForm({ onclose , fetchData}: LeaveRequestFormProps) 
         );
       }
       onclose();
-      fetchData();
+      if(fetchData){
+        fetchData();
+      }
     } catch (error: any) {
       console.error("Error Requesting leave:", error);
       if (error.response.status === 403) {

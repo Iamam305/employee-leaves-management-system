@@ -13,7 +13,7 @@ const truncateText = (text: any, length: number) => {
 
 const LeaveRequestModal: React.FC<{
   title: string;
-  fetchData: () => void;
+  fetchData?: () => void;
   //   accessorKey: any
   // row: LeavetypeInterface;
 }> = ({ title , fetchData}) => {
