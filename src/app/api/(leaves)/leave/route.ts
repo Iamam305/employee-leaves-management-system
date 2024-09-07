@@ -15,6 +15,131 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 connect_db();
 
+// export const POST = async (req: NextRequest) => {
+//   try {
+//     const {
+//       user_id,
+//       leave_type_id,
+//       org_id,
+//       start_date,
+//       end_date,
+//       description,
+//       docs,
+//       manager_id,
+//     } = await req.json();
+
+//     if (!user_id || !leave_type_id || !org_id || !start_date || !end_date) {
+//       return NextResponse.json(
+//         { msg: "All required fields must be provided" },
+//         { status: 400 }
+//       );
+//     }
+//     const membership = await Membership.findOne({ user_id })
+//       .populate("user_id")
+//       .populate("manager_id");
+
+//     if (!membership?.manager_id && membership.role !== "admin") {
+//       return NextResponse.json(
+//         { msg: "Manager not found for the user" },
+//         { status: 404 }
+//       );
+//     }
+//     const overLappedLeaves = await Leave.find({
+//       user_id: user_id,
+//       start_date: { $lt: new Date(start_date) },
+//       end_date: { $gt: new Date(end_date) },
+//       status: { $ne: "rejected" },
+//     });
+
+//     if (overLappedLeaves.length > 0) {
+//       console.log('overlapped' , overLappedLeaves)
+//       return NextResponse.json(
+//         {
+//           msg: "You already applied for the leave on following dates",
+          
+//         },
+//         { status: 403 }
+//       );
+//     }
+
+//     const leavetype:any = await LeaveType.findById(leave_type_id);
+
+//     const leaveBalance:any = await calculateLeaveBalance(
+//       user_id,
+//       new Date(start_date).getFullYear(),
+//       leavetype.name
+//     );
+
+//     const daysApplied = getDays(start_date , end_date);
+//     const monthAvaliable = leaveBalance.monthly[getMonth(start_date)].available
+//     console.log('days of leave applying' , daysApplied)
+//     console.log('current month available balance' , monthAvaliable)
+    
+
+//     if (leaveBalance.total.available <= 0) {
+//       return NextResponse.json(
+//         {
+//           msg: "You cannot take this leave due to insufficient balance available",
+//         },
+//         { status: 403 }
+//       );
+//     } else {
+//       if (monthAvaliable <= 0) {
+//         return NextResponse.json(
+//           {
+//             msg: "You cannot take this leave due to insufficient balance available",
+//           },
+//           { status: 403 }
+//         );
+//       }
+//       else{
+//         if(daysApplied > monthAvaliable){
+//           return NextResponse.json({msg:`you can't take this leave more than ${monthAvaliable} days`}, {status:403})
+//         }
+//       }
+        
+//       }
+
+//     // Create a new leave request
+//     const newLeave = new Leave({
+//       user_id,
+//       leave_type_id,
+//       org_id,
+//       start_date,
+//       end_date,
+//       description,
+//       docs,
+//       status: "pending",
+//       manager_id,
+//     });
+//     await newLeave.save();
+
+//     // Send message to manager
+//     const { data, error } = await resend.emails.send({
+//       from: "Acme <team@qtee.ai>",
+//       to: membership.manager_id.email,
+//       subject: "Leave Request Raised",
+//       react: LeaveRequestEmail({
+//         employeeName: membership.user_id.name,
+//         leaveStartDate: start_date,
+//         leaveEndDate: end_date,
+//         leaveReason: leavetype.name,
+//       }),
+//       html: "5",
+//     });
+
+//     return NextResponse.json(
+//       {
+//         msg: "Leave request created successfully",
+//       },
+//       { status: 201 }
+//     );
+//   } catch (error) {
+//     console.error("Error while creating leave request:", error);
+//     return NextResponse.json({ msg: "Something went wrong" }, { status: 500 });
+//   }
+// };
+
 export const POST = async (req: NextRequest) => {
   try {
     const {
@@ -28,22 +153,47 @@ export const POST = async (req: NextRequest) => {
       manager_id,
     } = await req.json();
 
+    // Check if required fields are provided
     if (!user_id || !leave_type_id || !org_id || !start_date || !end_date) {
       return NextResponse.json(
         { msg: "All required fields must be provided" },
         { status: 400 }
       );
     }
+
+    // Find membership details of the user
     const membership = await Membership.findOne({ user_id })
       .populate("user_id")
       .populate("manager_id");
 
+    // Check if a manager is assigned or the user is an admin
     if (!membership?.manager_id && membership.role !== "admin") {
       return NextResponse.json(
         { msg: "Manager not found for the user" },
         { status: 404 }
       );
     }
+
+    // Check if there's a pending leave for the same leave type in the same month
+    const currentMonth = new Date(start_date).getMonth();
+    const existingPendingLeave = await Leave.findOne({
+      user_id: user_id,
+      leave_type_id: leave_type_id,
+      start_date: { $gte: new Date(new Date(start_date).getFullYear(), currentMonth, 1) },
+      end_date: { $lte: new Date(new Date(start_date).getFullYear(), currentMonth + 1, 0) },
+      status: "pending",
+    });
+
+    if (existingPendingLeave) {
+      return NextResponse.json(
+        {
+          msg: "You already have a pending leave request for this leave type in the selected month",
+        },
+        { status: 403 }
+      );
+    }
+
+    // Check for overlapping leaves
     const overLappedLeaves = await Leave.find({
       user_id: user_id,
       start_date: { $lt: new Date(start_date) },
@@ -52,30 +202,33 @@ export const POST = async (req: NextRequest) => {
     });
 
     if (overLappedLeaves.length > 0) {
-      console.log('overlapped' , overLappedLeaves)
+      console.log("Overlapping leaves found:", overLappedLeaves);
       return NextResponse.json(
         {
-          msg: "You already applied for the leave on following dates",
-          
+          msg: "You already applied for leave on the following dates",
         },
         { status: 403 }
       );
     }
 
-    const leavetype:any = await LeaveType.findById(leave_type_id);
+    // Fetch leave type details
+    const leavetype: any = await LeaveType.findById(leave_type_id);
 
-    const leaveBalance:any = await calculateLeaveBalance(
+    // Calculate leave balance
+    const leaveBalance: any = await calculateLeaveBalance(
       user_id,
       new Date(start_date).getFullYear(),
       leavetype.name
     );
 
-    const daysApplied = getDays(start_date , end_date);
-    const monthAvaliable = leaveBalance.monthly[getMonth(start_date)].available
-    console.log('days of leave applying' , daysApplied)
-    console.log('current month available balance' , monthAvaliable)
-    
+    // Calculate the number of days applied
+    const daysApplied = getDays(start_date, end_date);
+    const monthAvailable = leaveBalance.monthly[getMonth(start_date)].available;
 
+    console.log("Days of leave applying:", daysApplied);
+    console.log("Current month available balance:", monthAvailable);
+
+    // Check if there is sufficient total leave balance
     if (leaveBalance.total.available <= 0) {
       return NextResponse.json(
         {
@@ -83,22 +236,15 @@ export const POST = async (req: NextRequest) => {
         },
         { status: 403 }
       );
-    } else {
-      if (monthAvaliable <= 0) {
-        return NextResponse.json(
-          {
-            msg: "You cannot take this leave due to insufficient balance available",
-          },
-          { status: 403 }
-        );
-      }
-      else{
-        if(daysApplied > monthAvaliable){
-          return NextResponse.json({msg:`you can't take this leave more than ${monthAvaliable} days`}, {status:403})
-        }
-      }
-        
-      }
+    }
+
+    // Check if there is sufficient leave balance for the month
+    if (monthAvailable <= 0 || daysApplied > monthAvailable) {
+      return NextResponse.json(
+        { msg: `You cannot apply for more than ${monthAvailable} days of leave for ${leavetype.name} the selected month.` },
+        { status: 403 }
+      );
+    }
 
     // Create a new leave request
     const newLeave = new Leave({
@@ -139,6 +285,7 @@ export const POST = async (req: NextRequest) => {
     return NextResponse.json({ msg: "Something went wrong" }, { status: 500 });
   }
 };
+
 
 // export const GET = async (req: NextRequest) => {
 //   try {
