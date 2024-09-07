@@ -14,16 +14,21 @@ import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { CalendarIcon, DownloadCloudIcon } from "lucide-react";
 import { format } from "date-fns";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSelector } from "react-redux";
 import { Skeleton } from "../ui/skeleton";
 import BalanceChart from "../dashboard/stats/BalanceChart";
 import dayjs from "dayjs";
 import LeaveRequestModal from "../leaves/LeaveRequestModal";
+import { toast } from "sonner";
 
 const UserDashboard = ({ id }: any) => {
   const router = useRouter();
   const pathname = usePathname();
+
+  const searchParams = useSearchParams();
+
+  const monthParam = searchParams.get("month");
 
   const current_user: any = useSelector(
     (state: any) => state.membership.memberShipData
@@ -49,6 +54,7 @@ const UserDashboard = ({ id }: any) => {
     new Date().getFullYear()
   );
   const [balanceData, setBalanceData] = useState<any>([]);
+  const [reportloading, setReportLoading] = useState<boolean>(false);
 
   const fetchUserDashboardDetails = async () => {
     try {
@@ -132,6 +138,30 @@ const UserDashboard = ({ id }: any) => {
     setSelectedYear(parseInt(event.target.value));
   };
 
+  const handleDownloadEmployeeReport = async () => {
+    try {
+      console.log("Download Btn===> ", monthParam);
+      setReportLoading(true);
+      let url = "/api/generate/leave-report";
+      if (monthParam) {
+        url += `?month=${monthParam}`;
+      }
+      const response = await axios.get(url, {
+        responseType: "blob",
+      });
+      const download_url = URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = download_url;
+      link.setAttribute("download", `leave-report.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setReportLoading(false);
+    } catch (error) {
+      toast.error("Something went wrong! we are trying to fix");
+    }
+  };
+
   return (
     <div>
       {current_user.role === "employee" && (
@@ -192,9 +222,13 @@ const UserDashboard = ({ id }: any) => {
         {(current_user.role === "admin" ||
           current_user.role === "hr" ||
           current_user.role === "manager") && (
-          <Button className=" flex gap-2 items-center mr-6" disabled={loading}>
+          <Button
+            className=" flex gap-2 items-center mr-6"
+            disabled={reportloading}
+            onClick={handleDownloadEmployeeReport}
+          >
             <DownloadCloudIcon className=" h-4 w-4" />
-            {loading ? "Downloading..." : "Download Reports"}
+            {reportloading ? "Downloading..." : "Download Reports"}
           </Button>
         )}
       </div>
