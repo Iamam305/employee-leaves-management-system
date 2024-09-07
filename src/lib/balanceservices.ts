@@ -179,7 +179,8 @@ export const initializeEmployeeBalance = async (userId: string, year: any, orgId
     userId: string,
     year: any,
     leaveTypeName: string,
-    month: number // Add month parameter to specify the month of leave
+    month: number,  // Specify the month of the leave
+    days: number    // Number of leave days the user applied for
   ) => {
     // Find the balance record for the specific user and year
     console.log("Entered values:", {
@@ -187,6 +188,7 @@ export const initializeEmployeeBalance = async (userId: string, year: any, orgId
       year,
       leaveTypeName,
       month,
+      days
     });
   
     const balance = await Balances.findOne({ userId, year });
@@ -214,16 +216,16 @@ export const initializeEmployeeBalance = async (userId: string, year: any, orgId
     // Get the current month's balance
     const currentMonthBalance = leaveTypeBalance.monthly.get(monthKey);
   
-    // Calculate the new used and available balances for the month
-    const newMonthUsed = currentMonthBalance.used + 1; // Increment by 1 for each use
-    const newMonthAvailable = currentMonthBalance.credit - newMonthUsed;
-  
-    // Ensure the available monthly balance does not go negative
-    if (newMonthAvailable < 0) {
+    // Ensure there is enough balance for the number of days the user applied for
+    if (currentMonthBalance.available < days) {
       throw new Error(
-        `Insufficient balance: cannot take more leaves for the month. Only ${currentMonthBalance.available} leaves available for this month.`
+        `Insufficient balance: cannot take ${days} leave(s) for the month. Only ${currentMonthBalance.available} leave(s) available for this month.`
       );
     }
+  
+    // Calculate the new used and available balances for the month based on the number of days
+    const newMonthUsed = currentMonthBalance.used + days; // Increment by the number of leave days
+    const newMonthAvailable = currentMonthBalance.credit - newMonthUsed;
   
     // Update the monthly balance in the map
     leaveTypeBalance.monthly.set(monthKey, {
@@ -233,7 +235,7 @@ export const initializeEmployeeBalance = async (userId: string, year: any, orgId
     });
   
     // Update the total balance for the leave type
-    const totalUsed = leaveTypeBalance.total.used + 1;
+    const totalUsed = leaveTypeBalance.total.used + days;  // Increment total used by the number of days
     const totalAvailable = leaveTypeBalance.total.credit - totalUsed;
   
     leaveTypeBalance.total.used = totalUsed;
@@ -247,6 +249,7 @@ export const initializeEmployeeBalance = async (userId: string, year: any, orgId
   
     return balance;
   };
+  
   
 
   // call when updating leavetype

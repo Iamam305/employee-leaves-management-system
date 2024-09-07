@@ -53,7 +53,8 @@ export const POST = async (req : NextRequest) => {
         if(statusupdate === 'approved'){
             const year = getYear(updateleave.end_date);
             const month = getMonth(updateleave.end_date);
-            updateuserbalance = await updateLeaveBalance(updateleave.user_id , year , updateleave.leave_type_id.name , month)   
+            const days = getDays(updateleave.start_date , updateleave.end_date)
+            updateuserbalance = await updateLeaveBalance(updateleave.user_id , year , updateleave.leave_type_id.name , month , days)   
         }
 
         console.log('updateleave' , updateleave)

@@ -2,6 +2,7 @@ import { LeaveRequestEmail } from "@/components/email-temp/LeaveRequestTemplate"
 import { connect_db } from "@/configs/db";
 import { auth_middleware } from "@/lib/auth-middleware";
 import { calculateLeaveBalance } from "@/lib/balanceservices";
+import { getDays, getMonth } from "@/lib/utils";
 import { LeaveType } from "@/models/leave-type.model";
 import { Leave } from "@/models/leave.model";
 import { Membership } from "@/models/membership.model";
@@ -45,27 +46,35 @@ export const POST = async (req: NextRequest) => {
     }
     const overLappedLeaves = await Leave.find({
       user_id: user_id,
-      start_date: { $lt: new Date(end_date) },
-      end_date: { $gt: new Date(start_date) },
+      start_date: { $lt: new Date(start_date) },
+      end_date: { $gt: new Date(end_date) },
       status: { $ne: "rejected" },
     });
 
-    if (overLappedLeaves) {
+    if (overLappedLeaves.length > 0) {
+      console.log('overlapped' , overLappedLeaves)
       return NextResponse.json(
         {
           msg: "You already applied for the leave on following dates",
+          
         },
         { status: 403 }
       );
     }
 
-    const leavetype = await LeaveType.findById(leave_type_id);
+    const leavetype:any = await LeaveType.findById(leave_type_id);
 
-    const leaveBalance = await calculateLeaveBalance(
+    const leaveBalance:any = await calculateLeaveBalance(
       user_id,
       new Date(start_date).getFullYear(),
       leavetype.name
     );
+
+    const daysApplied = getDays(start_date , end_date);
+    const monthAvaliable = leaveBalance.monthly[getMonth(start_date)].available
+    console.log('days of leave applying' , daysApplied)
+    console.log('current month available balance' , monthAvaliable)
+    
 
     if (leaveBalance.total.available <= 0) {
       return NextResponse.json(
@@ -75,7 +84,7 @@ export const POST = async (req: NextRequest) => {
         { status: 403 }
       );
     } else {
-      if (leaveBalance.monthly.available <= 0) {
+      if (monthAvaliable <= 0) {
         return NextResponse.json(
           {
             msg: "You cannot take this leave due to insufficient balance available",
@@ -83,7 +92,13 @@ export const POST = async (req: NextRequest) => {
           { status: 403 }
         );
       }
-    }
+      else{
+        if(daysApplied > monthAvaliable){
+          return NextResponse.json({msg:`you can't take this leave more than ${monthAvaliable} days`}, {status:403})
+        }
+      }
+        
+      }
 
     // Create a new leave request
     const newLeave = new Leave({
