@@ -136,7 +136,7 @@ const UserDashboard = ({ id }: any) => {
     <div>
       {current_user.role === "employee" && (
         <div className="w-full flex items-center justify-end p-2 gap-2">
-          <LeaveRequestModal title="Apply For Leave" />
+          <LeaveRequestModal fetchData={fetchUserDashboardDetails} title="Apply For Leave" />
         </div>
       )}
       <div className="flex md:flex-row flex-col items-center gap-4 justify-between md:pl-10 md:mb-0 mb-4 ">
