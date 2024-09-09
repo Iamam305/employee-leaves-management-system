@@ -6,7 +6,21 @@ const { ObjectId } = require("mongodb");
 export async function GET(req: NextRequest, content: any) {
   try {
     const userId = await content.params.id;
+    const searchParams = req.nextUrl.searchParams;
+    const monthParam = searchParams.get("month");
+    let matchFilter: any = {};
+    if (monthParam) {
+      const [year, month] = monthParam.split("-");
+      const startDate = new Date(`${year}-${month}-01`);
+      const endDate = new Date(startDate);
+      endDate.setMonth(endDate.getMonth() + 1);
+      matchFilter.start_date = {
+        $gte: startDate,
+        $lt: endDate,
+      };
+    }
     const data = await Leave.aggregate([
+      { $match: matchFilter },
       {
         $match: {
           user_id: new ObjectId(userId),
