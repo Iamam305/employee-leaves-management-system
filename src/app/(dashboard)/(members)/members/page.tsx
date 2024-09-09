@@ -112,7 +112,7 @@ const Page = () => {
 
   useEffect(() => {
     fetchManagers();
-  }, []);
+  }, [selected_orgId]);
 
   const fetch_all_orgs = async () => {
     try {

@@ -69,9 +69,6 @@ export function DataTable<TData, TValue>({
   managerId,
   setManagerId,
 }: DataTableProps<TData, TValue>) {
-  const router = useRouter();
-  const pathname = usePathname();
-
   const table = useReactTable({
     data,
     columns,
@@ -97,8 +94,6 @@ export function DataTable<TData, TValue>({
     } else {
       setManagerId(manager);
     }
-
-    console.log("Manager ==> ", manager);
   };
 
   return (
@@ -112,8 +107,7 @@ export function DataTable<TData, TValue>({
               onChange={(e) => setName(e.target.value)}
               className="max-w-sm"
             />
-
-            {type === "Members" &&
+            {(type === "Members" || type === "Leave") &&
               (current_user.role === "hr" || current_user.role === "admin") && (
                 <Select value={managerId} onValueChange={handleManagerChange}>
                   <SelectTrigger className="w-[180px]">
@@ -131,25 +125,8 @@ export function DataTable<TData, TValue>({
                   </SelectContent>
                 </Select>
               )}
-
-            {/* 
-            <select
-              name="group_name"
-              id=""
-              className="pl-2 hover:cursor-pointer rounded-md bg-transparent border"
-              onChange={(e) => setOrgId(e.target.value)}
-              required
-            >
-              <option value="">Select The Group</option>
-              {orgs.map((org: any, index: any) => (
-                <option key={index} value={org._id}>
-                  {org.name}
-                </option>
-              ))}
-            </select> */}
           </div>
         )}
-
         <div className="rounded-md border">
           <ScrollArea className="h-[calc(100vh-300px)] w-full  p-5">
             <Table className="border rel rounded-top-3 w-full ">

@@ -22,6 +22,10 @@ export const LeaveTableClient: React.FC<any> = ({
   // setPage,
   totalPage,
   fetchdata,
+  type,
+  managers,
+  managerId,
+  setManagerId,
 }) => {
   return (
     <>
@@ -30,7 +34,9 @@ export const LeaveTableClient: React.FC<any> = ({
           title={`All Leaves`}
           description="All Leave Request Raised by Users"
         />
-        <Link href="/leavetype"><Button variant="default">View Leave Types</Button></Link>
+        <Link href="/leavetype">
+          <Button variant="default">View Leave Types</Button>
+        </Link>
       </div>
       <Separator />
       <DataTable
@@ -46,6 +52,10 @@ export const LeaveTableClient: React.FC<any> = ({
         setPage={setPage}
         page={page}
         totalPage={totalPage}
+        type={type}
+        managers={managers}
+        managerId={managerId}
+        setManagerId={setManagerId}
       />
     </>
   );
