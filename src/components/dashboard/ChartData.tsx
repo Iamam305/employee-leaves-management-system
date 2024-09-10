@@ -7,10 +7,13 @@ import StatsCards from "./StateCards";
 import { useSelector } from "react-redux";
 import { Skeleton } from "../ui/skeleton";
 import TotalBalanceChart from "./stats/TotalBalanceChart";
-import { DownloadCloudIcon } from "lucide-react";
+import { CalendarIcon, DownloadCloudIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import LeaveRequestModal from "../leaves/LeaveRequestModal";
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { cn } from "@/lib/utils";
 
 const ChartData = () => {
   const org_id = useSelector((state: any) => state.organization.selectedOrg);
@@ -30,13 +33,39 @@ const ChartData = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [balanceHistory, setBalanceHistory] = useState<any>([]);
   const [reportloading, setReportLoading] = useState<boolean>(false);
+  const [selectedMonth, setSelectedMonth] = useState<any>()
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear()
+  );
 
   const fetchAllUsers = async () => {
     try {
       setLoading(true);
-      const endpoint = org_id
-        ? `/api/dashboard?org_id=${org_id}`
-        : `/api/dashboard`;
+       let endpoint = `/api/dashboard`;
+      if(org_id && selectedMonth){
+        const monthYear = format(selectedMonth, "yyyy-MM");
+        endpoint = `/api/dashboard?org_id=${org_id}&monthYear=${monthYear}`
+      }
+      else if (org_id){
+        endpoint = `/api/dashboard?org_id=${org_id}`
+      }
+      else if(selectedMonth){
+        const monthYear = format(selectedMonth, "yyyy-MM");
+        endpoint = `/api/dashboard?monthYear=${monthYear}`
+      }
+      else {
+        endpoint = `/api/dashboard`
+      }
+
+    //   const endpoint = org_id && monthParam 
+    // ? `/api/dashboard?org_id=${org_id}&monthYear=${monthParam}`
+    // : org_id 
+    // ? `/api/dashboard?org_id=${org_id}`
+    // : monthParam 
+    // ? `/api/dashboard?monthYear=${monthParam}`
+    // : `/api/dashboard`;
+
+
       const { data } = await axios.get(endpoint);
       setUsersData(data.users[0]?.users || []);
       setTotalUsers(data.users[0]?.totalUsers || 0);
@@ -54,6 +83,15 @@ const ChartData = () => {
     }
   };
 
+  const handleMonthSelect = (monthIndex: number) => {
+    const updatedDate = new Date(selectedYear, monthIndex);
+    setSelectedMonth(updatedDate);
+  };
+
+  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedYear(parseInt(event.target.value));
+  };
+
   const fetchbalance = async () => {
     try {
       if (userRole) {
@@ -67,7 +105,7 @@ const ChartData = () => {
   useEffect(() => {
     fetchAllUsers();
     fetchbalance();
-  }, [org_id]);
+  }, [org_id , selectedMonth]);
 
   const handleDownloadReports = async () => {
     try {
@@ -97,6 +135,56 @@ const ChartData = () => {
 
   return (
     <div>
+      <div className="w-full flex items-center justify-between">
+      <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              id="month-year-picker"
+              variant={"outline"}
+              className={cn(
+                "w-[300px] justify-start text-left font-normal",
+                !selectedMonth && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {selectedMonth ? (
+                `${format(selectedMonth, "MMMM")} ${selectedYear}`
+              ) : (
+                <span>Pick a month and year</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-4" align="start">
+            <div className="flex justify-between mb-4">
+              <select
+                value={selectedYear}
+                onChange={handleYearChange}
+                className="border p-2 rounded bg-gray-400 text-black"
+              >
+                {Array.from(
+                  { length: 10 },
+                  (_, i) => new Date().getFullYear() - i
+                ).map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {Array.from({ length: 12 }, (_, i) => (
+                <Button
+                  key={i}
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleMonthSelect(i)}
+                >
+                  {format(new Date(selectedYear, i), "MMMM")}
+                </Button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
       <div className="w-full flex items-center justify-end p-2 gap-2 mb-4">
         {current_user_role.role !== "manager" && (
           <Button
@@ -111,6 +199,7 @@ const ChartData = () => {
         {current_user_role.role === "admin" && (
           <LeaveRequestModal title="Apply For Leave" />
         )}
+      </div>
       </div>
 
       {loading ? (
