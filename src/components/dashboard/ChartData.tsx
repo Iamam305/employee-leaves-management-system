@@ -106,26 +106,46 @@ const ChartData = () => {
   const handleDownloadReports = async () => {
     try {
       setReportLoading(true);
+      
       let url = "/api/generate/leave-report";
+      
+      // Check if the current user is an admin and if org_id is provided
       if (current_user_role.role === "admin" && org_id !== null) {
         url += `?org_id=${org_id}`;
       }
+  
+      // Optionally, add month filtering if required (e.g., a dropdown or input for month)
+      if (selectedMonth) {
+        const monthYear = format(selectedMonth, "yyyy-MM");
+        const monthParam = `month=${monthYear}`;
+        url += org_id ? `&${monthParam}` : `?${monthParam}`;
+      }
+      
+      // Make the GET request to the API
       const response = await axios.get(url, {
         responseType: "blob",
       });
+      
+      // Create a downloadable link from the response
       const download_url = URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = download_url;
-      link.setAttribute("download", `leave-report.xlsx`);
+      link.setAttribute("download", "leave-report.xlsx");
+      
+      // Trigger download
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      
       setReportLoading(false);
+      
     } catch (error) {
-      toast.error("Something Unexpected Happpened! We are trying to fix");
+      console.error("Error downloading the report:", error);
+      toast.error("Something unexpected happened! We are working to fix this.");
       setReportLoading(false);
     }
   };
+  
 
   console.log("Total Balance ==> ", totalbalances, typeof totalbalances);
 
