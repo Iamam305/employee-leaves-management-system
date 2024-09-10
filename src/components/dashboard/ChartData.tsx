@@ -33,7 +33,7 @@ const ChartData = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [balanceHistory, setBalanceHistory] = useState<any>([]);
   const [reportloading, setReportLoading] = useState<boolean>(false);
-  const [selectedMonth, setSelectedMonth] = useState<any>()
+  const [selectedMonth, setSelectedMonth] = useState<any>();
   const [selectedYear, setSelectedYear] = useState<number>(
     new Date().getFullYear()
   );
@@ -41,30 +41,26 @@ const ChartData = () => {
   const fetchAllUsers = async () => {
     try {
       setLoading(true);
-       let endpoint = `/api/dashboard`;
-      if(org_id && selectedMonth){
+      let endpoint = `/api/dashboard`;
+      if (org_id && selectedMonth) {
         const monthYear = format(selectedMonth, "yyyy-MM");
-        endpoint = `/api/dashboard?org_id=${org_id}&monthYear=${monthYear}`
-      }
-      else if (org_id){
-        endpoint = `/api/dashboard?org_id=${org_id}`
-      }
-      else if(selectedMonth){
+        endpoint = `/api/dashboard?org_id=${org_id}&monthYear=${monthYear}`;
+      } else if (org_id) {
+        endpoint = `/api/dashboard?org_id=${org_id}`;
+      } else if (selectedMonth) {
         const monthYear = format(selectedMonth, "yyyy-MM");
-        endpoint = `/api/dashboard?monthYear=${monthYear}`
-      }
-      else {
-        endpoint = `/api/dashboard`
+        endpoint = `/api/dashboard?monthYear=${monthYear}`;
+      } else {
+        endpoint = `/api/dashboard`;
       }
 
-    //   const endpoint = org_id && monthParam 
-    // ? `/api/dashboard?org_id=${org_id}&monthYear=${monthParam}`
-    // : org_id 
-    // ? `/api/dashboard?org_id=${org_id}`
-    // : monthParam 
-    // ? `/api/dashboard?monthYear=${monthParam}`
-    // : `/api/dashboard`;
-
+      //   const endpoint = org_id && monthParam
+      // ? `/api/dashboard?org_id=${org_id}&monthYear=${monthParam}`
+      // : org_id
+      // ? `/api/dashboard?org_id=${org_id}`
+      // : monthParam
+      // ? `/api/dashboard?monthYear=${monthParam}`
+      // : `/api/dashboard`;
 
       const { data } = await axios.get(endpoint);
       setUsersData(data.users[0]?.users || []);
@@ -105,7 +101,7 @@ const ChartData = () => {
   useEffect(() => {
     fetchAllUsers();
     fetchbalance();
-  }, [org_id , selectedMonth]);
+  }, [org_id, selectedMonth]);
 
   const handleDownloadReports = async () => {
     try {
@@ -136,7 +132,7 @@ const ChartData = () => {
   return (
     <div>
       <div className="w-full flex items-center justify-between">
-      <Popover>
+        <Popover>
           <PopoverTrigger asChild>
             <Button
               id="month-year-picker"
@@ -162,7 +158,7 @@ const ChartData = () => {
                 className="border p-2 rounded bg-gray-400 text-black"
               >
                 {Array.from(
-                  { length: 10 },
+                  { length: 3 },
                   (_, i) => new Date().getFullYear() - i
                 ).map((year) => (
                   <option key={year} value={year}>
@@ -185,21 +181,21 @@ const ChartData = () => {
             </div>
           </PopoverContent>
         </Popover>
-      <div className="w-full flex items-center justify-end p-2 gap-2 mb-4">
-        {current_user_role.role !== "manager" && (
-          <Button
-            className=" flex gap-2 items-center"
-            onClick={handleDownloadReports}
-            disabled={reportloading}
-          >
-            <DownloadCloudIcon className=" h-4 w-4" />
-            {reportloading ? "Downloading..." : "Download Reports"}
-          </Button>
-        )}
-        {current_user_role.role === "admin" && (
-          <LeaveRequestModal title="Apply For Leave" />
-        )}
-      </div>
+        <div className="w-full flex items-center justify-end p-2 gap-2 mb-4">
+          {current_user_role.role !== "manager" && (
+            <Button
+              className=" flex gap-2 items-center"
+              onClick={handleDownloadReports}
+              disabled={reportloading}
+            >
+              <DownloadCloudIcon className=" h-4 w-4" />
+              {reportloading ? "Downloading..." : "Download Reports"}
+            </Button>
+          )}
+          {current_user_role.role === "admin" && (
+            <LeaveRequestModal title="Apply For Leave" />
+          )}
+        </div>
       </div>
 
       {loading ? (
