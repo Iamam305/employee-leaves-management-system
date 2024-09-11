@@ -1,7 +1,7 @@
 import { LeaveRequestEmail } from "@/components/email-temp/LeaveRequestTemplate";
 import { connect_db } from "@/configs/db";
 import { auth_middleware } from "@/lib/auth-middleware";
-import { calculateLeaveBalance } from "@/lib/balanceservices";
+import { calculateLeaveBalance, updateLeaveBalance } from "@/lib/balanceservices";
 import { getDays, getMonth } from "@/lib/utils";
 import { LeaveType } from "@/models/leave-type.model";
 import { Leave } from "@/models/leave.model";
@@ -44,8 +44,33 @@ export const POST = async (req: NextRequest) => {
     // Check if a manager is assigned or the user is an admin
     if (!membership?.manager_id && membership.role !== "admin") {
       return NextResponse.json(
-        { msg: "Manager not found for the user" },
-        { status: 404 }
+        { msg: "You are not assigned any manager! Please Contact your hr" },
+        { status: 403 }
+      );
+    }
+
+    // Check for overlapping leaves
+    const overLappedLeaves = await Leave.find({
+      user_id: user_id,
+      $or: [
+        {
+          start_date: { $lte: new Date(end_date), $gte: new Date(start_date) },
+        },
+        { end_date: { $gte: new Date(start_date), $lte: new Date(end_date) } },
+        {
+          start_date: { $lt: new Date(start_date) },
+          end_date: { $gt: new Date(end_date) },
+        },
+      ],
+      status: { $ne: "rejected" },
+    });
+
+    if (overLappedLeaves.length > 0) {
+      return NextResponse.json(
+        {
+          msg: "You already applied for leave during the selected dates",
+        },
+        { status: 403 }
       );
     }
 
@@ -67,24 +92,6 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json(
         {
           msg: "You already have a pending leave request for this leave type in the selected month",
-        },
-        { status: 403 }
-      );
-    }
-
-    // Check for overlapping leaves
-    const overLappedLeaves = await Leave.find({
-      user_id: user_id,
-      start_date: { $lt: new Date(start_date) },
-      end_date: { $gt: new Date(end_date) },
-      status: { $ne: "rejected" },
-    });
-
-    if (overLappedLeaves.length > 0) {
-      console.log("Overlapping leaves found:", overLappedLeaves);
-      return NextResponse.json(
-        {
-          msg: "You already applied for leave on the following dates",
         },
         { status: 403 }
       );
@@ -140,6 +147,14 @@ export const POST = async (req: NextRequest) => {
       manager_id,
     });
     await newLeave.save();
+
+    await updateLeaveBalance(
+      user_id,
+      new Date(start_date).getFullYear(),
+      leavetype.name,
+      currentMonth,
+      daysApplied
+    );
 
     // Send message to manager
     const { data, error } = await resend.emails.send({
