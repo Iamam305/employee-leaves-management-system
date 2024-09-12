@@ -82,7 +82,7 @@ const StatsCards = ({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stat.value}</div>
-            <p className="text-xs text-muted-foreground">
+            {/* <p className="text-xs text-muted-foreground">
               <span className="flex items-center">
                 {stat.change > 0 ? (
                   <HiArrowNarrowUp className="text-green-600" size={16} />
@@ -92,7 +92,7 @@ const StatsCards = ({
                 {stat.change}{" "}
               </span>{" "}
               from last month
-            </p>
+            </p> */}
           </CardContent>
         </Card>
       ))}
