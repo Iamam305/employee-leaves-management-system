@@ -1,21 +1,14 @@
-import mongoose from "mongoose";
 import { Resend } from "resend";
-import { LeaveStatusEmail } from "@/components/email-temp/LeaveStatusTemplate";
-import { Leave } from "@/models/leave.model";
-import dayjs from "dayjs";
 import { NextRequest, NextResponse } from "next/server";
+import { Leave } from "@/models/leave.model";
+import { connect_db } from "@/configs/db";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+connect_db();
+
 export async function GET(req: NextRequest) {
   try {
-    if (!mongoose.connection.readyState) {
-      return NextResponse.json(
-        { msg: "Mongoose is not connected. Skipping job." },
-        { status: 500 }
-      );
-    }
-
     const leaves = await Leave.aggregate([
       { $match: { status: "pending" } },
       {
@@ -28,62 +21,43 @@ export async function GET(req: NextRequest) {
       },
       { $unwind: "$manager" },
       {
-        $lookup: {
-          from: "leavetypes",
-          localField: "leave_type_id",
-          foreignField: "_id",
-          as: "leave_type",
-        },
-      },
-      { $unwind: "$leave_type" },
-      {
-        $project: {
-          _id: 1,
-          status: 1,
-          "manager.name": 1,
-          "manager.email": 1,
-          start_date: 1,
-          end_date: 1,
-          "leave_type.name": 1,
+        $group: {
+          _id: "$manager._id",
+          managerName: { $first: "$manager.name" },
+          managerEmail: { $first: "$manager.email" },
+          pendingLeavesCount: { $sum: 1 },
         },
       },
     ]);
 
     if (leaves.length > 0) {
-      for (const leave of leaves) {
-        const formattedStartDate = dayjs(leave.start_date).format("YYYY-MM-DD");
-        const formattedEndDate = dayjs(leave.end_date).format("YYYY-MM-DD");
+      for (const leaveGroup of leaves) {
+        const { managerEmail, managerName, pendingLeavesCount } = leaveGroup;
 
         const { data, error } = await resend.emails.send({
-          from: "Acme <team@qtee.ai>",
-          to: `${leave.manager.email}`,
-          subject: "Leave Status Changed",
-          react: LeaveStatusEmail({
-            employeeName: leave.manager.name,
-            leaveStartDate: formattedStartDate,
-            leaveEndDate: formattedEndDate,
-            leaveReason: leave.leave_type.name,
-            StatusOfLeave: leave.status,
-          }),
-          html: "<p>Leave status has been updated. Please check the details.</p>",
+          from: "Ritik <team@qtee.ai>",
+          to: managerEmail,
+          subject: "Pending Leave Count",
+          html: `<p>Hello ${managerName},</p>
+                 <p>You have ${pendingLeavesCount} pending leave requests awaiting your approval.</p>
+                 <p>Please review them at your earliest convenience.</p>`,
         });
 
         if (error) {
-          console.error("Error sending email:", error);
+          console.error("Error sending email to manager:", error);
         } else {
-          console.log("Email sent successfully:", data);
+          console.log("Email sent successfully to", managerEmail, ":", data);
         }
       }
     } else {
-      console.log("No pending leaves.");
+      console.log("No pending leaves found.");
     }
-
     return NextResponse.json(
-      { msg: "Task executed successfully" },
+      { msg: "Pending leave counts sent successfully." },
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("Error occurred:", error);
+    console.error("Error occurred during execution:", error);
     return NextResponse.json(
       { msg: "Internal Server Error", error: error.message },
       { status: 500 }
