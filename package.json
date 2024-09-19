@@ -41,7 +41,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.408.0",
     "mongoose": "^8.5.3",
-    "next": "14.2.5",
+    "next": "^14.2.12",
     "next13-progressbar": "^1.2.1",
     "node-cron": "^3.0.3",
     "react": "^18",
