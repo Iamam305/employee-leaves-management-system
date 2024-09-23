@@ -5,6 +5,7 @@ import { AnimatedSquareBackground } from "./Animation";
 import { Separator } from "../ui/separator";
 import Features from "./Features";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 const LandingPage = () => {
   const roles = [
@@ -32,20 +33,23 @@ const LandingPage = () => {
         <div className="relative z-10">
           <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <section className="text-center mb-16  relative flex flex-col gap-5 items-center justify-center">
-              <h1 className="text-6xl h-[10vh] sm:text-6xl font-extrabold mb-4 bg-gradient-to-l from-purple-500 to-pink-500 text-transparent bg-clip-text">
+              <h1 className="md:text-6xl text-4xl p-2 h-max sm:text-6xl font-extrabold mb-4 bg-gradient-to-l from-purple-500 to-pink-500 text-transparent bg-clip-text">
                 Leave Management System
               </h1>
-              <p className="text-xl">
+              <p className="md:text-xl text-sm">
                 Streamline your organizations leave management process
               </p>
-              <p className="text-xl mb-8">
+              <p className="md:text-xl text-sm mb-8">
                 Our Leave Management System helps organizations efficiently
                 manage employee leaves, approvals, and related processes across
                 different roles.
               </p>
-              <Button className="bg-green-600 text-white py-3 w-[20%] px-8 rounded-lg text-lg font-semibold hover:bg-green-700 transition-colors">
+              <Link
+                href={"/login"}
+                className="bg-green-600 text-white py-3 md:w-[20%] w-[60%] px-8 rounded-lg text-lg font-semibold hover:bg-green-700 transition-colors"
+              >
                 Get Started
-              </Button>
+              </Link>
               <div className="relative w-full mx-auto">
                 <Image
                   src="/dashboard.png"

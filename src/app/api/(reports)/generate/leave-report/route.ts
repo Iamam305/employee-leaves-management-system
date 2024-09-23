@@ -38,6 +38,15 @@ export async function GET(req: NextRequest) {
       };
     }
 
+
+    // const 
+
+      if (auth_data.membership.role === "manager") {
+        matchFilter = {
+          manager_id: auth_data.user._id, // Find memberships where the manager_id matches the logged-in user's ID
+        };
+      }
+
     if (monthParam) {
       const [year, month] = monthParam.split("-");
       const startDate = new Date(`${year}-${month}-01`);

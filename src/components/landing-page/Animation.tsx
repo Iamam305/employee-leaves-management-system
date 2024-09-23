@@ -88,7 +88,7 @@ export const AnimatedSquareBackground = () => {
   };
 
   return (
-    <div className="absolute z-[-1] p-20 overflow-hidden w-full h-full flex justify-center items-center m-auto">
+    <div className="absolute z-[-1] md:p-20 p-2 overflow-hidden w-full h-full flex justify-center items-center m-auto">
       <svg width="100%" height="100%">
         {generateSquares()}
       </svg>

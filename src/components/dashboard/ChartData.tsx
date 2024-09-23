@@ -202,7 +202,7 @@ const ChartData = () => {
           </PopoverContent>
         </Popover>
         <div className="w-full flex items-center justify-end p-2 gap-2 mb-4">
-          {current_user_role.role !== "manager" && (
+          {current_user_role.role !== "employee" && (
             <Button
               className=" flex gap-2 items-center"
               onClick={handleDownloadReports}

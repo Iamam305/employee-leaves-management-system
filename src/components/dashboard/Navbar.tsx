@@ -52,7 +52,6 @@ const Navbar = () => {
 
   console.log("User Role ===> ", user_role);
 
-
   const handleLogout = async () => {
     try {
       const res = await axios.get("/api/logout");
@@ -151,7 +150,7 @@ const Navbar = () => {
           </div>
         </form>
       </div>
-      <div className="relative">
+      {/* <div className="relative">
         <div className="absolute h-6 w-6 bg-red-500 rounded-full flex items-center justify-center text-white text-sm -top-1 -left-1">
           <span className="mb-1">10</span>
         </div>
@@ -164,7 +163,7 @@ const Navbar = () => {
             <Bell className="h-6 w-6" />
           </Button>
         </Link>
-      </div>
+      </div> */}
 
       {/* <button onClick={toggleTheme}>
         <div>Toggle Theme</div>

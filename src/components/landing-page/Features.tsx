@@ -49,11 +49,13 @@ const Features = () => {
 
   return (
     <div ref={sectionRef} className="relative">
-      <h2 className="text-5xl font-extrabold mb-10">Key Features</h2>
+      <h2 className="md:text-5xl text-2xl font-extrabold mb-10">
+        Key Features
+      </h2>
       <AnimatedSquareBackground />
-      <div className="w-full h-max flex gap-3 mb-1">
+      <div className="w-full h-max md:flex md:flex-row flex-col gap-3 mb-3">
         <motion.div
-          className="w-1/2"
+          className="md:w-1/2 w-full"
           initial="enterLeft"
           animate={inView ? "visible" : "enterLeft"}
           variants={animationVariants}
@@ -67,9 +69,9 @@ const Features = () => {
           />
         </motion.div>
 
-        <div className="w-1/2 flex flex-col gap-0">
+        <div className="md:w-1/2 w-full flex flex-col md:gap-0 gap-3">
           <motion.div
-            className="bg-gray-800 p-6 rounded-lg shadow-lg text-center flex w-1/2"
+            className="bg-gray-800 p-6 rounded-lg shadow-lg text-center flex md:w-1/2 w-full"
             initial="enterTop"
             animate={inView ? "visible" : "enterTop"}
             variants={animationVariants}
@@ -84,7 +86,7 @@ const Features = () => {
           </motion.div>
 
           <motion.div
-            className="bg-gray-800 p-6 rounded-lg shadow-lg text-center w-1/2 flex items-end ml-auto"
+            className="bg-gray-800 p-6 rounded-lg shadow-lg text-center md:w-1/2 w-full flex items-end ml-auto"
             initial="enterBottom"
             animate={inView ? "visible" : "enterBottom"}
             variants={animationVariants}
@@ -99,15 +101,15 @@ const Features = () => {
           </motion.div>
         </div>
       </div>
-      <div className="w-full h-max flex gap-3">
-        <div className="w-1/2 flex flex-col gap-0">
+      <div className="w-full h-max md:flex md:flex-row  flex-col-reverse gap-3">
+        <div className="md:w-1/2 w-full flex flex-col md:gap-0 gap-3">
           <motion.div
-            className="bg-gray-800 p-6 rounded-lg shadow-lg text-center flex w-1/2"
+            className="bg-gray-800 p-6 rounded-lg shadow-lg text-center flex md:w-1/2 w-full"
             initial="enterLeft"
             animate={inView ? "visible" : "enterLeft"}
             variants={animationVariants}
           >
-            <div className="flex justify-center mb-4 flex-col">
+            <div className="flex justify-center mb-4 flex-col gap-3">
               <FileText className="w-8 h-8 mb-2 text-green-500" />
               <h3 className="text-xl font-semibold mb-2">Reporting</h3>
               <p className="text-gray-300">
@@ -117,7 +119,7 @@ const Features = () => {
           </motion.div>
 
           <motion.div
-            className="bg-gray-800 p-6 rounded-lg shadow-lg text-center w-1/2 flex items-end ml-auto"
+            className="bg-gray-800 p-6 rounded-lg shadow-lg text-center md:w-1/2 w-full flex items-end ml-auto"
             initial="enterRight"
             animate={inView ? "visible" : "enterRight"}
             variants={animationVariants}
@@ -133,7 +135,7 @@ const Features = () => {
         </div>
 
         <motion.div
-          className="w-1/2"
+          className="md:w-1/2 w-full"
           initial="enterRight"
           animate={inView ? "visible" : "enterRight"}
           variants={animationVariants}
